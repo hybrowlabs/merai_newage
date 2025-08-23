@@ -244,7 +244,8 @@ app_license = "mit"
 
 doctype_js = {
     "Batch":"public/js/batch_script.js",
-    "Job Card":"public/js/line_clearance.js"
+    "Job Card":"public/js/line_clearance.js",
+    "Job Card":"public/js/job_card.js",
 }
 
 # doc_events = {
@@ -263,5 +264,11 @@ doc_events = {
 
  
 fixtures = [
-    {"dt": "Batch Number Template"},
+    # {"dt": "Batch Number Template"},
+{"dt": "Property Setter",  "filters": [ ["name", "=", "Quality Inspection-sample_size-mandatory"]] }
 ]
+
+
+override_doctype_class = {
+    "Job Card": "merai_newage.overrides.job_card.CustomJobCard"
+}
