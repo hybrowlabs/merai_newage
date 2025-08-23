@@ -242,8 +242,10 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
-
-
+doctype_js = {
+    "Batch":"public/js/batch_script.js"
+}
+ 
 fixtures = [
     {"dt": "Batch Number Template"},
 ]
