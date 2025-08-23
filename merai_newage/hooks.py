@@ -243,8 +243,24 @@ app_license = "mit"
 # }
 
 doctype_js = {
-    "Batch":"public/js/batch_script.js"
+    "Batch":"public/js/batch_script.js",
+    "Job Card":"public/js/line_clearance.js"
 }
+
+# doc_events = {
+#     "Batch": {
+#         "before_insert": "merai_newage.merai_newage.doctype.custom_batch_number_template.custom_batch_number_template.generate_batch_number",
+#         "validate": "merai_newage.merai_newage.doctype.custom_batch_number_template.custom_batch_number_template.generate_batch_number"
+#     }
+# }
+
+doc_events = {
+    "Work Order": {
+        "before_insert": "merai_newage.merai_newage.doctype.custom_batch_number_template.custom_batch_number_template.generate_batch_number",
+        "validate": "merai_newage.merai_newage.doctype.custom_batch_number_template.custom_batch_number_template.generate_batch_number"
+    }
+}
+
  
 fixtures = [
     {"dt": "Batch Number Template"},

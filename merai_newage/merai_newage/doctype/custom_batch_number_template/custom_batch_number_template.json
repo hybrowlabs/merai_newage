@@ -1,0 +1,51 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-23 15:51:25.430212",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "batch_number_template_name",
+  "batch_number_logic"
+ ],
+ "fields": [
+  {
+   "fieldname": "batch_number_template_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Batch Number Template Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "batch_number_logic",
+   "fieldtype": "Code",
+   "label": "Batch Number Logic"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-08-23 15:52:14.640938",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Custom Batch Number Template",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
