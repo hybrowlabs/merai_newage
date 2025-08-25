@@ -1,7 +1,7 @@
 // Copyright (c) 2025, Siddhant Hybrowlabs and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Custom Batch Number Template", {
+// frappe.ui.form.on("Batch Number Template", {
 // 	refresh(frm) {
 
 // 	},

@@ -1,3 +1,14 @@
+# Copyright (c) 2025, Siddhant Hybrowlabs and contributors
+# For license information, please see license.txt
+
+# import frappe
+from frappe.model.document import Document
+
+
+class BatchNumberTemplate(Document):
+	pass
+
+
 
 import frappe
 from frappe.utils.jinja import render_template
@@ -12,7 +23,7 @@ def generate_batch_number(doc, method=None):
         return
 
     # Fetch the actual template string
-    template = frappe.get_value("Custom Batch Number Template", template_name, "batch_number_logic")
+    template = frappe.get_value("Batch Number Template", template_name, "batch_number_logic")
     if not template:
         return
 

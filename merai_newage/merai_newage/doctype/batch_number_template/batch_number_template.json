@@ -1,20 +1,25 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-08-23 15:51:25.430212",
+ "autoname": "field:batch_number_template_name",
+ "creation": "2025-08-25 11:12:46.082392",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "section_break_qwvu",
   "batch_number_template_name",
   "batch_number_logic"
  ],
  "fields": [
   {
+   "fieldname": "section_break_qwvu",
+   "fieldtype": "Section Break"
+  },
+  {
    "fieldname": "batch_number_template_name",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Batch Number Template Name",
-   "reqd": 1
+   "unique": 1
   },
   {
    "fieldname": "batch_number_logic",
@@ -25,10 +30,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-23 15:52:14.640938",
+ "modified": "2025-08-25 11:14:16.492123",
  "modified_by": "Administrator",
  "module": "Merai Newage",
- "name": "Custom Batch Number Template",
+ "name": "Batch Number Template",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {

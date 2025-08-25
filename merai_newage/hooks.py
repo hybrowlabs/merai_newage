@@ -257,8 +257,8 @@ doctype_js = {
 
 doc_events = {
     "Work Order": {
-        "before_insert": "merai_newage.merai_newage.doctype.custom_batch_number_template.custom_batch_number_template.generate_batch_number",
-        "validate": "merai_newage.merai_newage.doctype.custom_batch_number_template.custom_batch_number_template.generate_batch_number"
+        "before_insert": "merai_newage.merai_newage.doctype.batch_number_template.batch_number_template.generate_batch_number",
+        "validate": "merai_newage.merai_newage.doctype.batch_number_template.batch_number_template.generate_batch_number"
     }
 }
 
