@@ -1,10 +1,18 @@
 [
  {
-  "batch_number_logic": "doc = variables[\"doc\"]\n\n# Get production item from Work Order\nproduction_item = doc.production_item\nitem_doc = frappe.get_doc(\"Item\", production_item)\n\nmaterial_type = item_doc.custom_material_type\nitem_code_field = item_doc.custom_code\n\n# Date parts\nwo_date = frappe.utils.today()\nyear_code = wo_date[2:4]  # Last two digits of year\nmonth_letters = \"ABCDEFGHIJKL\"\nmonth_code = month_letters[int(wo_date[5:7]) - 1]\n\n# Prefix logic\nif material_type.upper() == \"FG\":\n    static_prefix = \"RT\"\nelif material_type.upper() == \"SFG\":\n    static_prefix = \"IRT\"\nelse:\n    frappe.throw(f\"Unsupported Material Type: {material_type}\")\n\nfinal_prefix = f\"{static_prefix}{year_code}{month_code}{item_code_field.upper()}\"\n\n# Find last document for incremental number\nlast_doc = frappe.get_all(\n    \"Batch\",\n    filters=[[\"Batch\", \"name\", \"like\", f\"{final_prefix}%\"]],\n    order_by=\"creation desc\",\n    limit=1\n)\n\nif last_doc:\n    last_name = last_doc[0].name\n    last_number = int(last_name.replace(final_prefix, \"\"))\nelse:\n    last_number = 0\n\nnew_number = last_number + 1\nreturn final_prefix + str(new_number).zfill(3)\n",
-  "batch_number_template_name": "MerAi Batch Number",
+  "batch_number_logic": "doc = variables[\"doc\"]\n\nproduction_item = doc.production_item\nitem_doc = frappe.get_doc(\"Item\", production_item)\n\nitem_code_field = item_doc.get(\"custom_code\")\nif not item_code_field:\n    frappe.throw(\"Item missing custom_code required for batch number\")\n\nwo_date = frappe.utils.today()\nyear_code = wo_date[2:4]\nmonth_letters = \"ABCDEFGHIJKL\"\nmonth_code = month_letters[int(wo_date[5:7]) - 1]\nstatic_prefix = \"RT\"\n\nfinal_prefix = f\"{static_prefix}{year_code}{month_code}{item_code_field.upper()}\"\n\nlast_doc = frappe.get_all(\n    \"Batch\",\n    filters=[[\"Batch\", \"name\", \"like\", f\"{final_prefix}%\"]],\n    order_by=\"creation desc\",\n    limit=1\n)\n\nif last_doc:\n    last_name = last_doc[0].name\n    try:\n        last_number = int(last_name.replace(final_prefix, \"\"))\n    except:\n        last_number = 0\nelse:\n    last_number = 0\n\nnew_number = last_number + 1\n\nreturn final_prefix + str(new_number).zfill(3)\n",
+  "batch_number_template_name": "MerAi Batch Number FG",
   "docstatus": 0,
   "doctype": "Batch Number Template",
-  "modified": "2025-08-06 23:22:33.609003",
-  "name": "MerAi Batch Number"
+  "modified": "2025-08-25 13:31:47.742540",
+  "name": "MerAi Batch Number FG"
+ },
+ {
+  "batch_number_logic": "doc = variables[\"doc\"]\n\n# Get production item from Work Order\nproduction_item = doc.production_item\nitem_doc = frappe.get_doc(\"Item\", production_item)\n\nmaterial_type = item_doc.custom_material_type\nitem_code_field = item_doc.custom_code\n\n# Date parts\nwo_date = frappe.utils.today()\nyear_code = wo_date[2:4]  # Last two digits of year\nmonth_letters = \"ABCDEFGHIJKL\"\nmonth_code = month_letters[int(wo_date[5:7]) - 1]\n\nstatic_prefix = \"IRT\"\n\nfinal_prefix = f\"{static_prefix}{year_code}{month_code}{item_code_field.upper()}\"\n\n# Find last document for incremental number\nlast_doc = frappe.get_all(\n    \"Batch\",\n    filters=[[\"Batch\", \"name\", \"like\", f\"{final_prefix}%\"]],\n    order_by=\"creation desc\",\n    limit=1\n)\n\nif last_doc:\n    last_name = last_doc[0].name\n    last_number = int(last_name.replace(final_prefix, \"\"))\nelse:\n    last_number = 0\n\nnew_number = last_number + 1\nreturn final_prefix + str(new_number).zfill(3)\n",
+  "batch_number_template_name": "MerAi Batch Number SFG",
+  "docstatus": 0,
+  "doctype": "Batch Number Template",
+  "modified": "2025-08-25 11:59:08.076314",
+  "name": "MerAi Batch Number SFG"
  }
 ]
