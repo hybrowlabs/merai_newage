@@ -25,6 +25,7 @@ def before_insert(doc, _method):
             batch.batch_qty = doc.qty
 
             doc.custom_batch = batch.batch_id
+            doc.custom_batch_number = batch_number.replace(item+"-", "")
             
         except Exception as e:
             frappe.log_error(
