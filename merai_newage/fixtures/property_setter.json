@@ -1,1 +1,18 @@
-[]
+[
+ {
+  "default_value": null,
+  "doc_type": "Work Order",
+  "docstatus": 0,
+  "doctype": "Property Setter",
+  "doctype_or_field": "DocField",
+  "field_name": "use_multi_level_bom",
+  "is_system_generated": 0,
+  "modified": "2025-08-26 19:59:05.798508",
+  "module": "Merai Newage",
+  "name": "Work Order-use_multi_level_bom-Check",
+  "property": "reqd",
+  "property_type": "Check",
+  "row_name": null,
+  "value": "0"
+ }
+]
