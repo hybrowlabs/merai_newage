@@ -1,0 +1,39 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-08-26 11:19:09.227444",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_u0tg",
+  "feasibility_testing"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_u0tg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "feasibility_testing",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Feasibility Testing",
+   "options": "Feasibility Test"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-08-26 11:33:31.452870",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Feasibility Testing Template Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

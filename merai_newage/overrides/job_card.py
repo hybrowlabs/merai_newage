@@ -3,7 +3,6 @@ from erpnext.manufacturing.doctype.job_card.job_card import JobCard
 
 class CustomJobCard(JobCard):
     def before_submit(self):
-        # print("======self==6=",self)
         if not self.quality_inspection:
             frappe.throw("Please create and submit a Quality Inspection before submitting the Job Card.")
 
