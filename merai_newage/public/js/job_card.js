@@ -69,5 +69,27 @@ frappe.ui.form.on("Job Card", {
                 }
             });
         }
+
+
+
+if (frm.doc.production_item) {
+    frappe.db.get_doc("Item", frm.doc.production_item).then(item => {
+        if (item.custom_feasibility_testing_template) {
+            let template_name = item.custom_feasibility_testing_template;
+            // console.log("template=====79",template_name)
+            frappe.db.get_doc("Feasibility Testing Template", template_name).then(template => {
+                frm.clear_table("custom_feasibility_testing");
+
+                (template.feasibility_testing_template_details || []).forEach(row => {
+                    let child = frm.add_child("custom_feasibility_testing");
+                    child.feasibility_testing = row.feasibility_testing;   
+                });
+
+                frm.refresh_field("custom_feasibility_testing");
+            });
+        }
+    });
+}
+
     }
 });

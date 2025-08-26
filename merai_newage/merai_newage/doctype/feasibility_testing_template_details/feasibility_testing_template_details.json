@@ -1,39 +1,35 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-08-21 12:27:46.666746",
+ "creation": "2025-08-26 11:19:09.227444",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "line_clearance_criteria",
-  "yesno"
+  "section_break_u0tg",
+  "feasibility_testing"
  ],
  "fields": [
   {
-   "fieldname": "line_clearance_criteria",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Line Clearance Criteria",
-   "reqd": 1
+   "fieldname": "section_break_u0tg",
+   "fieldtype": "Section Break"
   },
   {
-   "fieldname": "yesno",
-   "fieldtype": "Select",
+   "fieldname": "feasibility_testing",
+   "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Yes/No",
-   "options": "\nYes\nNo",
-   "reqd": 1
+   "label": "Feasibility Testing",
+   "options": "Feasibility Test"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-26 09:50:53.089825",
+ "modified": "2025-08-26 11:33:31.452870",
  "modified_by": "Administrator",
  "module": "Merai Newage",
- "name": "Line Clearance Checklist",
+ "name": "Feasibility Testing Template Details",
  "owner": "Administrator",
  "permissions": [],
  "row_format": "Dynamic",
