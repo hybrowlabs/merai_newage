@@ -71,13 +71,14 @@ frappe.ui.form.on("Job Card", {
         }
 
 
+if (frm.doc.operation) {
+    frappe.db.get_doc("Operation", frm.doc.operation).then(op => {
+        if (op.custom_feasibility_testing_template) {
+            let template_name = op.custom_feasibility_testing_template;
 
-if (frm.doc.production_item) {
-    frappe.db.get_doc("Item", frm.doc.production_item).then(item => {
-        if (item.custom_feasibility_testing_template) {
-            let template_name = item.custom_feasibility_testing_template;
             frappe.db.get_doc("Feasibility Testing Template", template_name).then(template => {
                 frm.clear_table("custom_feasibility_testing");
+
                 (template.feasibility_testing_template_details || []).forEach(row => {
                     let child = frm.add_child("custom_feasibility_testing");
                     child.feasibility_testing = row.feasibility_testing;   
@@ -88,6 +89,23 @@ if (frm.doc.production_item) {
         }
     });
 }
+if (frm.doc.bom_no && frm.doc.operation) {
+    frappe.db.get_doc("BOM", frm.doc.bom_no).then(bom_doc => {
+        frm.clear_table("custom_jobcard_opeartion_deatils");  
+
+        (bom_doc.items || []).forEach(row => {
+            if (row.operation === frm.doc.operation) {
+                let child = frm.add_child("custom_jobcard_opeartion_deatils");
+                child.item_code = row.item_code;
+                child.item_name = row.item_name;
+                child.item_description = row.description;
+            }
+        });
+
+        frm.refresh_field("custom_jobcard_opeartion_deatils");
+    });
+}
+
 
     }
 });
