@@ -17,14 +17,13 @@
   {
    "fieldname": "line_clearance_criteria",
    "fieldtype": "Data",
-   "label": "Line Clearance Criteria",
-   "unique": 1
+   "label": "Line Clearance Criteria"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-27 22:29:04.280610",
+ "modified": "2025-08-27 22:42:37.313862",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Line Clearance Checklist",
