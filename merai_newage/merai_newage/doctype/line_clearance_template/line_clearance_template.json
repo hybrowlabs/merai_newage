@@ -7,7 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "line_clearance_template_name",
-  "line_clearence_checkpoints"
+  "line_clearance_template_details"
  ],
  "fields": [
   {
@@ -19,16 +19,16 @@
    "unique": 1
   },
   {
-   "fieldname": "line_clearence_checkpoints",
+   "fieldname": "line_clearance_template_details",
    "fieldtype": "Table",
-   "label": "Line Clearence Checkpoints",
-   "options": "Line Clearance Checklist"
+   "label": "Line Clearance Template Details",
+   "options": "Line Clearance Template Details"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-21 12:37:25.948450",
+ "modified": "2025-08-27 16:46:58.551971",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Line Clearance Template",

@@ -3,7 +3,7 @@ frappe.ui.form.on("Job Card", {
         // console.log("operation =", frm.doc.operation);
 
         if (!frm.doc.operation || !frm.doc.work_order) return;
-        if(frm.doc.docstatus!=1){
+        if(frm.doc.docstatus!=1 && !frm.doc.quality_inspection){
         frappe.db.get_value("Operation", frm.doc.operation, "custom_quality_inspection_required")
             .then(r => {
                 if (r.message && r.message.custom_quality_inspection_required) {
@@ -17,14 +17,26 @@ frappe.ui.form.on("Job Card", {
         if(!frm.doc.custom_feasibility_testing_template && frm.doc.docstatus!=1){
             load_feasibility_testing_template(frm)
         }
-
+        if(!frm.doc.custom_line_clearance_template && frm.doc.docstatus!=1){
+        if (frm.doc.custom_line_clearance_template) {
+           load_line_clearnce_from_template(frm, frm.doc.custom_line_clearance_template);
+        } else {
+            frm.clear_table("custom_line_clearance_checklist_details");
+            frm.refresh_field("custom_line_clearance_checklist_details");
+            frm.set_df_property("custom_line_clearance_checklist_details", "hidden", 1);
+        }
+    }
         if (frm.is_new() || frm.doc.__islocal || !frm._software_fields_initialized) {
             setTimeout(() => {
                 handle_software_fields(frm);
                 // frm._software_fields_initialized = true;
             }, 500);
         }
-
+ if (frm.is_new() || frm.doc.__islocal) {
+         setTimeout(() => {
+        hide_tabs_and_tables_if_templates_empty(frm);
+    }, 2500);
+ }
         load_form_data(frm);
     },
 
@@ -84,6 +96,15 @@ frappe.ui.form.on("Job Card", {
             frm.refresh_field("custom_feasibility_testing");
             frm.set_df_property("custom_feasibility_testing", "hidden", 1);
         }
+    },
+     custom_line_clearance_template: function(frm) {
+        if (frm.doc.custom_feasibility_testing_template) {
+           load_line_clearnce_from_template(frm, frm.doc.custom_line_clearance_template);
+        } else {
+            frm.clear_table("custom_feasibility_testing");
+            frm.refresh_field("custom_feasibility_testing");
+            frm.set_df_property("custom_feasibility_testing", "hidden", 1);
+        }
     }
 });
 
@@ -102,7 +123,7 @@ function create_quality_inspection(frm) {
         let qi = frappe.model.get_new_doc("Quality Inspection");
         qi.reference_type = "Job Card";
         qi.reference_name = frm.doc.name;
-        qi.inspection_type = "Incoming";
+        qi.inspection_type = "In Process";
         qi.item_code = work_order_doc.production_item;
         qi.sample_size = frm.doc.for_quantity;
         qi.inspected_by = frappe.session.user;
@@ -155,7 +176,7 @@ function load_form_data(frm) {
         setTimeout(() => {
             toggle_custom_tab(frm);
             toggle_lineclearance_tab(frm);
-        }, 100);
+        }, 1000);
     });
 }}
 
@@ -263,6 +284,27 @@ function load_feasibility_testing_from_template(frm, template_name, item_doc = n
         }
     });
 }
+
+function load_line_clearnce_from_template(frm, template_name, item_doc = null) {
+    return frappe.db.get_doc("Line Clearance Template", template_name).then(template => {
+        frm.clear_table("custom_line_clearance_checklist_details");
+
+        (template.line_clearance_template_details || []).forEach(template_row => {
+            let child = frm.add_child("custom_line_clearance_checklist_details");
+            child.line_clearance_checklist = template_row.line_clearance_checklist;
+            
+        });
+
+        frm.refresh_field("custom_line_clearance_checklist_details");
+        frm._last_feasibility_operation = frm.doc.operation;
+
+        // Show table only if rows exist
+        if ((frm.doc.custom_line_clearance_checklist_details || []).length > 0) {
+            frm.set_df_property("custom_line_clearance_checklist_details", "hidden", 0);
+        }
+    });
+}
+
 function load_bom_operation_details(frm) {
     const software_operations = [
         "MISSO Robotic Execution Software-Arm Cart",
@@ -320,11 +362,11 @@ function toggle_custom_tab(frm) {
 
 
 function toggle_lineclearance_tab(frm) {
-    let has_rows = (frm.doc.custom_line_clearance_checklist || []).length > 0;
+    let has_rows = (frm.doc.custom_line_clearance_checklist_details || []).length > 0;
     console.log("Line clearance has rows:", has_rows);
     
+    frm.set_df_property("custom_line_clearance_checklist_details", "hidden", !has_rows);
     frm.set_df_property("custom_line_clearance", "hidden", !has_rows);
-    frm.set_df_property("custom_line_clearance_checklist", "hidden", !has_rows);
 
     frm.refresh_fields();
 }
@@ -367,5 +409,22 @@ function handle_software_fields(frm) {
         // toggle_custom_tab(frm);
     }
 
+    frm.refresh_fields();
+}
+
+
+
+
+function hide_tabs_and_tables_if_templates_empty(frm) {
+    // Check feasibility testing template
+    if (!frm.doc.custom_feasibility_testing_template) {
+        frm.set_df_property("custom_feasibility_test", "hidden", 1);
+        frm.set_df_property("custom_feasibility_testing", "hidden", 1);
+    }
+    // Check line clearance template
+    if (!frm.doc.custom_line_clearance_template) {
+        frm.set_df_property("custom_line_clearance", "hidden", 1);
+        frm.set_df_property("custom_line_clearance_checklist_details", "hidden", 1);
+    }
     frm.refresh_fields();
 }

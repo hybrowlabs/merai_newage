@@ -34,7 +34,6 @@
   {
    "fieldname": "item_description",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Item description"
   },
   {
@@ -42,7 +41,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Verified",
-   "options": "Yes\nNo"
+   "options": "\nYes\nNo"
   },
   {
    "fieldname": "remarks",
@@ -55,7 +54,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-23 18:04:43.829648",
+ "modified": "2025-08-27 17:37:29.502669",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "QC Items",
