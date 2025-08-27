@@ -11,4 +11,4 @@ class CustomJobCard(JobCard):
         if qi_doc.docstatus != 1:
             frappe.throw(f"Quality Inspection {qi_doc.name} must be submitted before submitting the Job Card.")
 
-        super().before_submit()
+        # super().before_submit()

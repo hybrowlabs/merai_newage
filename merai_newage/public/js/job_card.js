@@ -3,7 +3,7 @@ frappe.ui.form.on("Job Card", {
         // console.log("operation =", frm.doc.operation);
 
         if (!frm.doc.operation || !frm.doc.work_order) return;
-
+        if(frm.doc.docstatus!=1){
         frappe.db.get_value("Operation", frm.doc.operation, "custom_quality_inspection_required")
             .then(r => {
                 if (r.message && r.message.custom_quality_inspection_required) {
@@ -13,7 +13,8 @@ frappe.ui.form.on("Job Card", {
                 }
             });
             
-        if(!frm.doc.custom_feasibility_testing_template){
+        }
+        if(!frm.doc.custom_feasibility_testing_template && frm.doc.docstatus!=1){
             load_feasibility_testing_template(frm)
         }
 
@@ -32,7 +33,7 @@ frappe.ui.form.on("Job Card", {
             frm._last_line_clearance_operation = null;
             frm._last_feasibility_operation = null;
             frm._last_bom_operation = null;
-            frm._software_fields_initialized = null; // Reset to trigger re-initialization
+            frm._software_fields_initialized = null; 
             
             load_form_data(frm);
             handle_software_fields(frm);
@@ -137,7 +138,7 @@ function create_quality_inspection(frm) {
 
 function load_form_data(frm) {
     let promises = [];
-
+     if(frm.doc.docstatus!=1){
     if (should_load_line_clearance(frm)) {
         promises.push(load_line_clearance_template(frm));
     }
@@ -156,7 +157,7 @@ function load_form_data(frm) {
             toggle_lineclearance_tab(frm);
         }, 100);
     });
-}
+}}
 
 function should_load_line_clearance(frm) {
     return frm.doc.operation && 

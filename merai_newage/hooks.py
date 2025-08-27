@@ -246,7 +246,8 @@ doctype_js = {
     "Batch":"public/js/batch_script.js",
     "Job Card":"public/js/line_clearance.js",
     "Job Card":"public/js/job_card.js",
-    "Quality Inspection":"public/js/quality_inspection.js"
+    "Quality Inspection":"public/js/quality_inspection.js",
+    "Work Order":"public/js/work_order.js"
 }
 
 # doc_events = {
