@@ -507,7 +507,7 @@ def print_job_cards(name, pdf_writer, task_id=None, default_letter_head=None):
 
             # Print Job Card - use custom print format if available, otherwise use default
             print_format = job_card_doc.custom_print_format if job_card_doc.custom_print_format else None
-            
+            print("print format========510====",print_format)
             pdf_writer = frappe.get_print(
                 "Job Card",
                 job_card_doc.name,
@@ -687,7 +687,6 @@ def print_stock_entries_for_job_card(job_card_doc, pdf_writer, default_letter_he
         )
 
 
-
 def print_single_stock_entry(stock_entry_name, pdf_writer, default_letter_head, job_card_doc=None):
     """Print a single Stock Entry document"""
     try:
@@ -698,7 +697,7 @@ def print_single_stock_entry(stock_entry_name, pdf_writer, default_letter_head, 
         
         # Determine print format priority:
         # 1. From Stock Entry document's custom_print_format (if exists)
-        # 2. From Job Card's operation's custom_stock_entry_print_format (if you add this field)
+        # 2. From Work Order's custom_stock_entry_print_format field
         # 3. Use default Stock Entry print format if none specified
         
         print_format = None
@@ -706,13 +705,15 @@ def print_single_stock_entry(stock_entry_name, pdf_writer, default_letter_head, 
         if hasattr(stock_entry_doc, 'custom_print_format') and stock_entry_doc.custom_print_format:
             print_format = stock_entry_doc.custom_print_format
             frappe.logger("print").info(f"Using Stock Entry custom print format: {print_format}")
-        elif job_card_doc and job_card_doc.operation:
-            # Try to get print format from operation
+        elif stock_entry_doc.work_order:
+            # Get print format from Work Order's custom_stock_entry_print_format field
             try:
-                operation_doc = frappe.get_doc("Operation", job_card_doc.operation)
-                if hasattr(operation_doc, 'custom_stock_entry_print_format') and operation_doc.custom_stock_entry_print_format:
-                    print_format = operation_doc.custom_stock_entry_print_format
-                    frappe.logger("print").info(f"Using Operation Stock Entry print format: {print_format}")
+                work_order_doc = frappe.get_doc("Work Order", stock_entry_doc.work_order)
+                if hasattr(work_order_doc, 'custom_stock_entry_print_format') and work_order_doc.custom_stock_entry_print_format:
+                    print_format = work_order_doc.custom_stock_entry_print_format
+                    print("===========714",print_format)
+                    frappe.logger("print").info(f"Using Work Order Stock Entry print format: {print_format}")
+
             except:
                 pass
         
