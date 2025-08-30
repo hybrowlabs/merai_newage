@@ -723,10 +723,10 @@ function load_feasibility_testing_template(frm) {
 
     frm._loading_feasibility_template = true;
     
-    return frappe.db.get_doc("Item", frm.doc.production_item).then(item => {
-        let template_name = item.custom_feasibility_testing_template || "";
-    
-        // Only update if different to avoid triggering events
+    return frappe.db.get_doc("Operation", frm.doc.operation).then(operation_doc => {
+        let template_name = operation_doc.custom_feasibility_testing_template || "";
+        console.log("=====728====feasibility================", template_name);
+        
         if (frm.doc.custom_feasibility_testing_template !== template_name) {
             frm.doc.custom_feasibility_testing_template = template_name;
             frm.refresh_field("custom_feasibility_testing_template");
@@ -739,7 +739,7 @@ function load_feasibility_testing_template(frm) {
             return Promise.resolve();
         }
 
-        return load_feasibility_testing_from_template(frm, template_name, item).then(() => {
+        return load_feasibility_testing_from_template(frm, template_name, operation_doc).then(() => {
             frm._loading_feasibility_template = false;
         });
     }).catch(err => {
@@ -749,7 +749,8 @@ function load_feasibility_testing_template(frm) {
     });
 }
 
-function load_feasibility_testing_from_template(frm, template_name, item_doc = null) {
+
+function load_feasibility_testing_from_template(frm, template_name, operation_doc = null) {
     return frappe.db.get_doc("Feasibility Testing Template", template_name).then(template => {
         frm.clear_table("custom_feasibility_testing");
 
@@ -757,14 +758,15 @@ function load_feasibility_testing_from_template(frm, template_name, item_doc = n
             let child = frm.add_child("custom_feasibility_testing");
             child.feasibility_testing = template_row.feasibility_testing;
             
-            if (item_doc && item_doc.custom_feasibility_testing_details) {
-                let existing_row = item_doc.custom_feasibility_testing_details.find(
-                    item_row => item_row.feasibility_testing === template_row.feasibility_testing
+            // ✅ fetch from Operation instead of Item
+            if (operation_doc && operation_doc.custom_feasibility_testing_details) {
+                let existing_row = operation_doc.custom_feasibility_testing_details.find(
+                    op_row => op_row.feasibility_testing === template_row.feasibility_testing
                 );
                 
                 if (existing_row) {
                     Object.keys(existing_row).forEach(key => {
-                        if (key !== 'name' && key !== 'parent' && key !== 'parentfield' && key !== 'parenttype' && key !== 'idx') {
+                        if (!['name','parent','parentfield','parenttype','idx'].includes(key)) {
                             child[key] = existing_row[key];
                         }
                     });
@@ -782,7 +784,6 @@ function load_feasibility_testing_from_template(frm, template_name, item_doc = n
         console.error("Error loading feasibility testing template:", err);
     });
 }
-
 function load_line_clearance_template(frm) {
     if (frm._loading_line_clearance_template) {
         return Promise.resolve();

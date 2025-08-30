@@ -1,11 +1,14 @@
 
 
+
 # from merai_newage.merai_newage.doctype.batch_number_template.batch_number_template import create_batch_number
+
 
 # import frappe, json, uuid
 # import http
 # import math
 # from io import BytesIO
+
 
 # import frappe
 # from dateutil.relativedelta import relativedelta
@@ -49,6 +52,7 @@
 # from pypika import functions as fn
 
 
+
 # def before_insert(doc, _method):
 #     item = doc.production_item
 #     batch_number = create_batch_number(doc)
@@ -69,6 +73,7 @@
 #         batch.save(ignore_permissions=True)
 #         batch.batch_qty = doc.qty
 
+
 #         doc.custom_batch = batch.batch_id
 #         doc.custom_batch_number = batch_number.replace(item+"-", "")
         
@@ -80,10 +85,12 @@
 #         pass
 
 
+
 # @frappe.whitelist()
 # def print_work_order_async(name):
 #     task_id = str(uuid.uuid4())
 #     return _print_work_order(name, task_id)
+
 
 
 # def _print_work_order(name, task_id=None):
@@ -97,6 +104,7 @@
 #         limit=1
 #     )
 
+
 #     frappe.publish_progress(
 #         percent=1,
 #         title="Generating PDF",
@@ -104,10 +112,12 @@
 #         task_id=task_id,
 #     )
 
-#     # Print job cards with quality inspections
+
+#     # Print job cards with quality inspections and stock entries
 #     print_job_cards(
 #         name, pdf_writer, task_id=task_id, default_letter_head=default_letter_head
 #     )
+
 
 #     with BytesIO() as merged_pdf:
 #         pdf_writer.write(merged_pdf)
@@ -131,6 +141,7 @@
 #             frappe.local.response.filetype = "PDF"
 
 
+
 # def print_job_cards(name, pdf_writer, task_id=None, default_letter_head=None):
 #     job_cards = frappe.get_list(
 #         "Job Card",
@@ -150,9 +161,10 @@
 #             frappe.logger("print").info(f"Generating PDF for Job Card {job_card}")
 #             job_card_doc = frappe.get_doc("Job Card", job_card)
 
+
 #             # Print Job Card - use custom print format if available, otherwise use default
 #             print_format = job_card_doc.custom_print_format if job_card_doc.custom_print_format else None
-            
+#             print("print format========510====",print_format)
 #             pdf_writer = frappe.get_print(
 #                 "Job Card",
 #                 job_card_doc.name,
@@ -164,8 +176,13 @@
 #                 pdf_options={"page-size": "A4", "encoding": "UTF-8"},
 #             )
 
+
 #             # Print Quality Inspections for this Job Card
 #             print_quality_inspections_for_job_card(job_card_doc, pdf_writer, default_letter_head)
+
+#             # Print Stock Entries for this Job Card
+#             print_stock_entries_for_job_card(job_card_doc, pdf_writer, default_letter_head)
+
 
 #         except Exception as e:
 #             if task_id:
@@ -187,6 +204,7 @@
 #         frappe.publish_realtime(task_id=task_id, message={"message": "Success"})
 
 
+
 # def print_quality_inspections_for_job_card(job_card_doc, pdf_writer, default_letter_head):
 #     """Print all Quality Inspection documents linked to this Job Card"""
     
@@ -198,6 +216,7 @@
 #         except:
 #             pass
 
+
 #     # Main Quality Inspection
 #     if job_card_doc.quality_inspection:
 #         print_single_quality_inspection(
@@ -206,6 +225,7 @@
 #             default_letter_head, 
 #             operation_doc
 #         )
+
 
 #     # Additional Quality Inspections - removing company specific check
 #     additional_qis = [
@@ -224,6 +244,7 @@
 #                 operation_doc
 #             )
 
+
 #     # Bio Burden QC
 #     if hasattr(job_card_doc, 'custom_bio_burden_qc') and job_card_doc.custom_bio_burden_qc:
 #         print_single_quality_inspection(
@@ -232,6 +253,7 @@
 #             default_letter_head, 
 #             operation_doc
 #         )
+
 
 
 # def print_single_quality_inspection(qi_name, pdf_writer, default_letter_head, operation_doc=None):
@@ -287,6 +309,105 @@
 #         )
 
 
+
+# def print_stock_entries_for_job_card(job_card_doc, pdf_writer, default_letter_head):
+#     """Print all Stock Entry documents of type 'Material Transfer for Manufacture' linked to this Job Card"""
+    
+#     try:
+#         # Get Stock Entries of type 'Material Transfer for Manufacture' linked to this Job Card
+#         # print("")
+#         stock_entries = frappe.get_all(
+#             "Stock Entry",
+#             filters={
+#                 "stock_entry_type": "Material Transfer for Manufacture",
+#                 "work_order": job_card_doc.work_order,
+#                 "docstatus": 1  # Only submitted stock entries
+#             },
+#             fields=["name"],
+#             order_by="posting_date, posting_time"
+#         )
+#         print("stockentries===============",stock_entries)
+#         frappe.logger("print").info(f"Found {len(stock_entries)} Material Transfer for Manufacture Stock Entries for Job Card {job_card_doc.name}")
+        
+#         for stock_entry in stock_entries:
+#             print_single_stock_entry(
+#                 stock_entry.name,
+#                 pdf_writer,
+#                 default_letter_head,
+#                 job_card_doc
+#             )
+            
+#     except Exception as e:
+#         frappe.log_error(
+#             f"Error getting Stock Entries for Job Card {job_card_doc.name}: {str(e)}",
+#             "Work Order Print Stock Entry Error"
+#         )
+
+
+# def print_single_stock_entry(stock_entry_name, pdf_writer, default_letter_head, job_card_doc=None):
+#     """Print a single Stock Entry document"""
+#     try:
+#         stock_entry_doc = frappe.get_doc("Stock Entry", stock_entry_name)
+        
+#         # Log for debugging
+#         frappe.logger("print").info(f"Attempting to print Stock Entry: {stock_entry_name}")
+        
+#         # Determine print format priority:
+#         # 1. From Stock Entry document's custom_print_format (if exists)
+#         # 2. From Work Order's custom_stock_entry_print_format field
+#         # 3. Use default Stock Entry print format if none specified
+        
+#         print_format = None
+        
+#         if hasattr(stock_entry_doc, 'custom_print_format') and stock_entry_doc.custom_print_format:
+#             print_format = stock_entry_doc.custom_print_format
+#             frappe.logger("print").info(f"Using Stock Entry custom print format: {print_format}")
+#         elif stock_entry_doc.work_order:
+#             # Get print format from Work Order's custom_stock_entry_print_format field
+#             try:
+#                 work_order_doc = frappe.get_doc("Work Order", stock_entry_doc.work_order)
+#                 if hasattr(work_order_doc, 'custom_stock_entry_print_format') and work_order_doc.custom_stock_entry_print_format:
+#                     print_format = work_order_doc.custom_stock_entry_print_format
+#                     print("===========714",print_format)
+#                     frappe.logger("print").info(f"Using Work Order Stock Entry print format: {print_format}")
+
+#             except:
+#                 pass
+        
+#         if not print_format:
+#             # Try to find a default Stock Entry print format
+#             default_formats = frappe.get_list(
+#                 "Print Format",
+#                 filters={"doc_type": "Stock Entry", "disabled": 0},
+#                 pluck="name",
+#                 limit=1
+#             )
+#             if default_formats:
+#                 print_format = default_formats[0]
+#                 frappe.logger("print").info(f"Using default Stock Entry print format: {print_format}")
+        
+#         # Print the Stock Entry
+#         pdf_writer = frappe.get_print(
+#             "Stock Entry",
+#             stock_entry_doc.name,
+#             print_format=print_format,
+#             as_pdf=True,
+#             no_letterhead=0,
+#             letterhead=default_letter_head[0].name if default_letter_head else None,
+#             output=pdf_writer,
+#             pdf_options={"page-size": "A4", "encoding": "UTF-8"},
+#         )
+        
+#         frappe.logger("print").info(f"Successfully printed Stock Entry: {stock_entry_name}")
+            
+#     except Exception as e:
+#         frappe.log_error(
+#             f"Error printing Stock Entry {stock_entry_name}: {str(e)}",
+#             "Work Order Print Stock Entry Error"
+#         )
+
+
+
 # def print_meril_specific_documents(job_card_doc, pdf_writer):
 #     """Print Meril Life Sciences specific documents"""
     
@@ -307,6 +428,7 @@
 #             pdf_options={"page-size": "A4", "encoding": "UTF-8"},
 #         )
 
+
 #     # Label Printing
 #     label_printing_list = frappe.get_all(
 #         "Label Printing", 
@@ -323,6 +445,7 @@
 #             output=pdf_writer,
 #             pdf_options={"page-size": "A4", "encoding": "UTF-8"},
 #         )
+
 
 #     # BMR For Packing Material
 #     bmr_for_packing_material = frappe.get_all(
@@ -346,12 +469,10 @@
 
 from merai_newage.merai_newage.doctype.batch_number_template.batch_number_template import create_batch_number
 
-
 import frappe, json, uuid
 import http
 import math
 from io import BytesIO
-
 
 import frappe
 from dateutil.relativedelta import relativedelta
@@ -394,8 +515,6 @@ from frappe.utils import (
 from pypdf import PdfWriter
 from pypika import functions as fn
 
-
-
 def before_insert(doc, _method):
     item = doc.production_item
     batch_number = create_batch_number(doc)
@@ -416,7 +535,6 @@ def before_insert(doc, _method):
         batch.save(ignore_permissions=True)
         batch.batch_qty = doc.qty
 
-
         doc.custom_batch = batch.batch_id
         doc.custom_batch_number = batch_number.replace(item+"-", "")
         
@@ -427,14 +545,10 @@ def before_insert(doc, _method):
         )
         pass
 
-
-
 @frappe.whitelist()
 def print_work_order_async(name):
     task_id = str(uuid.uuid4())
     return _print_work_order(name, task_id)
-
-
 
 def _print_work_order(name, task_id=None):
     work_order_doc = frappe.get_doc("Work Order", name)
@@ -447,7 +561,6 @@ def _print_work_order(name, task_id=None):
         limit=1
     )
 
-
     frappe.publish_progress(
         percent=1,
         title="Generating PDF",
@@ -455,12 +568,10 @@ def _print_work_order(name, task_id=None):
         task_id=task_id,
     )
 
-
-    # Print job cards with quality inspections and stock entries
-    print_job_cards(
-        name, pdf_writer, task_id=task_id, default_letter_head=default_letter_head
+    # Print documents in sequence
+    print_documents_in_sequence(
+        work_order_doc, pdf_writer, task_id=task_id, default_letter_head=default_letter_head
     )
-
 
     with BytesIO() as merged_pdf:
         pdf_writer.write(merged_pdf)
@@ -483,62 +594,73 @@ def _print_work_order(name, task_id=None):
             frappe.local.response.filecontent = merged_pdf.getvalue()
             frappe.local.response.filetype = "PDF"
 
-
-
-def print_job_cards(name, pdf_writer, task_id=None, default_letter_head=None):
-    job_cards = frappe.get_list(
-        "Job Card",
-        filters=[
-            ["Job Card", "docstatus", "=", 1],
-            ["Job Card", "work_order", "=", name],
-        ],
-        pluck="name",
-        order_by="sequence_id asc",
-    )
+def print_documents_in_sequence(work_order_doc, pdf_writer, task_id=None, default_letter_head=None):
+    """Print all documents in the correct sequence"""
     
-    total_docs = len(job_cards)
-    count = 1
-    
-    for job_card in job_cards:
+    # Step 1: Print Work Order first (if custom_work_order_print_format is specified)
+    if hasattr(work_order_doc, 'custom_work_order_print_format') and work_order_doc.custom_work_order_print_format:
         try:
-            frappe.logger("print").info(f"Generating PDF for Job Card {job_card}")
-            job_card_doc = frappe.get_doc("Job Card", job_card)
-
-
-            # Print Job Card - use custom print format if available, otherwise use default
-            print_format = job_card_doc.custom_print_format if job_card_doc.custom_print_format else None
-            print("print format========510====",print_format)
+            frappe.logger("print").info(f"Printing Work Order {work_order_doc.name} with custom format")
             pdf_writer = frappe.get_print(
-                "Job Card",
-                job_card_doc.name,
-                print_format=print_format,
+                "Work Order",
+                work_order_doc.name,
+                print_format=work_order_doc.custom_work_order_print_format,
                 as_pdf=True,
                 no_letterhead=0,
                 letterhead=default_letter_head[0].name if default_letter_head else None,
                 output=pdf_writer,
                 pdf_options={"page-size": "A4", "encoding": "UTF-8"},
             )
+            frappe.logger("print").info(f"Successfully printed Work Order: {work_order_doc.name}")
+        except Exception as e:
+            frappe.log_error(
+                f"Error printing Work Order {work_order_doc.name}: {str(e)}",
+                "Work Order Print Error"
+            )
 
+    # Step 2: Print Stock Entries for the Work Order
+    print_stock_entries_for_work_order(work_order_doc, pdf_writer, default_letter_head)
 
-            # Print Quality Inspections for this Job Card
+    # Step 3: Print Job Cards and their respective QI documents in sequence
+    job_cards = frappe.get_list(
+        "Job Card",
+        filters=[
+            ["Job Card", "docstatus", "=", 1],
+            ["Job Card", "work_order", "=", work_order_doc.name],
+        ],
+        fields=["name", "sequence_id"],
+        order_by="sequence_id asc",
+    )
+    
+    total_docs = len(job_cards) + 2  # +2 for Work Order and Stock Entries
+    current_step = 3  # We've already done WO and Stock Entries
+    
+    for job_card_data in job_cards:
+        try:
+            job_card_doc = frappe.get_doc("Job Card", job_card_data.name)
+            frappe.logger("print").info(f"Processing Job Card {job_card_doc.name} (Sequence: {job_card_data.sequence_id})")
+
+            # Print Job Card
+            print_single_job_card(job_card_doc, pdf_writer, default_letter_head)
+            
+            # Print Quality Inspections for this specific Job Card
             print_quality_inspections_for_job_card(job_card_doc, pdf_writer, default_letter_head)
-
-            # Print Stock Entries for this Job Card
-            print_stock_entries_for_job_card(job_card_doc, pdf_writer, default_letter_head)
-
 
         except Exception as e:
             if task_id:
                 frappe.publish_realtime(task_id=task_id, message={"message": "Failed"})
-            frappe.throw(e.__str__(), exc=frappe.PrintFormatError)
+            frappe.log_error(
+                f"Error processing Job Card {job_card_data.name}: {str(e)}",
+                "Work Order Print Job Card Error"
+            )
         
-        count += 1
+        current_step += 1
         if task_id:
             frappe.publish_progress(
-                percent=(count / total_docs) * 100,
+                percent=(current_step / total_docs) * 100,
                 title="Generating PDF",
                 description=_(
-                    "Generating PDF for Job Card {0} of {1}".format(count, total_docs)
+                    "Processing Job Card {0} of {1}".format(current_step - 2, len(job_cards))
                 ),
                 task_id=task_id,
             )
@@ -546,10 +668,67 @@ def print_job_cards(name, pdf_writer, task_id=None, default_letter_head=None):
     if task_id:
         frappe.publish_realtime(task_id=task_id, message={"message": "Success"})
 
+def print_single_job_card(job_card_doc, pdf_writer, default_letter_head):
+    """Print a single Job Card"""
+    try:
+        # Use custom print format if available, otherwise use default
+        print_format = job_card_doc.custom_print_format if hasattr(job_card_doc, 'custom_print_format') and job_card_doc.custom_print_format else None
+        
+        frappe.logger("print").info(f"Printing Job Card {job_card_doc.name} with print format: {print_format}")
+        
+        pdf_writer = frappe.get_print(
+            "Job Card",
+            job_card_doc.name,
+            print_format=print_format,
+            as_pdf=True,
+            no_letterhead=0,
+            letterhead=default_letter_head[0].name if default_letter_head else None,
+            output=pdf_writer,
+            pdf_options={"page-size": "A4", "encoding": "UTF-8"},
+        )
+        
+        frappe.logger("print").info(f"Successfully printed Job Card: {job_card_doc.name}")
+        
+    except Exception as e:
+        frappe.log_error(
+            f"Error printing Job Card {job_card_doc.name}: {str(e)}",
+            "Job Card Print Error"
+        )
 
+def print_stock_entries_for_work_order(work_order_doc, pdf_writer, default_letter_head):
+    """Print all Stock Entry documents of type 'Material Transfer for Manufacture' for the Work Order"""
+    
+    try:
+        # Get Stock Entries of type 'Material Transfer for Manufacture' linked to this Work Order
+        stock_entries = frappe.get_all(
+            "Stock Entry",
+            filters={
+                "stock_entry_type": "Material Transfer for Manufacture",
+                "work_order": work_order_doc.name,
+                "docstatus": 1  # Only submitted stock entries
+            },
+            fields=["name"],
+            order_by="posting_date, posting_time"
+        )
+        
+        frappe.logger("print").info(f"Found {len(stock_entries)} Material Transfer Stock Entries for Work Order {work_order_doc.name}")
+        
+        for stock_entry in stock_entries:
+            print_single_stock_entry(
+                stock_entry.name,
+                pdf_writer,
+                default_letter_head,
+                work_order_doc
+            )
+            
+    except Exception as e:
+        frappe.log_error(
+            f"Error getting Stock Entries for Work Order {work_order_doc.name}: {str(e)}",
+            "Work Order Print Stock Entry Error"
+        )
 
 def print_quality_inspections_for_job_card(job_card_doc, pdf_writer, default_letter_head):
-    """Print all Quality Inspection documents linked to this Job Card"""
+    """Print all Quality Inspection documents linked to this specific Job Card"""
     
     # Get the operation to check for QI print format
     operation_doc = None
@@ -558,7 +737,6 @@ def print_quality_inspections_for_job_card(job_card_doc, pdf_writer, default_let
             operation_doc = frappe.get_doc("Operation", job_card_doc.operation)
         except:
             pass
-
 
     # Main Quality Inspection
     if job_card_doc.quality_inspection:
@@ -569,8 +747,7 @@ def print_quality_inspections_for_job_card(job_card_doc, pdf_writer, default_let
             operation_doc
         )
 
-
-    # Additional Quality Inspections - removing company specific check
+    # Additional Quality Inspections
     additional_qis = [
         getattr(job_card_doc, 'custom_quality_inspection_3', None),
         getattr(job_card_doc, 'custom_quality_inspection_4', None),
@@ -587,7 +764,6 @@ def print_quality_inspections_for_job_card(job_card_doc, pdf_writer, default_let
                 operation_doc
             )
 
-
     # Bio Burden QC
     if hasattr(job_card_doc, 'custom_bio_burden_qc') and job_card_doc.custom_bio_burden_qc:
         print_single_quality_inspection(
@@ -596,8 +772,6 @@ def print_quality_inspections_for_job_card(job_card_doc, pdf_writer, default_let
             default_letter_head, 
             operation_doc
         )
-
-
 
 def print_single_quality_inspection(qi_name, pdf_writer, default_letter_head, operation_doc=None):
     """Print a single Quality Inspection document"""
@@ -609,7 +783,7 @@ def print_single_quality_inspection(qi_name, pdf_writer, default_letter_head, op
         
         # Determine print format priority:
         # 1. From QI document's custom_print_format
-        # 2. From Operation's qi_print_format (if you add this field)
+        # 2. From Operation's custom_qi_print_format
         # 3. Use default Quality Inspection print format if none specified
         
         print_format = None
@@ -632,7 +806,7 @@ def print_single_quality_inspection(qi_name, pdf_writer, default_letter_head, op
                 print_format = default_formats[0]
                 frappe.logger("print").info(f"Using default QI print format: {print_format}")
         
-        # Always try to print the QI, even without a custom format
+        # Print the QI
         pdf_writer = frappe.get_print(
             "Quality Inspection",
             qi_doc.name,
@@ -651,43 +825,7 @@ def print_single_quality_inspection(qi_name, pdf_writer, default_letter_head, op
             "Work Order Print QI Error"
         )
 
-
-
-def print_stock_entries_for_job_card(job_card_doc, pdf_writer, default_letter_head):
-    """Print all Stock Entry documents of type 'Material Transfer for Manufacture' linked to this Job Card"""
-    
-    try:
-        # Get Stock Entries of type 'Material Transfer for Manufacture' linked to this Job Card
-        # print("")
-        stock_entries = frappe.get_all(
-            "Stock Entry",
-            filters={
-                "stock_entry_type": "Material Transfer for Manufacture",
-                "work_order": job_card_doc.work_order,
-                "docstatus": 1  # Only submitted stock entries
-            },
-            fields=["name"],
-            order_by="posting_date, posting_time"
-        )
-        print("stockentries===============",stock_entries)
-        frappe.logger("print").info(f"Found {len(stock_entries)} Material Transfer for Manufacture Stock Entries for Job Card {job_card_doc.name}")
-        
-        for stock_entry in stock_entries:
-            print_single_stock_entry(
-                stock_entry.name,
-                pdf_writer,
-                default_letter_head,
-                job_card_doc
-            )
-            
-    except Exception as e:
-        frappe.log_error(
-            f"Error getting Stock Entries for Job Card {job_card_doc.name}: {str(e)}",
-            "Work Order Print Stock Entry Error"
-        )
-
-
-def print_single_stock_entry(stock_entry_name, pdf_writer, default_letter_head, job_card_doc=None):
+def print_single_stock_entry(stock_entry_name, pdf_writer, default_letter_head, work_order_doc=None):
     """Print a single Stock Entry document"""
     try:
         stock_entry_doc = frappe.get_doc("Stock Entry", stock_entry_name)
@@ -705,17 +843,9 @@ def print_single_stock_entry(stock_entry_name, pdf_writer, default_letter_head, 
         if hasattr(stock_entry_doc, 'custom_print_format') and stock_entry_doc.custom_print_format:
             print_format = stock_entry_doc.custom_print_format
             frappe.logger("print").info(f"Using Stock Entry custom print format: {print_format}")
-        elif stock_entry_doc.work_order:
-            # Get print format from Work Order's custom_stock_entry_print_format field
-            try:
-                work_order_doc = frappe.get_doc("Work Order", stock_entry_doc.work_order)
-                if hasattr(work_order_doc, 'custom_stock_entry_print_format') and work_order_doc.custom_stock_entry_print_format:
-                    print_format = work_order_doc.custom_stock_entry_print_format
-                    print("===========714",print_format)
-                    frappe.logger("print").info(f"Using Work Order Stock Entry print format: {print_format}")
-
-            except:
-                pass
+        elif work_order_doc and hasattr(work_order_doc, 'custom_stock_entry_print_format') and work_order_doc.custom_stock_entry_print_format:
+            print_format = work_order_doc.custom_stock_entry_print_format
+            frappe.logger("print").info(f"Using Work Order Stock Entry print format: {print_format}")
         
         if not print_format:
             # Try to find a default Stock Entry print format
@@ -749,8 +879,7 @@ def print_single_stock_entry(stock_entry_name, pdf_writer, default_letter_head, 
             "Work Order Print Stock Entry Error"
         )
 
-
-
+# Keep the existing functions for Meril specific documents
 def print_meril_specific_documents(job_card_doc, pdf_writer):
     """Print Meril Life Sciences specific documents"""
     
@@ -771,7 +900,6 @@ def print_meril_specific_documents(job_card_doc, pdf_writer):
             pdf_options={"page-size": "A4", "encoding": "UTF-8"},
         )
 
-
     # Label Printing
     label_printing_list = frappe.get_all(
         "Label Printing", 
@@ -788,7 +916,6 @@ def print_meril_specific_documents(job_card_doc, pdf_writer):
             output=pdf_writer,
             pdf_options={"page-size": "A4", "encoding": "UTF-8"},
         )
-
 
     # BMR For Packing Material
     bmr_for_packing_material = frappe.get_all(
