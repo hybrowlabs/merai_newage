@@ -219,11 +219,13 @@ if ((frm.doc.__islocal || !(frm.doc.custom_line_clearance_checklist_details && f
 if ((frm.doc.__islocal || !(frm.doc.custom_feasibility_testing && frm.doc.custom_feasibility_testing.length > 0))) {
     promises.push(load_feasibility_testing_template(frm));
 }
+if ((frm.doc.__islocal || !(frm.doc.custom_jobcard_opeartion_deatils.length > 0))) {
+    promises.push(load_bom_operation_details(frm));
+}
 
-
-        if (should_load_bom_details(frm)) {
-            promises.push(load_bom_operation_details(frm));
-        }
+        // if (should_load_bom_details(frm)) {
+        //     promises.push(load_bom_operation_details(frm));
+        // }
 
         Promise.all(promises).then(() => {
             setTimeout(() => {
@@ -249,7 +251,7 @@ function should_load_feasibility_testing(frm) {
 }
 
 function should_load_bom_details(frm) {
-    return frm.is_new() && frm.doc.bom_no && frm.doc.operation && 
+    return frm.doc.bom_no && frm.doc.operation && 
            (!frm.doc.custom_jobcard_opeartion_deatils || 
             frm.doc.custom_jobcard_opeartion_deatils.length === 0 ||
             frm._last_bom_operation !== frm.doc.operation ||
