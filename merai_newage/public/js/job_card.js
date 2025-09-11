@@ -9,7 +9,8 @@ frappe.ui.form.on("Job Card", {
 
         if (!frm.doc.operation || !frm.doc.work_order) return;
         
-        if(frm.doc.docstatus!=1 && !frm.doc.quality_inspection){
+        // Quality Inspection button
+        if(frm.doc.docstatus != 1 && !frm.doc.quality_inspection) {
             frappe.db.get_value("Operation", frm.doc.operation, "custom_quality_inspection_required")
                 .then(r => {
                     if (r.message && r.message.custom_quality_inspection_required) {
@@ -20,59 +21,95 @@ frappe.ui.form.on("Job Card", {
                 });
         }
         
-         if ((frm.is_new() || frm.doc.__islocal) && frm.doc.docstatus != 1) {
-            console.log("====refresh==========")
-            if (!frm.doc.custom_feasibility_testing_template) {
-                console.log("refresh=====2")
-                load_feasibility_testing_template(frm);
-            }
-            if (!frm.doc.custom_line_clearance_template) {
-                load_line_clearance_template(frm);
-            }
+        // Load templates only for new documents
+        if ((frm.is_new() || frm.doc.__islocal) && frm.doc.docstatus != 1) {
+            load_templates_for_new_doc(frm);
         }
-
-
-        // Only load templates if they don't exist and doc is not submitted
-        // if(!frm.doc.custom_feasibility_testing_template && frm.doc.docstatus!=1){
-        //     load_feasibility_testing_template(frm)
-        // }
         
-        // if(!frm.doc.custom_line_clearance_template && frm.doc.docstatus!=1){
-        //     load_line_clearance_template(frm);
-        // }
-        
+        // Handle software fields
         if (frm.is_new() || frm.doc.__islocal || !frm._software_fields_initialized) {
             setTimeout(() => {
                 handle_software_fields(frm);
+                frm._software_fields_initialized = true;
             }, 500);
         }
         
-        if (frm.is_new() || frm.doc.__islocal) {
-            setTimeout(() => {
-                hide_tabs_and_tables_if_templates_empty(frm);
-            }, 2500);
-        }
-        
+        // Load form data and manage visibility
         load_form_data(frm);
+        
+        // Single call to manage all tab visibility
+        setTimeout(() => {
+            manage_tab_visibility(frm);
+        }, 1000);
     },
 
+    // before_workflow_action: function (frm) {
+
+
+    //     if (frm.doc.workflow_state === "Draft") {
+
+    //         let incomplete = [];
+
+    //         (frm.doc.custom_line_clearance_checklist_details || []).forEach(row => {
+    //             if (!row.yesno) {
+    //                 incomplete.push(row.line_clearance_checklist);
+    //             }
+    //         });
+
+    //         if (incomplete.length > 0) {
+    //             frappe.throw(
+    //                 __("Please complete Line Clearance Checklist before proceeding. Missing responses for: {0}",
+    //                     [incomplete.join(", ")])
+    //             );
+    //         }
+
+    //     }
+
+    //      if (frm.doc.workflow_state === "Feasibility Verification Pending" || frm.doc.workflow_state==="Feasibility Test Verified") {
+    //         let incomplete = [];
+
+    //         (frm.doc.custom_feasibility_testing || []).forEach(row => {
+    //             if (!row.verified) {
+    //                 incomplete.push(row.feasibility_testing);
+    //             }
+    //         });
+
+    //         if (incomplete.length > 0) {
+    //             frappe.throw(
+    //                 __("Please complete Feasibility Testings before proceeding. Missing responses for: {0}",
+    //                     [incomplete.join(", ")])
+    //             );
+    //         }
+    //     }
+    // },
+
+    // after_workflow_action: function (frm) {
+    //     frappe.call({
+    //         method: "merai_newage.overrides.job_card.update_user_detail_in_sign_table",
+    //         args: {
+    //             doc: frm.doc
+    //         }
+    //     });
+        
+    //     // Refresh tab visibility after workflow change
+    //     setTimeout(() => {
+    //         manage_tab_visibility(frm);
+    //     }, 500);
+    // },
+
     operation: function(frm) {
-        // Prevent cascading events during refresh
         if (frm._refresh_in_progress) return;
         
         if (frm.doc.operation) {
-            frm._last_line_clearance_operation = null;
-            frm._last_feasibility_operation = null;
-            frm._last_bom_operation = null;
-            frm._software_fields_initialized = null; 
+            reset_operation_cache(frm);
             
-            // Use timeout to prevent immediate cascading
             clearTimeout(frm._operation_timeout);
             frm._operation_timeout = setTimeout(() => {
                 load_form_data(frm);
                 handle_software_fields(frm);
+                manage_tab_visibility(frm);
                 frm._software_fields_initialized = true;
-            }, 200);
+            }, 300);
         }
     },
     
@@ -87,10 +124,10 @@ frappe.ui.form.on("Job Card", {
             frm._bom_timeout = setTimeout(() => {
                 if (should_load_bom_details(frm)) {
                     load_bom_operation_details(frm).then(() => {
-                        toggle_custom_tab(frm);
+                        manage_tab_visibility(frm);
                     });
                 }
-            }, 200);
+            }, 300);
         }
     },
 
@@ -102,17 +139,16 @@ frappe.ui.form.on("Job Card", {
             
             clearTimeout(frm._item_timeout);
             frm._item_timeout = setTimeout(() => {
-                console.log("============production item")
                 load_feasibility_testing_template(frm).then(() => {
-                    toggle_feasibility_tab(frm);
+                    manage_tab_visibility(frm);
                 });
-            }, 200);
+            }, 300);
         } else {
             frm.clear_table("custom_feasibility_testing");
             frm.doc.custom_feasibility_testing_template = "";
             frm.refresh_field("custom_feasibility_testing_template");
             frm.refresh_field("custom_feasibility_testing");
-            frm.set_df_property("custom_feasibility_testing", "hidden", 1);
+            manage_tab_visibility(frm);
         }
     },
 
@@ -123,13 +159,14 @@ frappe.ui.form.on("Job Card", {
             frm._loading_feasibility_template = true;
             load_feasibility_testing_from_template(frm, frm.doc.custom_feasibility_testing_template).then(() => {
                 frm._loading_feasibility_template = false;
+                manage_tab_visibility(frm);
             }).catch(() => {
                 frm._loading_feasibility_template = false;
             });
         } else {
             frm.clear_table("custom_feasibility_testing");
             frm.refresh_field("custom_feasibility_testing");
-            frm.set_df_property("custom_feasibility_testing", "hidden", 1);
+            manage_tab_visibility(frm);
         }
     },
     
@@ -140,16 +177,70 @@ frappe.ui.form.on("Job Card", {
             frm._loading_line_clearance_template = true;
             load_line_clearnce_from_template(frm, frm.doc.custom_line_clearance_template).then(() => {
                 frm._loading_line_clearance_template = false;
+                manage_tab_visibility(frm);
             }).catch(() => {
                 frm._loading_line_clearance_template = false;
             });
         } else {
             frm.clear_table("custom_line_clearance_checklist_details");
             frm.refresh_field("custom_line_clearance_checklist_details");
-            frm.set_df_property("custom_line_clearance_checklist_details", "hidden", 1);
+            manage_tab_visibility(frm);
         }
     }
 });
+
+// Centralized function to manage all tab visibility
+function manage_tab_visibility(frm) {
+    const software_operations = [
+        "MISSO Robotic Execution Software-Arm Cart",
+        "MISSO Robotic Execution Software",
+        "MISSO Planning Software"
+    ];
+    
+    const is_draft = frm.doc.workflow_state === "Draft";
+    const is_software_operation = frm.doc.operation && software_operations.includes(frm.doc.operation);
+    const has_feasibility_data = (frm.doc.custom_feasibility_testing || []).length > 0;
+    const has_line_clearance_data = (frm.doc.custom_line_clearance_checklist_details || []).length > 0;
+    const has_operation_details = (frm.doc.custom_jobcard_opeartion_deatils || []).length > 0;
+    
+    // Check if templates exist
+    const has_feasibility_template = frm.doc.custom_feasibility_testing_template;
+    const has_line_clearance_template = frm.doc.custom_line_clearance_template;
+
+    // Feasibility Testing - Hide if: No template OR (Draft state AND has template)
+    // Show only if: Has template AND NOT draft state
+    const hide_feasibility = !has_feasibility_template || (is_draft && has_feasibility_template);
+    frm.set_df_property("custom_feasibility_testing", "hidden", hide_feasibility ? 1 : 0);
+    frm.set_df_property("custom_feasibility_test", "hidden", hide_feasibility || !has_feasibility_data ? 1 : 0);
+
+    // Operations List - Hide if: software operation OR draft state OR no operation details
+    frm.set_df_property("custom_opeartions_list", "hidden", (is_software_operation || is_draft || !has_operation_details) ? 1 : 0);
+    frm.set_df_property("custom_jobcard_opeartion_deatils", "hidden", (is_software_operation || is_draft || !has_operation_details) ? 1 : 0);
+
+    // Line Clearance - Hide if: No template OR no data
+    // Show only if: Has template AND has data
+    const hide_line_clearance = !has_line_clearance_template || !has_line_clearance_data;
+    frm.set_df_property("custom_line_clearance_checklist_details", "hidden", hide_line_clearance ? 1 : 0);
+    frm.set_df_property("custom_line_clearance", "hidden", hide_line_clearance ? 1 : 0);
+
+    frm.refresh_fields();
+}
+
+function reset_operation_cache(frm) {
+    frm._last_line_clearance_operation = null;
+    frm._last_feasibility_operation = null;
+    frm._last_bom_operation = null;
+    frm._software_fields_initialized = null;
+}
+
+function load_templates_for_new_doc(frm) {
+    if (!frm.doc.custom_feasibility_testing_template) {
+        load_feasibility_testing_template(frm);
+    }
+    if (!frm.doc.custom_line_clearance_template) {
+        load_line_clearance_template(frm);
+    }
+}
 
 function create_quality_inspection(frm) {
     const software_operations = [
@@ -170,7 +261,7 @@ function create_quality_inspection(frm) {
         qi.item_code = work_order_doc.production_item;
         qi.sample_size = frm.doc.for_quantity;
         qi.inspected_by = frappe.session.user;
-        qi.manual_inspection=1
+        qi.manual_inspection = 1;
 
         if (software_operations.includes(frm.doc.operation)) {
             qi.custom_software = frm.doc.operation;
@@ -199,55 +290,26 @@ function create_quality_inspection(frm) {
 }
 
 function load_form_data(frm) {
-    let promises = [];
+    if (frm.doc.docstatus == 1) return;
     
-    if(frm.doc.docstatus!=1){
-        // if (should_load_line_clearance(frm)) {
-        //     console.log("==========")
-        //     promises.push(load_line_clearance_template(frm));
-        // }
+    let promises = [];
 
-        // if (should_load_feasibility_testing(frm)) {
-        //     console.log("======load form data=====")
-        //     promises.push(load_feasibility_testing_template(frm));
-        // }
-
-        // Only load if the table is empty (length is 0), or if it's a new doc
-if ((frm.doc.__islocal || !(frm.doc.custom_line_clearance_checklist_details && frm.doc.custom_line_clearance_checklist_details.length > 0))) {
-    promises.push(load_line_clearance_template(frm));
-}
-if ((frm.doc.__islocal || !(frm.doc.custom_feasibility_testing && frm.doc.custom_feasibility_testing.length > 0))) {
-    promises.push(load_feasibility_testing_template(frm));
-}
-if ((frm.doc.__islocal || !(frm.doc.custom_jobcard_opeartion_deatils.length > 0))) {
-    promises.push(load_bom_operation_details(frm));
-}
-
-        // if (should_load_bom_details(frm)) {
-        //     promises.push(load_bom_operation_details(frm));
-        // }
-
-        Promise.all(promises).then(() => {
-            setTimeout(() => {
-                toggle_custom_tab(frm);
-                toggle_lineclearance_tab(frm);
-            }, 1000);
-        });
+    // Load templates only if tables are empty or it's a new document
+    if (frm.doc.__islocal || !(frm.doc.custom_line_clearance_checklist_details && frm.doc.custom_line_clearance_checklist_details.length > 0)) {
+        promises.push(load_line_clearance_template(frm));
     }
-}
+    if (frm.doc.__islocal || !(frm.doc.custom_feasibility_testing && frm.doc.custom_feasibility_testing.length > 0)) {
+        promises.push(load_feasibility_testing_template(frm));
+    }
+    if (frm.doc.__islocal || !(frm.doc.custom_jobcard_opeartion_deatils && frm.doc.custom_jobcard_opeartion_deatils.length > 0)) {
+        promises.push(load_bom_operation_details(frm));
+    }
 
-function should_load_line_clearance(frm) {
-    return   frm.doc.operation 
-        && (!frm.doc.custom_line_clearance_checklist_details 
-            || frm.doc.custom_line_clearance_checklist_details.length === 0)
-        && frm._last_line_clearance_operation !== frm.doc.operation;
-}
-
-function should_load_feasibility_testing(frm) {
-    return  frm.doc.production_item && 
-           (!frm.doc.custom_feasibility_testing || 
-            frm.doc.custom_feasibility_testing.length === 0 ||
-            frm._last_feasibility_operation !== frm.doc.operation);
+    Promise.all(promises).then(() => {
+        setTimeout(() => {
+            manage_tab_visibility(frm);
+        }, 500);
+    });
 }
 
 function should_load_bom_details(frm) {
@@ -259,25 +321,14 @@ function should_load_bom_details(frm) {
 }
 
 function load_feasibility_testing_template(frm) {
-    if (frm._loading_feasibility_template) {
+    if (frm._loading_feasibility_template || !frm.doc.production_item) {
         return Promise.resolve();
     }
     
-    frm.set_df_property("custom_feasibility_testing", "hidden", 1);
-
-    if (!frm.doc.production_item) {
-        frm.clear_table("custom_feasibility_testing");
-        frm.doc.custom_feasibility_testing_template = "";
-        frm.refresh_field("custom_feasibility_testing_template");
-        frm.refresh_field("custom_feasibility_testing");
-        return Promise.resolve();
-    }
-
     frm._loading_feasibility_template = true;
     
     return frappe.db.get_doc("Operation", frm.doc.operation).then(operation_doc => {
         let template_name = operation_doc.custom_feasibility_testing_template || "";
-        console.log("=====728====feasibility================", template_name);
         
         if (frm.doc.custom_feasibility_testing_template !== template_name) {
             frm.doc.custom_feasibility_testing_template = template_name;
@@ -301,7 +352,6 @@ function load_feasibility_testing_template(frm) {
     });
 }
 
-
 function load_feasibility_testing_from_template(frm, template_name, operation_doc = null) {
     return frappe.db.get_doc("Feasibility Testing Template", template_name).then(template => {
         frm.clear_table("custom_feasibility_testing");
@@ -310,7 +360,6 @@ function load_feasibility_testing_from_template(frm, template_name, operation_do
             let child = frm.add_child("custom_feasibility_testing");
             child.feasibility_testing = template_row.feasibility_testing;
             
-            // ✅ fetch from Operation instead of Item
             if (operation_doc && operation_doc.custom_feasibility_testing_details) {
                 let existing_row = operation_doc.custom_feasibility_testing_details.find(
                     op_row => op_row.feasibility_testing === template_row.feasibility_testing
@@ -328,10 +377,6 @@ function load_feasibility_testing_from_template(frm, template_name, operation_do
 
         frm.refresh_field("custom_feasibility_testing");
         frm._last_feasibility_operation = frm.doc.operation;
-
-        if ((frm.doc.custom_feasibility_testing || []).length > 0) {
-            frm.set_df_property("custom_feasibility_testing", "hidden", 0);
-        }
     }).catch(err => {
         console.error("Error loading feasibility testing template:", err);
     });
@@ -342,14 +387,11 @@ function load_line_clearance_template(frm) {
         return Promise.resolve();
     }
     
-    frm.set_df_property("custom_line_clearance_checklist_details", "hidden", 1);
-
     frm._loading_line_clearance_template = true;
     
-    return frappe.db.get_doc("Operation", frm.doc.operation).then(item => {
-        let template_name = item.custom_line_clearance_template || "";
+    return frappe.db.get_doc("Operation", frm.doc.operation).then(operation_doc => {
+        let template_name = operation_doc.custom_line_clearance_template || "";
     
-        // Only update if different to avoid triggering events
         if (frm.doc.custom_line_clearance_template !== template_name) {
             frm.doc.custom_line_clearance_template = template_name;
             frm.refresh_field("custom_line_clearance_template");
@@ -362,7 +404,7 @@ function load_line_clearance_template(frm) {
             return Promise.resolve();
         }
 
-        return load_line_clearnce_from_template(frm, template_name, item).then(() => {
+        return load_line_clearnce_from_template(frm, template_name, operation_doc).then(() => {
             frm._loading_line_clearance_template = false;
         });
     }).catch(err => {
@@ -372,7 +414,7 @@ function load_line_clearance_template(frm) {
     });
 }
 
-function load_line_clearnce_from_template(frm, template_name, item_doc = null) {
+function load_line_clearnce_from_template(frm, template_name, operation_doc = null) {
     return frappe.db.get_doc("Line Clearance Template", template_name).then(template => {
         frm.clear_table("custom_line_clearance_checklist_details");
 
@@ -382,12 +424,7 @@ function load_line_clearnce_from_template(frm, template_name, item_doc = null) {
         });
 
         frm.refresh_field("custom_line_clearance_checklist_details");
-        // FIX: This was the bug - was setting feasibility instead of line clearance
         frm._last_line_clearance_operation = frm.doc.operation;
-
-        if ((frm.doc.custom_line_clearance_checklist_details || []).length > 0) {
-            frm.set_df_property("custom_line_clearance_checklist_details", "hidden", 0);
-        }
     }).catch(err => {
         console.error("Error loading line clearance template:", err);
     });
@@ -403,7 +440,6 @@ function load_bom_operation_details(frm) {
     if (software_operations.includes(frm.doc.operation)) {
         frm.clear_table("custom_jobcard_opeartion_deatils");
         frm.refresh_field("custom_jobcard_opeartion_deatils");
-        frm.set_df_property("custom_jobcard_opeartion_deatils", "hidden", 1);
         
         frm._last_bom_operation = frm.doc.operation;
         frm._last_bom_no = frm.doc.bom_no;
@@ -428,10 +464,6 @@ function load_bom_operation_details(frm) {
         });
 
         frm.refresh_field("custom_jobcard_opeartion_deatils");
-
-        let has_rows = (frm.doc.custom_jobcard_opeartion_deatils || []).length > 0;
-        frm.set_df_property("custom_jobcard_opeartion_deatils", "hidden", has_rows ? 0 : 1);
-
         frm._last_bom_operation = frm.doc.operation;
         frm._last_bom_no = frm.doc.bom_no;
     }).catch(err => {
@@ -440,33 +472,6 @@ function load_bom_operation_details(frm) {
         frm._last_bom_no = frm.doc.bom_no;
         return Promise.resolve();
     });
-}
-
-function toggle_custom_tab(frm) {
-    let has_rows = (frm.doc.custom_jobcard_opeartion_deatils || []).length > 0;
-    
-    frm.set_df_property("custom_opeartions_list", "hidden", !has_rows);
-    frm.set_df_property("custom_jobcard_opeartion_deatils", "hidden", !has_rows);
-
-    frm.refresh_fields();
-}
-
-function toggle_lineclearance_tab(frm) {
-    let has_rows = (frm.doc.custom_line_clearance_checklist_details || []).length > 0;
-    
-    frm.set_df_property("custom_line_clearance_checklist_details", "hidden", !has_rows);
-    frm.set_df_property("custom_line_clearance", "hidden", !has_rows);
-
-    frm.refresh_fields();
-}
-
-function toggle_feasibility_tab(frm) {
-    let has_rows = (frm.doc.custom_feasibility_testing || []).length > 0;
-    
-    frm.set_df_property("custom_feasibility_test", "hidden", !has_rows);
-    frm.set_df_property("custom_feasibility_testing", "hidden", !has_rows);
-
-    frm.refresh_fields();
 }
 
 function handle_software_fields(frm) {
@@ -480,17 +485,18 @@ function handle_software_fields(frm) {
         frm.set_df_property("custom_software", "hidden", 0);
         frm.set_df_property("custom_version", "hidden", 0);
         frm.set_df_property("custom_installed", "hidden", 0);
+        
 
-        // Only update if different to avoid triggering events
-        if (frm.doc.custom_software !== frm.doc.operation) {
-            frm.doc.custom_software = frm.doc.operation;
-            frm.refresh_field("custom_software");
+        if (!frm.doc.custom_software) {
+            frm.set_value("custom_software", frm.doc.operation);
         }
+        // if (frm.doc.custom_software !== frm.doc.operation) {
+        //     frm.doc.custom_software = frm.doc.operation;
+        //     frm.refresh_field("custom_software");
+        // }
         
         frm.clear_table("custom_jobcard_opeartion_deatils");
         frm.refresh_field("custom_jobcard_opeartion_deatils");
-        frm.set_df_property("custom_jobcard_opeartion_deatils", "hidden", 1);
-
     } else {
         frm.set_df_property("custom_software", "hidden", 1);
         frm.set_df_property("custom_version", "hidden", 1);
@@ -500,15 +506,182 @@ function handle_software_fields(frm) {
     frm.refresh_fields();
 }
 
-function hide_tabs_and_tables_if_templates_empty(frm) {
-    if (!frm.doc.custom_feasibility_testing_template) {
-        frm.set_df_property("custom_feasibility_test", "hidden", 1);
-        frm.set_df_property("custom_feasibility_testing", "hidden", 1);
-    }
+
+
+// frappe.ui.form.on("Line Clearance Checklist Details", {
+//     yesno: function (frm, cdt, cdn) {
+//         if (!frm.is_new()) {
+//             frm.save();
+//         }
+//         let row = locals[cdt][cdn];
+//         frappe.call({
+//             method: "merai_newage.overrides.job_card.set_value",
+//             args: {
+//                 doctype: "Line Clearance Checklist Details",
+//                 name: row.name,
+//                 fieldname: "yesno",
+//                 value: row.yesno
+//             },
+//             callback: function(r) {
+//                 // update local model as well
+//                 // frm.reload_doc();  
+//                 frappe.model.set_value(cdt, cdn, "yesno", row.yesno);
+//                 frm.refresh_field("line_clearance_checklist_details");
+//             }
+//         });
+//     }
+// });
+
+
+
+
+
+
+
+// frappe.ui.form.on("Job Card", {
+//     refresh: function(frm) {
+//         toggle_complete_button(frm);
+//     },
+//     after_save: function(frm) {
+//         toggle_complete_button(frm);
+//     },
+//     onload_post_render: function(frm) {
+//         // Listen to all editable fields and trigger toggle on change
+//         Object.keys(frm.fields_dict).forEach(fieldname => {
+//             let field = frm.fields_dict[fieldname];
+//             if (field.df && !field.df.read_only) {
+//                 // Unbind previous handler to avoid duplicates
+//                 $(field.input || field.wrapper).off('change.complete_button');
+//                 // Bind change event to toggle button visibility
+//                 $(field.input || field.wrapper).on('change.complete_button', () => {
+//                     toggle_complete_button(frm);
+//                 });
+//             }
+//         });
+//     }
+// });
+
+// function toggle_complete_button(frm) {
+//     // Remove custom button always first to avoid duplicates
+//     frm.remove_custom_button("Complete Job");
+
+//     // Show custom button only if form is saved and clean
+//     if (!frm.is_new() && !frm.is_dirty()) {
+//         frm.add_custom_button(__("Complete Job"), () => {
+//             frm.events.complete_job(frm, "Complete", frm.doc.for_quantity - frm.doc.total_completed_qty);
+//         }).addClass("btn-primary");
+//     }
+
+//     // Manage native workflow button visibility by filtering button text
+//     let $btn = frm.page.wrapper.find('button').filter(function() {
+//         return $(this).text().trim() === "Complete Job";
+//     });
+
+//     if ($btn.length) {
+//         if (frm.is_new() || frm.is_dirty()) {
+//             $btn.hide();
+//         } else {
+//             $btn.show();
+//         }
+//     }
+// }
+
+
+
+
+
+
+frappe.ui.form.on("Job Card", {
+    refresh: function(frm) {
+        // Wait for default ERPNext buttons to load
+        setTimeout(() => {
+            control_default_button_visibility(frm);
+        }, 1000);
+    },
     
-    if (!frm.doc.custom_line_clearance_template) {
-        frm.set_df_property("custom_line_clearance", "hidden", 1);
-        frm.set_df_property("custom_line_clearance_checklist_details", "hidden", 1);
+    after_save: function(frm) {
+        setTimeout(() => {
+            control_default_button_visibility(frm);
+        }, 300);
     }
-    frm.refresh_fields();
+});
+
+function control_default_button_visibility(frm) {
+    // Find ANY button with "Complete Job" text (default ERPNext button)
+    let buttons_found = 0;
+    
+    // Search in the entire document for Complete Job buttons
+    $(document).find('button, .btn, a').each(function() {
+        let $this = $(this);
+        let text = $this.text().trim();
+        let dataLabel = $this.attr('data-label');
+        let onclick = $this.attr('onclick');
+        
+        // Check if this looks like a Complete Job button
+        if (text === "Complete Job" || 
+            text.includes("Complete Job") ||
+            dataLabel === "Complete%20Job" ||
+            (onclick && onclick.includes("Complete"))) {
+            
+            buttons_found++;
+            console.log("Found Complete Job button:", text, $this.attr('class'));
+            
+            // Control visibility based on form state
+            if (frm.is_dirty() || frm.is_new()) {
+                $this.hide();
+                console.log("Hiding default button");
+            } else {
+                $this.show();
+                console.log("Showing default button");
+            }
+        }
+    });
+    
+    console.log("Total buttons found:", buttons_found);
+    console.log("Form state - dirty:", frm.is_dirty(), "new:", frm.is_new());
+    
+    // Debug: Show all buttons on the page
+    if (buttons_found === 0) {
+        console.log("=== ALL BUTTONS ON PAGE ===");
+        $(document).find('button').each(function(index) {
+            console.log(index + ":", $(this).text().trim(), $(this).attr('class'));
+        });
+        console.log("=== END BUTTON LIST ===");
+    }
+}
+
+// Listen for any form changes
+$(document).on('change input keyup', function() {
+    if (cur_frm && cur_frm.doctype === "Job Card") {
+        setTimeout(() => {
+            control_default_button_visibility(cur_frm);
+        }, 100);
+    }
+});
+
+// Alternative: Use MutationObserver to watch for button creation
+if (typeof window.job_card_observer === 'undefined') {
+    window.job_card_observer = new MutationObserver(function(mutations) {
+        if (cur_frm && cur_frm.doctype === "Job Card") {
+            mutations.forEach(function(mutation) {
+                if (mutation.addedNodes.length > 0) {
+                    // Check if any new buttons were added
+                    $(mutation.addedNodes).find('button').each(function() {
+                        if ($(this).text().includes("Complete Job")) {
+                            console.log("New Complete Job button detected!");
+                            setTimeout(() => {
+                                control_default_button_visibility(cur_frm);
+                            }, 100);
+                        }
+                    });
+                }
+            });
+        }
+    });
+    
+    // Start observing
+    window.job_card_observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
 }
