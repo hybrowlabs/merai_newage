@@ -1,0 +1,181 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-09-02 14:19:43.643132",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_vm4e",
+  "line_clearance_username",
+  "line_clearance_userid",
+  "line_clearance_user_fullname",
+  "line_clearance_date",
+  "column_break_oh3n",
+  "feasibility_test_username",
+  "feasibility_test_userid",
+  "feasibility_test_user_fullname",
+  "feasibility_test_date",
+  "column_break_1lut",
+  "feasibility_test_approved_username",
+  "feasibility_test__approved_userid",
+  "feasibility_test__approved_user_fullname",
+  "feasibility_test_approved__date",
+  "column_break_h5jl",
+  "software_checked_by",
+  "softtware_checked_by_userid",
+  "software_checked_by_fullname",
+  "software_checked_by_date",
+  "column_break_m7gb",
+  "software_verified_by",
+  "software_verified_by_userid",
+  "software_verified_by_fullname",
+  "software_verified_by_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_vm4e",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "line_clearance_username",
+   "fieldtype": "Link",
+   "label": "Line Clearance UserName",
+   "options": "User"
+  },
+  {
+   "fieldname": "line_clearance_userid",
+   "fieldtype": "Data",
+   "label": "Line Clearance UserID"
+  },
+  {
+   "fieldname": "line_clearance_user_fullname",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Line Clearance User FullName"
+  },
+  {
+   "fieldname": "line_clearance_date",
+   "fieldtype": "Data",
+   "label": "Line Clearance Date"
+  },
+  {
+   "fieldname": "feasibility_test_username",
+   "fieldtype": "Link",
+   "label": "Feasibility Test Checked UserName",
+   "options": "User"
+  },
+  {
+   "fieldname": "feasibility_test_userid",
+   "fieldtype": "Data",
+   "label": "Feasibility Test Checked userID"
+  },
+  {
+   "fieldname": "feasibility_test_user_fullname",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Feasibility Test User Checked FullName"
+  },
+  {
+   "fieldname": "feasibility_test_date",
+   "fieldtype": "Data",
+   "label": "Feasibility Test Checked Date"
+  },
+  {
+   "fieldname": "feasibility_test_approved__date",
+   "fieldtype": "Data",
+   "label": "Feasibility Test Approved  Date"
+  },
+  {
+   "fieldname": "feasibility_test_approved_username",
+   "fieldtype": "Link",
+   "label": "Feasibility Test Approved UserName",
+   "options": "User"
+  },
+  {
+   "fieldname": "feasibility_test__approved_userid",
+   "fieldtype": "Data",
+   "label": "Feasibility Test  Approved UserID"
+  },
+  {
+   "fieldname": "feasibility_test__approved_user_fullname",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Feasibility Test  Approved user FullName"
+  },
+  {
+   "fieldname": "software_checked_by",
+   "fieldtype": "Link",
+   "label": "Software Checked By",
+   "options": "User"
+  },
+  {
+   "fieldname": "softtware_checked_by_userid",
+   "fieldtype": "Data",
+   "label": "Softtware Checked By UserID"
+  },
+  {
+   "fieldname": "software_checked_by_fullname",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Software Checked By Fullname"
+  },
+  {
+   "fieldname": "software_checked_by_date",
+   "fieldtype": "Data",
+   "label": "Software Checked By date"
+  },
+  {
+   "fieldname": "software_verified_by",
+   "fieldtype": "Link",
+   "label": "Software Verified By ",
+   "options": "User"
+  },
+  {
+   "fieldname": "software_verified_by_userid",
+   "fieldtype": "Data",
+   "label": "Software verified By UserID"
+  },
+  {
+   "fieldname": "software_verified_by_fullname",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Software verified By Fullname"
+  },
+  {
+   "fieldname": "software_verified_by_date",
+   "fieldtype": "Data",
+   "label": "Software Verified By Date"
+  },
+  {
+   "fieldname": "column_break_oh3n",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_1lut",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_h5jl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_m7gb",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-09-02 23:20:28.924590",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Job Card Signature Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
