@@ -42,60 +42,18 @@ frappe.ui.form.on("Job Card", {
             manage_tab_visibility(frm);
         }, 1000);
     },
-
-    // before_workflow_action: function (frm) {
-
-
-    //     if (frm.doc.workflow_state === "Draft") {
-
-    //         let incomplete = [];
-
-    //         (frm.doc.custom_line_clearance_checklist_details || []).forEach(row => {
-    //             if (!row.yesno) {
-    //                 incomplete.push(row.line_clearance_checklist);
-    //             }
-    //         });
-
-    //         if (incomplete.length > 0) {
-    //             frappe.throw(
-    //                 __("Please complete Line Clearance Checklist before proceeding. Missing responses for: {0}",
-    //                     [incomplete.join(", ")])
-    //             );
-    //         }
-
-    //     }
-
-    //      if (frm.doc.workflow_state === "Feasibility Verification Pending" || frm.doc.workflow_state==="Feasibility Test Verified") {
-    //         let incomplete = [];
-
-    //         (frm.doc.custom_feasibility_testing || []).forEach(row => {
-    //             if (!row.verified) {
-    //                 incomplete.push(row.feasibility_testing);
-    //             }
-    //         });
-
-    //         if (incomplete.length > 0) {
-    //             frappe.throw(
-    //                 __("Please complete Feasibility Testings before proceeding. Missing responses for: {0}",
-    //                     [incomplete.join(", ")])
-    //             );
-    //         }
-    //     }
-    // },
-
-    // after_workflow_action: function (frm) {
-    //     frappe.call({
-    //         method: "merai_newage.overrides.job_card.update_user_detail_in_sign_table",
-    //         args: {
-    //             doc: frm.doc
-    //         }
-    //     });
-        
-    //     // Refresh tab visibility after workflow change
-    //     setTimeout(() => {
-    //         manage_tab_visibility(frm);
-    //     }, 500);
-    // },
+before_save: function(frm) {
+        frappe.call({
+            method: "merai_newage.overrides.job_card.get_employee_by_user",
+            callback: function(r) {
+                if (r.message) {
+                    console.log("r---",r)
+                    frm.doc.custom_signed_by = r.message; 
+                    frm.refresh_field('custom_signed_by');
+                }
+            }
+        });
+    },
 
     operation: function(frm) {
         if (frm._refresh_in_progress) return;
@@ -197,7 +155,7 @@ function manage_tab_visibility(frm) {
         "MISSO Planning Software"
     ];
     
-    const is_draft = frm.doc.workflow_state === "Draft";
+    // const is_draft = frm.doc.workflow_state === "Draft";
     const is_software_operation = frm.doc.operation && software_operations.includes(frm.doc.operation);
     const has_feasibility_data = (frm.doc.custom_feasibility_testing || []).length > 0;
     const has_line_clearance_data = (frm.doc.custom_line_clearance_checklist_details || []).length > 0;
@@ -209,13 +167,13 @@ function manage_tab_visibility(frm) {
 
     // Feasibility Testing - Hide if: No template OR (Draft state AND has template)
     // Show only if: Has template AND NOT draft state
-    const hide_feasibility = !has_feasibility_template || (is_draft && has_feasibility_template);
+    const hide_feasibility = !has_feasibility_template || ( has_feasibility_template);
     frm.set_df_property("custom_feasibility_testing", "hidden", hide_feasibility ? 1 : 0);
     frm.set_df_property("custom_feasibility_test", "hidden", hide_feasibility || !has_feasibility_data ? 1 : 0);
 
     // Operations List - Hide if: software operation OR draft state OR no operation details
-    frm.set_df_property("custom_opeartions_list", "hidden", (is_software_operation || is_draft || !has_operation_details) ? 1 : 0);
-    frm.set_df_property("custom_jobcard_opeartion_deatils", "hidden", (is_software_operation || is_draft || !has_operation_details) ? 1 : 0);
+    frm.set_df_property("custom_opeartions_list", "hidden", (is_software_operation ||  !has_operation_details) ? 1 : 0);
+    frm.set_df_property("custom_jobcard_opeartion_deatils", "hidden", (is_software_operation || !has_operation_details) ? 1 : 0);
 
     // Line Clearance - Hide if: No template OR no data
     // Show only if: Has template AND has data
@@ -505,86 +463,6 @@ function handle_software_fields(frm) {
 
     frm.refresh_fields();
 }
-
-
-
-// frappe.ui.form.on("Line Clearance Checklist Details", {
-//     yesno: function (frm, cdt, cdn) {
-//         if (!frm.is_new()) {
-//             frm.save();
-//         }
-//         let row = locals[cdt][cdn];
-//         frappe.call({
-//             method: "merai_newage.overrides.job_card.set_value",
-//             args: {
-//                 doctype: "Line Clearance Checklist Details",
-//                 name: row.name,
-//                 fieldname: "yesno",
-//                 value: row.yesno
-//             },
-//             callback: function(r) {
-//                 // update local model as well
-//                 // frm.reload_doc();  
-//                 frappe.model.set_value(cdt, cdn, "yesno", row.yesno);
-//                 frm.refresh_field("line_clearance_checklist_details");
-//             }
-//         });
-//     }
-// });
-
-
-
-
-
-
-
-// frappe.ui.form.on("Job Card", {
-//     refresh: function(frm) {
-//         toggle_complete_button(frm);
-//     },
-//     after_save: function(frm) {
-//         toggle_complete_button(frm);
-//     },
-//     onload_post_render: function(frm) {
-//         // Listen to all editable fields and trigger toggle on change
-//         Object.keys(frm.fields_dict).forEach(fieldname => {
-//             let field = frm.fields_dict[fieldname];
-//             if (field.df && !field.df.read_only) {
-//                 // Unbind previous handler to avoid duplicates
-//                 $(field.input || field.wrapper).off('change.complete_button');
-//                 // Bind change event to toggle button visibility
-//                 $(field.input || field.wrapper).on('change.complete_button', () => {
-//                     toggle_complete_button(frm);
-//                 });
-//             }
-//         });
-//     }
-// });
-
-// function toggle_complete_button(frm) {
-//     // Remove custom button always first to avoid duplicates
-//     frm.remove_custom_button("Complete Job");
-
-//     // Show custom button only if form is saved and clean
-//     if (!frm.is_new() && !frm.is_dirty()) {
-//         frm.add_custom_button(__("Complete Job"), () => {
-//             frm.events.complete_job(frm, "Complete", frm.doc.for_quantity - frm.doc.total_completed_qty);
-//         }).addClass("btn-primary");
-//     }
-
-//     // Manage native workflow button visibility by filtering button text
-//     let $btn = frm.page.wrapper.find('button').filter(function() {
-//         return $(this).text().trim() === "Complete Job";
-//     });
-
-//     if ($btn.length) {
-//         if (frm.is_new() || frm.is_dirty()) {
-//             $btn.hide();
-//         } else {
-//             $btn.show();
-//         }
-//     }
-// }
 
 
 
