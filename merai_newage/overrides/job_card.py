@@ -28,6 +28,7 @@ class CustomJobCard(JobCard):
     def on_submit(self):
         employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
         self.custom_authorised_by = employee
+        check_the_values_set_r_not(self.name)
 
 
 @frappe.whitelist()
@@ -211,38 +212,43 @@ def set_value(doctype,name,fieldname,value):
 import frappe
 
 @frappe.whitelist()
-def check_the_values_set_r_not(docname,job_card_status):
+def check_the_values_set_r_not(docname):
     """
     Check if required checklist values are filled before proceeding.
     Raises an exception if any mandatory responses are missing.
     """
 
-    # Fetch the Job Card document
     doc = frappe.get_doc("Job Card", docname)
 
-    # 🔹 1. Line Clearance Check — when in "Draft"
-    if job_card_status == "Draft":
-        incomplete = []
-        for row in doc.custom_line_clearance_checklist_details or []:
-            if not row.yesno:
-                incomplete.append(row.line_clearance_checklist)
 
-        if incomplete:
-            frappe.throw(
-                f"Please complete Line Clearance Checklist before proceeding. Missing responses for: {', '.join(incomplete)}"
-            )
+    incomplete = []
+    for row in doc.custom_line_clearance_checklist_details or []:
+        if not row.yesno:
+            incomplete.append(row.line_clearance_checklist)
 
-    # 🔹 2. Feasibility Verification / Test Verified — when in those statuses
-    elif job_card_status in ["Feasibility Verification Pending", "Feasibility Test Verified"]:
-        incomplete = []
-        for row in doc.custom_feasibility_testing or []:
-            if not row.verified:
-                incomplete.append(row.feasibility_testing)
+    if incomplete:
+        frappe.throw(
+            f"Please complete Line Clearance Checklist before proceeding. Missing responses for: {', '.join(incomplete)}"
+        )
 
-        if incomplete:
-            frappe.throw(
-                f"Please complete Feasibility Testings before proceeding. Missing responses for: {', '.join(incomplete)}"
-            )
+    incomplete = []
+    for row in doc.custom_feasibility_testing or []:
+        if not row.verified:
+            incomplete.append(row.feasibility_testing)
 
-    return "✅ All required checks are complete."
+    if incomplete:
+        frappe.throw(
+            f"Please complete Feasibility Testings before proceeding. Missing responses for: {', '.join(incomplete)}"
+        )
+    incomplete = []
+    for row in doc.custom_jobcard_opeartion_deatils or []:
+        if not row.verified:
+            incomplete.append(row.item_code)
+
+    if incomplete:
+        frappe.throw(
+            f"Please complete Operation Testings before proceeding. Missing responses for: {', '.join(incomplete)}"
+        )
+
+    # return "✅ All required checks are complete."
 

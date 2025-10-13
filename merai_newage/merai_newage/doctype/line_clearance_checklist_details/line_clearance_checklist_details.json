@@ -27,6 +27,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Yes/No",
+   "mandatory_depends_on": "#eval:parent.status==\"Work In Progress\"",
    "options": "\nYes\nNo"
   }
  ],
@@ -34,7 +35,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-27 17:15:42.635128",
+ "modified": "2025-09-10 15:23:23.072867",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Line Clearance Checklist Details",
