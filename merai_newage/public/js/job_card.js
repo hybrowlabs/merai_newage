@@ -39,10 +39,11 @@ frappe.ui.form.on("Job Card", {
         
         // Single call to manage all tab visibility
         setTimeout(() => {
+            // display_fields_in_ops(frm)
             manage_tab_visibility(frm);
         }, 1000);
     },
-before_save: function(frm) {
+    before_save: function(frm) {
         frappe.call({
             method: "merai_newage.overrides.job_card.get_employee_by_user",
             callback: function(r) {
@@ -54,7 +55,18 @@ before_save: function(frm) {
             }
         });
     },
+onload: function(frm) {
+        setTimeout(() => {
+            manage_tab_visibility(frm);
+        }, 1000);
 
+         if (frm.is_new() || frm.doc.__islocal || !frm._software_fields_initialized) {
+            setTimeout(() => {
+                handle_software_fields(frm);
+                frm._software_fields_initialized = true;
+            }, 500);
+        }
+    },
     operation: function(frm) {
         if (frm._refresh_in_progress) return;
         
@@ -149,15 +161,12 @@ before_save: function(frm) {
 
 // Centralized function to manage all tab visibility
 function manage_tab_visibility(frm) {
-    const software_operations = [
-        "MISSO Robotic Execution Software-Arm Cart",
-        "MISSO Robotic Execution Software",
-        "MISSO Planning Software"
-    ];
+   
     
     // const is_draft = frm.doc.workflow_state === "Draft";
-    const is_software_operation = frm.doc.operation && software_operations.includes(frm.doc.operation);
+    const is_software_operation = frm.doc.custom_software_reqd
     const has_feasibility_data = (frm.doc.custom_feasibility_testing || []).length > 0;
+    console.log("has_feasibility_data---------160",has_feasibility_data)
     const has_line_clearance_data = (frm.doc.custom_line_clearance_checklist_details || []).length > 0;
     const has_operation_details = (frm.doc.custom_jobcard_opeartion_deatils || []).length > 0;
     
@@ -167,7 +176,7 @@ function manage_tab_visibility(frm) {
 
     // Feasibility Testing - Hide if: No template OR (Draft state AND has template)
     // Show only if: Has template AND NOT draft state
-    const hide_feasibility = !has_feasibility_template || ( has_feasibility_template);
+    const hide_feasibility = !has_feasibility_template
     frm.set_df_property("custom_feasibility_testing", "hidden", hide_feasibility ? 1 : 0);
     frm.set_df_property("custom_feasibility_test", "hidden", hide_feasibility || !has_feasibility_data ? 1 : 0);
 
@@ -201,12 +210,7 @@ function load_templates_for_new_doc(frm) {
 }
 
 function create_quality_inspection(frm) {
-    const software_operations = [
-        "MISSO Robotic Execution Software-Arm Cart",
-        "MISSO Robotic Execution Software",
-        "MISSO Planning Software"
-    ];
-
+   
     frappe.db.get_doc("Work Order", frm.doc.work_order).then(work_order_doc => {
         let matched_items = (work_order_doc.required_items || []).filter(item => {
             return item.operation === frm.doc.operation;
@@ -221,7 +225,7 @@ function create_quality_inspection(frm) {
         qi.inspected_by = frappe.session.user;
         qi.manual_inspection = 1;
 
-        if (software_operations.includes(frm.doc.operation)) {
+        if (frm.doc.custom_software_reqd) {
             qi.custom_software = frm.doc.operation;
             frappe.db.insert(qi).then(qi_doc => {
                 frm.set_value("quality_inspection", qi_doc.name);
@@ -389,13 +393,9 @@ function load_line_clearnce_from_template(frm, template_name, operation_doc = nu
 }
 
 function load_bom_operation_details(frm) {
-    const software_operations = [
-        "MISSO Robotic Execution Software-Arm Cart",
-        "MISSO Robotic Execution Software",
-        "MISSO Planning Software"
-    ];
+    
 
-    if (software_operations.includes(frm.doc.operation)) {
+    if (frm.doc.custom_software_reqd) {
         frm.clear_table("custom_jobcard_opeartion_deatils");
         frm.refresh_field("custom_jobcard_opeartion_deatils");
         
@@ -433,13 +433,9 @@ function load_bom_operation_details(frm) {
 }
 
 function handle_software_fields(frm) {
-    const software_operations = [
-        "MISSO Robotic Execution Software-Arm Cart",
-        "MISSO Robotic Execution Software",
-        "MISSO Planning Software"
-    ];
 
-    if (frm.doc.operation && software_operations.includes(frm.doc.operation)) {
+
+    if (frm.doc.custom_software_reqd) {
         frm.set_df_property("custom_software", "hidden", 0);
         frm.set_df_property("custom_version", "hidden", 0);
         frm.set_df_property("custom_installed", "hidden", 0);
@@ -502,29 +498,29 @@ function control_default_button_visibility(frm) {
             (onclick && onclick.includes("Complete"))) {
             
             buttons_found++;
-            console.log("Found Complete Job button:", text, $this.attr('class'));
+            // console.log("Found Complete Job button:", text, $this.attr('class'));
             
             // Control visibility based on form state
             if (frm.is_dirty() || frm.is_new()) {
                 $this.hide();
-                console.log("Hiding default button");
+                // console.log("Hiding default button");
             } else {
                 $this.show();
-                console.log("Showing default button");
+                // console.log("Showing default button");
             }
         }
     });
     
-    console.log("Total buttons found:", buttons_found);
-    console.log("Form state - dirty:", frm.is_dirty(), "new:", frm.is_new());
+    // console.log("Total buttons found:", buttons_found);
+    // console.log("Form state - dirty:", frm.is_dirty(), "new:", frm.is_new());
     
     // Debug: Show all buttons on the page
     if (buttons_found === 0) {
-        console.log("=== ALL BUTTONS ON PAGE ===");
+        // console.log("=== ALL BUTTONS ON PAGE ===");
         $(document).find('button').each(function(index) {
-            console.log(index + ":", $(this).text().trim(), $(this).attr('class'));
+            // console.log(index + ":", $(this).text().trim(), $(this).attr('class'));
         });
-        console.log("=== END BUTTON LIST ===");
+        // console.log("=== END BUTTON LIST ===");
     }
 }
 
@@ -546,7 +542,7 @@ if (typeof window.job_card_observer === 'undefined') {
                     // Check if any new buttons were added
                     $(mutation.addedNodes).find('button').each(function() {
                         if ($(this).text().includes("Complete Job")) {
-                            console.log("New Complete Job button detected!");
+                            // console.log("New Complete Job button detected!");
                             setTimeout(() => {
                                 control_default_button_visibility(cur_frm);
                             }, 100);
