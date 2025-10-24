@@ -767,12 +767,12 @@ def complete_work_order(doc_name):
         "message": f"Stock Entry {stock_entry.name} created successfully."
     }
     
-from erpnext.manufacturing.doctype.work_order.work_order import WorkOrder
+# from erpnext.manufacturing.doctype.work_order.work_order import WorkOrder
 
 
-class CustomWorkOrder(WorkOrder):
-    def on_submit(self):
-        pass
-        # create_stock_entry_for_received_material_on_submit(self.name)
-        # create_stock_entry_on_submit(self.name)
-        # frappe.msgprint(f"{self.name} work order has been released")
+# class CustomWorkOrder(WorkOrder):
+@frappe.whitelist()
+def on_submit(doc, method=None):
+    create_stock_entry_for_received_material_on_submit(doc.name)
+    create_stock_entry_on_submit(doc.name)
+    frappe.msgprint(f"{doc.name} work order has been released")

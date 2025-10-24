@@ -3,42 +3,47 @@ from erpnext.manufacturing.doctype.job_card.job_card import JobCard
 import json
 from frappe.utils import nowdate
 
-class CustomJobCard(JobCard):
-    def before_submit(self):
-        # is_qi_reqd = frappe.db.get_value("Opeartion",self.operation,"custom_quality_inspection_required")
-        is_qi_reqd = frappe.db.get_value(
-            "Operation", 
-            self.operation,  # assuming self.operation stores Operation name
-            "custom_quality_inspection_required"
-        )
-        if self.operation and "soft" in self.operation.lower():
-            self.custom_software = self.operation
+# class CustomJobCard(JobCard):
+@frappe.whitelist()
+def before_submit(self,method=None):
+    # is_qi_reqd = frappe.db.get_value("Opeartion",self.operation,"custom_quality_inspection_required")
+    is_qi_reqd = frappe.db.get_value(
+        "Operation", 
+        self.operation,  # assuming self.operation stores Operation name
+        "custom_quality_inspection_required"
+    )
+    if self.operation and "soft" in self.operation.lower():
+        self.custom_software = self.operation
 
-        # print("is_qi_reqd========7===",is_qi_reqd)
-        if is_qi_reqd:
-            if not self.quality_inspection:
-                frappe.throw("Please create and submit a Quality Inspection before submitting the Job Card.")
+    # print("is_qi_reqd========7===",is_qi_reqd)
+    if is_qi_reqd:
+        if not self.quality_inspection:
+            frappe.throw("Please create and submit a Quality Inspection before submitting the Job Card.")
 
-            qi_doc = frappe.get_doc("Quality Inspection", self.quality_inspection)
+        qi_doc = frappe.get_doc("Quality Inspection", self.quality_inspection)
 
-            if qi_doc.docstatus != 1:
-                frappe.throw(f"Quality Inspection {qi_doc.name} must be submitted before submitting the Job Card.")
+        if qi_doc.docstatus != 1:
+            frappe.throw(f"Quality Inspection {qi_doc.name} must be submitted before submitting the Job Card.")
 
-        # super().before_submit()
-    def on_submit(self):
-        employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
-        self.custom_authorised_by = employee
+    # super().before_submit()
+@frappe.whitelist()
+def on_submit(self,method=None):
+    employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
+    self.custom_authorised_by = employee
+    if self.name:
         check_the_values_set_r_not(self.name)
         check_full_dhr_rqd(self)
-    # def after_insert(self):
-    #     print("------34---in merai-",self.custom_software_reqd)
-    #     if self.custom_software_reqd==1:
-    #         self.custom_software = frappe.db.get_value("Operation",self.operation,"description")
 
-    def before_insert(self):
-        print("------39---in merai-",self.custom_software_reqd)
-        if self.custom_software_reqd==1:
-            self.custom_software = frappe.db.get_value("Operation",self.operation,"description")
+# def after_insert(self):
+#     print("------34---in merai-",self.custom_software_reqd)
+#     if self.custom_software_reqd==1:
+#         self.custom_software = frappe.db.get_value("Operation",self.operation,"description")
+
+@frappe.whitelist()
+def before_insert(self,method=None):
+    print("------39---in merai-",self.custom_software_reqd)
+    if self.custom_software_reqd==1:
+        self.custom_software = frappe.db.get_value("Operation",self.operation,"description")
 
 
 
