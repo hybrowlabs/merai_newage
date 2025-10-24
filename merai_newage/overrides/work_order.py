@@ -606,3 +606,173 @@ def print_workorder_attachments(work_order_name, pdf_writer, task_id=None):
         task_id=task_id,
     )
 
+
+
+
+
+
+
+
+
+
+@frappe.whitelist()
+def create_stock_entry_for_received_material_on_submit(doc_name):
+    doc = frappe.get_doc("Work Order", doc_name)
+    
+    stock_entry = frappe.new_doc("Stock Entry")
+    stock_entry.stock_entry_type = "Material Receipt"
+    stock_entry.posting_date = frappe.utils.nowdate()
+    stock_entry.posting_time = frappe.utils.nowtime()
+    stock_entry.company = "Merai Newage Pvt. Ltd."
+    
+    for item in doc.required_items:
+        batch = frappe.get_value("Item", item.item_code, "has_batch_no")
+        batch_no = ""
+        if batch:
+            batch_list = frappe.get_all("Batch", filters={"item": item.item_code}, pluck="name")
+            count = len(batch_list) + 1
+            new_batch_name = f"{item.item_code}-{count}"
+            
+            batch_doc = frappe.new_doc("Batch")
+            batch_doc.item = item.item_code
+            batch_doc.batch_id = new_batch_name
+            batch_doc.batch_qty = item.required_qty
+            batch_doc.insert(ignore_permissions=True)
+            batch_doc.submit()
+            batch_no = new_batch_name
+            
+        stock_entry_item = stock_entry.append("items", {})
+        stock_entry_item.item_code = item.item_code
+        stock_entry_item.item_name = item.item_name
+        stock_entry_item.uom = item.stock_uom
+        stock_entry_item.qty = item.required_qty
+        stock_entry_item.t_warehouse = item.source_warehouse
+        stock_entry_item.basic_rate = item.rate
+        stock_entry_item.basic_amount = item.amount
+        stock_entry_item.batch_no = batch_no if batch else None
+        
+    stock_entry.insert()
+    stock_entry.submit()
+    frappe.db.commit()
+    return {
+        "status": "success",
+        "stock_entry": stock_entry.name,
+        "message": f"Stock Entry {stock_entry.name} created successfully."
+    }
+
+
+
+        
+@frappe.whitelist()
+def create_stock_entry_on_submit(doc_name):
+    doc = frappe.get_doc("Work Order", doc_name)
+    
+    stock_entry = frappe.new_doc("Stock Entry")
+    stock_entry.stock_entry_type = "Material Transfer for Manufacture"
+    stock_entry.work_order = doc_name
+    stock_entry.posting_date = frappe.utils.nowdate()
+    stock_entry.posting_time = frappe.utils.nowtime()
+    stock_entry.company = "Merai Newage Pvt. Ltd."
+    stock_entry.from_bom = 1
+    stock_entry.use_multi_level_bom = 1
+    stock_entry.bom_no = doc.bom_no
+    stock_entry.fg_completed_qty = doc.qty
+    stock_entry.to_warehouse = doc.wip_warehouse
+    
+    total_amount = 0
+    for item in doc.required_items:
+        stock_entry_item = stock_entry.append("items", {})
+        stock_entry_item.item_code = item.item_code
+        stock_entry_item.item_name = item.item_name
+        stock_entry_item.uom = item.stock_uom
+        stock_entry_item.qty = item.required_qty
+        stock_entry_item.s_warehouse = item.source_warehouse
+        stock_entry_item.t_warehouse = doc.wip_warehouse
+        stock_entry_item.basic_rate = item.rate
+        stock_entry_item.basic_amount = item.amount
+
+        total_amount += item.amount
+    
+    stock_entry.total_incoming_value = total_amount
+    stock_entry.insert()
+    stock_entry.submit()
+    frappe.db.commit()
+    return {
+        "status": "success",
+        "stock_entry": stock_entry.name,
+        "message": f"Stock Entry {stock_entry.name} created successfully."
+    }
+    
+
+
+@frappe.whitelist()
+def complete_work_order(doc_name):
+    doc = frappe.get_doc("Work Order", doc_name)
+    
+    stock_entry = frappe.new_doc("Stock Entry")
+    stock_entry.stock_entry_type = "Manufacture"
+    stock_entry.work_order = doc_name
+    stock_entry.posting_date = frappe.utils.nowdate()
+    stock_entry.posting_time = frappe.utils.nowtime()
+    stock_entry.company = "Merai Newage Pvt. Ltd."
+    stock_entry.from_bom = 1
+    stock_entry.use_multi_level_bom = 1
+    stock_entry.bom_no = doc.bom_no
+    stock_entry.fg_completed_qty = doc.qty
+    
+    for item in doc.required_items:
+        stock_entry_item = stock_entry.append("items", {})
+        stock_entry_item.item_code = item.item_code
+        stock_entry_item.item_name = item.item_name
+        stock_entry_item.uom = item.stock_uom
+        stock_entry_item.qty = item.required_qty
+        stock_entry_item.s_warehouse = doc.wip_warehouse
+        stock_entry_item.basic_rate = item.rate
+        stock_entry_item.basic_amount = item.amount
+        
+        
+    batch_no = ""
+    batch = frappe.get_value("Item", doc.production_item, "has_batch_no")
+    if batch:
+        batch_list = frappe.get_all("Batch", filters={"item": doc.production_item}, pluck="name")
+        count = len(batch_list) + 1
+        new_batch_name = f"{doc.production_item}-{count}"
+        
+        batch_doc = frappe.new_doc("Batch")
+        batch_doc.item = doc.production_item
+        batch_doc.batch_id = new_batch_name
+        batch_doc.batch_qty = doc.qty
+        batch_doc.insert(ignore_permissions=True)
+        batch_doc.submit()
+        batch_no = new_batch_name
+        
+    stock_entry_item = stock_entry.append("items", {})
+    stock_entry_item.item_code = doc.production_item
+    stock_entry_item.item_name = doc.item_name
+    stock_entry_item.uom = doc.stock_uom
+    stock_entry_item.qty = doc.qty
+    stock_entry_item.t_warehouse = doc.fg_warehouse
+    stock_entry_item.is_finished_item = 1
+    stock_entry_item.use_serial_batch_fields = 1
+    stock_entry_item.batch_no = batch_no if batch else None
+    
+    stock_entry.insert()
+    stock_entry.submit()
+    frappe.db.commit()
+    
+    return {
+        "status": "success",
+        "stock_entry": stock_entry.name,
+        "batch_no": batch_no,
+        "message": f"Stock Entry {stock_entry.name} created successfully."
+    }
+    
+from erpnext.manufacturing.doctype.work_order.work_order import WorkOrder
+
+
+class CustomWorkOrder(WorkOrder):
+    def on_submit(self):
+        pass
+        # create_stock_entry_for_received_material_on_submit(self.name)
+        # create_stock_entry_on_submit(self.name)
+        # frappe.msgprint(f"{self.name} work order has been released")

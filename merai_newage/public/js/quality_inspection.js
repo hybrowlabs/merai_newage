@@ -1,6 +1,23 @@
 frappe.ui.form.on("Quality Inspection", {
     refresh: function(frm) {
         handle_software_fields(frm);
+        if (frm.doc.custom_qi_print_format) {
+            let print_format = frm.doc.custom_qi_print_format;
+            frm.meta.default_print_format = print_format;
+
+            frm.page.print_doc = () => {
+                frappe.ui.get_print_settings(false, (print_settings) => {
+                    frappe.print_doc({
+                        doctype: frm.doc.doctype,
+                        name: frm.doc.name,
+                        print_format: print_format,   
+                        letterhead: print_settings.letterhead,
+                        lang: print_settings.lang,
+                        always_print: print_settings.always_print
+                    });
+                });
+            };
+        }
     },
 
     after_save: function(frm) {

@@ -2,6 +2,24 @@
 
 frappe.ui.form.on("Job Card", {
     refresh: function (frm) {
+
+        if (frm.doc.custom_print_format) {
+            let print_format = frm.doc.custom_print_format;
+            frm.meta.default_print_format = print_format;
+
+            frm.page.print_doc = () => {
+                frappe.ui.get_print_settings(false, (print_settings) => {
+                    frappe.print_doc({
+                        doctype: frm.doc.doctype,
+                        name: frm.doc.name,
+                        print_format: print_format,   
+                        letterhead: print_settings.letterhead,
+                        lang: print_settings.lang,
+                        always_print: print_settings.always_print
+                    });
+                });
+            };
+        }
          setTimeout(() => 
           set_batch_query(frm),1000);
         // Prevent multiple refresh calls in short time
@@ -220,6 +238,7 @@ function create_quality_inspection(frm) {
         let matched_items = (work_order_doc.required_items || []).filter(item => {
             return item.operation === frm.doc.operation;
         });
+        
 
         let qi = frappe.model.get_new_doc("Quality Inspection");
         qi.reference_type = "Job Card";
@@ -229,6 +248,7 @@ function create_quality_inspection(frm) {
         qi.sample_size = frm.doc.for_quantity;
         qi.inspected_by = frappe.session.user;
         qi.manual_inspection = 1;
+        qi.custom_qi_print_format = frm.doc.custom_qi_print_format
 
         if (frm.doc.custom_software_reqd) {
             qi.custom_software = frm.doc.operation;

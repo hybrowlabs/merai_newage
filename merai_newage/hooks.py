@@ -275,5 +275,6 @@ fixtures = [
 
 
 override_doctype_class = {
-    "Job Card": "merai_newage.overrides.job_card.CustomJobCard"
+    "Job Card": "merai_newage.overrides.job_card.CustomJobCard",
+    "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
 }
