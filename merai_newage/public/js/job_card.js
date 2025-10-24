@@ -2,6 +2,8 @@
 
 frappe.ui.form.on("Job Card", {
     refresh: function (frm) {
+         setTimeout(() => 
+          set_batch_query(frm),1000);
         // Prevent multiple refresh calls in short time
         if (frm._refresh_in_progress) return;
         frm._refresh_in_progress = true;
@@ -56,6 +58,9 @@ frappe.ui.form.on("Job Card", {
         });
     },
 onload: function(frm) {
+
+        
+
         setTimeout(() => {
             manage_tab_visibility(frm);
         }, 1000);
@@ -511,16 +516,12 @@ function control_default_button_visibility(frm) {
         }
     });
     
-    // console.log("Total buttons found:", buttons_found);
-    // console.log("Form state - dirty:", frm.is_dirty(), "new:", frm.is_new());
-    
-    // Debug: Show all buttons on the page
     if (buttons_found === 0) {
         // console.log("=== ALL BUTTONS ON PAGE ===");
         $(document).find('button').each(function(index) {
             // console.log(index + ":", $(this).text().trim(), $(this).attr('class'));
         });
-        // console.log("=== END BUTTON LIST ===");
+
     }
 }
 
@@ -559,3 +560,67 @@ if (typeof window.job_card_observer === 'undefined') {
         subtree: true
     });
 }
+
+function set_batch_query(frm) {
+    if (frm.fields_dict.custom_jobcard_opeartion_deatils) {
+        console.log("570------------------")
+        frm.fields_dict.custom_jobcard_opeartion_deatils.grid.get_field("batch_number").get_query = function(doc, cdt, cdn) {
+            const child = locals[cdt][cdn];
+            
+            if (!child.item_code) {
+                return;
+            }
+            
+            return {
+                filters: {
+                    item: child.item_code,  
+                    // disabled: 0
+                }
+            };
+        };
+    }
+}
+
+
+
+
+frappe.ui.form.on("Job Card Opeartion Deatils", {
+    batch_number: function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+        console.log("row---------",row)
+        if (row.batch_number) {
+            frappe.db.get_value("Batch", row.batch_number, "custom_batch_number")
+                .then(r => {
+                    if (r.message && r.message.custom_batch_number) {
+                        frappe.model.set_value(cdt, cdn, "batch_no_common", r.message.custom_batch_number);
+                    } else {
+                        frappe.model.set_value(cdt, cdn, "batch_no_common", "");
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching custom_batch_no:", err);
+                    frappe.model.set_value(cdt, cdn, "batch_no_common", "");
+                });
+
+            frappe.db.get_value("Work Order",{"custom_batch":row.batch_number} , "name")
+                .then(r => {
+                    if (r.message && r.message.name) {
+                        frappe.model.set_value(cdt, cdn, "work_order_reference", r.message.name);
+                    } else {
+                        frappe.model.set_value(cdt, cdn, "work_order_reference", "");
+                    }
+                })
+                .catch(err => {
+                    console.error("Error fetching custom_batch_no:", err);
+                    frappe.model.set_value(cdt, cdn, "work_order_reference", "");
+                });
+
+
+        } else {
+            frappe.model.set_value(cdt, cdn, "batch_no_common", "");
+        }
+
+
+        
+    }
+});

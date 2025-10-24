@@ -29,6 +29,17 @@ class CustomJobCard(JobCard):
         employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
         self.custom_authorised_by = employee
         check_the_values_set_r_not(self.name)
+        check_full_dhr_rqd(self)
+    # def after_insert(self):
+    #     print("------34---in merai-",self.custom_software_reqd)
+    #     if self.custom_software_reqd==1:
+    #         self.custom_software = frappe.db.get_value("Operation",self.operation,"description")
+
+    def before_insert(self):
+        print("------39---in merai-",self.custom_software_reqd)
+        if self.custom_software_reqd==1:
+            self.custom_software = frappe.db.get_value("Operation",self.operation,"description")
+
 
 
 @frappe.whitelist()
@@ -108,8 +119,6 @@ def update_user_detail_in_sign_table(doc):
     doc.flags.ignore_validate_update_after_submit = True
     doc.save(ignore_permissions=True)
     frappe.db.commit()
-
-
 
 
 
@@ -251,4 +260,23 @@ def check_the_values_set_r_not(docname):
         )
 
     # return "✅ All required checks are complete."
+def check_full_dhr_rqd(doc):
+    full_dhr = 0
+    print("------------257==============")
 
+    for i in doc.custom_jobcard_opeartion_deatils:
+        print("Row -------", i.name, "| Batch:", i.batch_number)
+        if i.batch_number:
+            full_dhr = 1
+            break  
+
+    if full_dhr > 0 and doc.work_order:
+        workorder_doc = frappe.get_doc("Work Order", doc.work_order)
+        workorder_doc.custom_is_full_dhr = 1
+        workorder_doc.flags.ignore_permissions = True
+        workorder_doc.save(ignore_permissions=True)
+        frappe.db.commit()
+        print("✅ Work Order updated with full DHR = 1")
+
+    else:
+        print("⚠️ No batch number found, skipping update.")
