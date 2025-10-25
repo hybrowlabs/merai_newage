@@ -68,20 +68,20 @@ frappe.ui.form.on("Work Order", {
                             let batch_no = first.message.batch_no;
 
                             // 2nd call (runs only after first is finished)
-                            // let second = await frappe.call({
-                            //     method: "chatnext_manufacturing.config.py.work_order_methods.create_fg_consumption_entry",
-                            //     args: {
-                            //         doc_name: frm.doc.name,
-                            //         batch_no: batch_no
-                            //     }
-                            // });
+                            let second = await frappe.call({
+                                method: "merai_newage.overrides.work_order.create_fg_consumption_entry",
+                                args: {
+                                    doc_name: frm.doc.name,
+                                    batch_no: batch_no
+                                }
+                            });
 
-                            // if (second.message) {
-                            //     frappe.show_alert({
-                            //         message: __("FG Consumption Entry Created Successfully"),
-                            //         indicator: "green"
-                            //     });
-                            // }
+                            if (second.message) {
+                                frappe.show_alert({
+                                    message: __("FG Consumption Entry Created Successfully"),
+                                    indicator: "green"
+                                });
+                            }
                         } catch (e) {
                             frappe.msgprint(__("Something went wrong: ") + e.message);
                         }

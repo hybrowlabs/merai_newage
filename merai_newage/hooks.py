@@ -264,9 +264,9 @@ doc_events = {
         "on_submit": "merai_newage.overrides.work_order.on_submit",
     },
     "Job Card": {
-        "before_submit": "merai_newage.overrides.job_card.before_insert",
+        "before_submit": "merai_newage.overrides.job_card.before_submit",
         "on_submit": "merai_newage.overrides.job_card.on_submit",
-        "before_insert": "merai_newage.overrides.job_card.on_submit",
+        "before_insert": "merai_newage.overrides.job_card.before_insert",
 
     },
     

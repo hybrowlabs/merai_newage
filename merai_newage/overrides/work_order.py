@@ -153,7 +153,7 @@ def print_documents_in_sequence(work_order_doc, pdf_writer, task_id=None, defaul
             )
     print_workorder_attachments(work_order_doc.name,pdf_writer, task_id)
     # Step 2: Print Stock Entries for the Work Order
-    print_stock_entries_for_work_order(work_order_doc, pdf_writer, default_letter_head)
+    # print_stock_entries_for_work_order(work_order_doc, pdf_writer, default_letter_head)
 
     # Step 3: Print Job Cards and their respective QI documents in sequence
     job_cards = frappe.get_list(
@@ -776,3 +776,32 @@ def on_submit(doc, method=None):
     create_stock_entry_for_received_material_on_submit(doc.name)
     create_stock_entry_on_submit(doc.name)
     frappe.msgprint(f"{doc.name} work order has been released")
+
+
+
+@frappe.whitelist()
+def create_fg_consumption_entry(doc_name, batch_no):
+    doc = frappe.get_doc("Work Order", doc_name)
+    
+    stock_entry = frappe.new_doc("Stock Entry")
+    
+    stock_entry.stock_entry_type = "Material Issue"
+    stock_entry.t_warehouse = doc.fg_warehouse
+    stock_entry.company = "Merai Newage Pvt. Ltd."
+    stock_entry.posting_date = frappe.utils.nowdate()
+    stock_entry.posting_time = frappe.utils.nowtime()
+    
+    
+    stock_entry_item = stock_entry.append("items", {})
+    stock_entry_item.item_code = doc.production_item
+    stock_entry_item.item_name = doc.item_name
+    stock_entry_item.uom = doc.stock_uom
+    stock_entry_item.qty = doc.qty
+    stock_entry_item.s_warehouse = doc.fg_warehouse
+    stock_entry.use_serial_batch_fields = 1
+    stock_entry.batch_no = batch_no
+    
+    stock_entry.insert()
+    stock_entry.submit()
+    frappe.db.commit()
+    
