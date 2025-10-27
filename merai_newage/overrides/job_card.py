@@ -8,7 +8,7 @@ from frappe.utils import nowdate
 def before_submit(self,method=None):
     # is_qi_reqd = frappe.db.get_value("Opeartion",self.operation,"custom_quality_inspection_required")
     is_qi_reqd = frappe.db.get_value(
-        "Operation", 
+        "Operation",
         self.operation,  # assuming self.operation stores Operation name
         "custom_quality_inspection_required"
     )
@@ -41,10 +41,14 @@ def on_submit(self,method=None):
 
 @frappe.whitelist()
 def before_insert(self,method=None):
-    print("------39---in merai-",self.custom_software_reqd)
-    if self.custom_software_reqd==1:
-        self.custom_software = frappe.db.get_value("Operation",self.operation,"description")
-
+	if self.work_order:
+		work_order = frappe.get_doc("Work Order", self.work_order)
+		if work_order.planned_start_date:
+			self.posting_date = frappe.utils.getdate(work_order.planned_start_date)
+			self.db_set("posting_date", frappe.utils.getdate(work_order.planned_start_date), update_modified=False)
+	print("------39---in merai-", "\n\n\n\n\n\n", self.custom_software_reqd)
+	if getattr(self, "custom_software_reqd", None) == 1:
+		self.custom_software = frappe.db.get_value("Operation", self.operation, "description")
 
 
 @frappe.whitelist()
@@ -75,7 +79,7 @@ def update_user_detail_in_sign_table(doc):
                 "line_clearance_username":cur_user,
                 "line_clearance_userid":username
             })
-    
+
     elif doc.workflow_state == "Feasibility Verification Pending":
         duplicate = any(row.get("feasibility_test_username") == cur_user for row in doc.custom_job_card_signature_details)
         if not duplicate:
@@ -163,7 +167,7 @@ def set_value_to_user_table(doc_name, user_id, document_state=None):
     cur_user = user_id
     if document_state == "Line Clearance Approved":
         # duplicate = any(row.get("line_clearance_username") == cur_user for row in doc.custom_job_card_signature_details)
-     
+
         row_data.update({
                 "line_clearance_user_fullname": full_name,
                 "line_clearance_date": today,
@@ -273,7 +277,7 @@ def check_full_dhr_rqd(doc):
         print("Row -------", i.name, "| Batch:", i.batch_number)
         if i.batch_number:
             full_dhr = 1
-            break  
+            break
 
     if full_dhr > 0 and doc.work_order:
         workorder_doc = frappe.get_doc("Work Order", doc.work_order)
