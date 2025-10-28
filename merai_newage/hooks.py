@@ -269,10 +269,10 @@ doc_events = {
         "before_insert": "merai_newage.overrides.job_card.before_insert",
 
     },
-    
+
 }
 
- 
+
 fixtures = [
     {"dt": "Batch Number Template"},
 # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
