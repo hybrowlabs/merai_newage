@@ -277,6 +277,7 @@ fixtures = [
     {"dt": "Batch Number Template"},
 # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
 ]
+page_js = {"print": "public/js/print.js"}
 
 
 override_doctype_class = {

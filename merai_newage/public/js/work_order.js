@@ -1,6 +1,24 @@
 frappe.ui.form.on("Work Order", {
     refresh: function (frm) {
-        if (frm.doc.docstatus == 1) {
+ setTimeout(function() {
+        $('[data-original-title="Print"], .btn[title="Print"]').hide();
+        
+        frm.page.btn_secondary.find('.btn[data-original-title="Print"]').hide();
+        
+        $('.icon-btn svg use[href="#icon-printer"]').closest('.btn').hide();
+    }, 100);
+         if (frm.doc.docstatus=1) {
+            frappe.db.count("Job Card", {
+                filters: { work_order: frm.doc.name }
+            }).then(count => {
+                if (count > 0) {
+                    frm.remove_custom_button("Create Job Card");
+                    frm.remove_custom_button("Material Consumption");
+                    frm.remove_custom_button("Create Pick List");
+                }
+            });
+        }
+        if (frm.doc.status === "Completed") {
             frm.add_custom_button("Print DHR", function () {
                 frappe.call({
                     method: "merai_newage.overrides.work_order.print_work_order_async",
@@ -16,7 +34,7 @@ frappe.ui.form.on("Work Order", {
             });
         }
         
-        if (frm.doc.docstatus == 1 && frm.doc.custom_is_full_dhr === 1) {
+        if (frm.doc.status === "Completed" && frm.doc.custom_is_full_dhr === 1) {
             frm.add_custom_button("Print Full DHR", function () {
                 frappe.call({
                     method: "merai_newage.overrides.work_order.print_full_bmr",

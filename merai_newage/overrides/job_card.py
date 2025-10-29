@@ -30,6 +30,7 @@ def before_submit(self,method=None):
 def on_submit(self,method=None):
     employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
     self.custom_authorised_by = employee
+    self.custom_authorised_by_date = frappe.utils.nowdate()
     if self.name:
         check_the_values_set_r_not(self.name)
         check_full_dhr_rqd(self)

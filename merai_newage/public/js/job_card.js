@@ -75,7 +75,9 @@ frappe.ui.form.on("Job Card", {
         if (r.message) {
           console.log("r---", r);
           frm.doc.custom_signed_by = r.message;
+          frm.doc.custom_signed_by_date = frappe.datetime.now_datetime();
           frm.refresh_field("custom_signed_by");
+          frm.refresh_field("custom_signed_by_date");
         }
       },
     });
@@ -289,7 +291,7 @@ function create_quality_inspection(frm) {
     qi.sample_size = frm.doc.for_quantity;
     qi.inspected_by = frappe.session.user;
     qi.manual_inspection = 1;
-    qi.custom_qi_print_format = frm.doc.custom_qi_print_format;
+    qi.custom_print_format = frm.doc.custom_qi_print_format;
 
     if (frm.doc.custom_software_reqd) {
       qi.custom_software = frm.doc.operation;
