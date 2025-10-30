@@ -26,22 +26,22 @@ frappe.ui.form.on("Job Card", {
     if (!frm.doc.operation || !frm.doc.work_order) return;
 
     // Quality Inspection button
-    if (frm.doc.docstatus != 1 && !frm.doc.quality_inspection) {
-      frappe.db
-        .get_value(
-          "Operation",
-          frm.doc.operation,
-          "custom_quality_inspection_required"
-        )
-        .then((r) => {
-          if (r.message && r.message.custom_quality_inspection_required) {
-            frm.add_custom_button(__("Create QI"), function () {
-              create_quality_inspection(frm);
-            });
-          }
-        });
-    }
-
+    // if (frm.doc) {
+      // frappe.db
+      //   .get_value(
+      //     "Operation",
+      //     frm.doc.operation,
+      //     "custom_quality_inspection_required"
+      //   )
+      //   .then((r) => {
+      //     if (r.message && r.message.custom_quality_inspection_required) {
+      //       frm.add_custom_button(__("Create QI"), function () {
+      //         create_quality_inspection(frm);
+      //       });
+      //     }
+      //   });
+    // }
+  add_qi_button_if_required(frm)
     // Load templates only for new documents
     if ((frm.is_new() || frm.doc.__islocal) && frm.doc.docstatus != 1) {
       load_templates_for_new_doc(frm);
@@ -85,6 +85,7 @@ frappe.ui.form.on("Job Card", {
   onload: function (frm) {
     setTimeout(() => {
       manage_tab_visibility(frm);
+      add_qi_button_if_required(frm);
     }, 1000);
 
     if (
@@ -94,9 +95,19 @@ frappe.ui.form.on("Job Card", {
     ) {
       setTimeout(() => {
         handle_software_fields(frm);
+
         frm._software_fields_initialized = true;
       }, 500);
     }
+  },
+   after_save(frm) {
+    add_qi_button_if_required(frm);
+  },
+before_save(frm) {
+    add_qi_button_if_required(frm);
+  },
+  on_submit(frm) {
+    add_qi_button_if_required(frm);
   },
   operation: function (frm) {
     if (frm._refresh_in_progress) return;
@@ -277,47 +288,108 @@ function load_templates_for_new_doc(frm) {
   }
 }
 
+// function create_quality_inspection(frm) {
+//   frappe.db.get_doc("Work Order", frm.doc.work_order).then((work_order_doc) => {
+//     let matched_items = (work_order_doc.required_items || []).filter((item) => {
+//       return item.operation === frm.doc.operation;
+//     });
+    
+//     let qi = frappe.model.get_new_doc("Quality Inspection");
+//     qi.reference_type = "Job Card";
+//     qi.reference_name = frm.doc.name;
+//     qi.inspection_type = "In Process";
+//     qi.item_code = work_order_doc.production_item;
+//     qi.sample_size = frm.doc.for_quantity;
+//     qi.inspected_by = frappe.session.user;
+//     qi.manual_inspection = 1;
+//     qi.custom_print_format = frm.doc.custom_qi_print_format;
+
+//     if (frm.doc.custom_software_reqd) {
+//       qi.custom_software = frm.doc.operation;
+//       frappe.db.insert(qi).then((qi_doc) => {
+//         frm.set_value("quality_inspection", qi_doc.name);
+//         frm.save().then(() => {
+//           frappe.set_route("Form", "Quality Inspection", qi_doc.name);
+//         });
+//       });
+//     } else {
+//       matched_items.forEach((item) => {
+//         let qi_item = frappe.model.add_child(qi, "QC Items", "custom_qc_items");
+//         qi_item.item_code = item.item_code;
+//         qi_item.item_name = item.item_name;
+//         qi_item.item_description = item.description;
+//       });
+
+//       frappe.db.insert(qi).then((qi_doc) => {
+//         frm.set_value("quality_inspection", qi_doc.name);
+//         frm.save().then(() => {
+//           frappe.set_route("Form", "Quality Inspection", qi_doc.name);
+//         });
+//       });
+//     }
+//   });
+// }
+
+
 function create_quality_inspection(frm) {
-  frappe.db.get_doc("Work Order", frm.doc.work_order).then((work_order_doc) => {
-    let matched_items = (work_order_doc.required_items || []).filter((item) => {
-      return item.operation === frm.doc.operation;
+  // Step 1: Check if QI already exists for this Job Card
+  frappe.db.get_value("Quality Inspection", { reference_name: frm.doc.name }, "name")
+    .then((r) => {
+      if (r.message && r.message.name) {
+        // QI already exists — show error with link
+        const qi_name = r.message.name;
+        frappe.msgprint({
+          title: __("Quality Inspection Already Exists"),
+          indicator: "red",
+          message: __(
+            `A Quality Inspection already exists for this Job Card.<br>
+            <a href="#Form/Quality Inspection/${qi_name}" style="font-weight:bold; color:var(--blue-600);">
+              ${qi_name}
+            </a>`
+          ),
+        });
+        frappe.utils.play_sound("error");
+        return;
+      }
+
+      // Step 2: No existing QI → proceed to create a new one
+      frappe.db.get_doc("Work Order", frm.doc.work_order).then((work_order_doc) => {
+        let matched_items = (work_order_doc.required_items || []).filter(
+          (item) => item.operation === frm.doc.operation
+        );
+
+        let qi = frappe.model.get_new_doc("Quality Inspection");
+        qi.reference_type = "Job Card";
+        qi.reference_name = frm.doc.name;
+        qi.inspection_type = "In Process";
+        qi.item_code = work_order_doc.production_item;
+        qi.sample_size = frm.doc.for_quantity;
+        qi.inspected_by = frappe.session.user;
+        qi.manual_inspection = 1;
+        qi.custom_print_format = frm.doc.custom_qi_print_format;
+
+        if (frm.doc.custom_software_reqd) {
+          qi.custom_software = frm.doc.operation;
+        } else {
+          matched_items.forEach((item) => {
+            let qi_item = frappe.model.add_child(qi, "QC Items", "custom_qc_items");
+            qi_item.item_code = item.item_code;
+            qi_item.item_name = item.item_name;
+            qi_item.item_description = item.description;
+          });
+        }
+
+        // Step 3: Insert the new QI
+        frappe.db.insert(qi).then((qi_doc) => {
+          frm.set_value("quality_inspection", qi_doc.name);
+          frm.save().then(() => {
+            frappe.set_route("Form", "Quality Inspection", qi_doc.name);
+          });
+        });
+      });
     });
-
-    let qi = frappe.model.get_new_doc("Quality Inspection");
-    qi.reference_type = "Job Card";
-    qi.reference_name = frm.doc.name;
-    qi.inspection_type = "In Process";
-    qi.item_code = work_order_doc.production_item;
-    qi.sample_size = frm.doc.for_quantity;
-    qi.inspected_by = frappe.session.user;
-    qi.manual_inspection = 1;
-    qi.custom_print_format = frm.doc.custom_qi_print_format;
-
-    if (frm.doc.custom_software_reqd) {
-      qi.custom_software = frm.doc.operation;
-      frappe.db.insert(qi).then((qi_doc) => {
-        frm.set_value("quality_inspection", qi_doc.name);
-        frm.save().then(() => {
-          frappe.set_route("Form", "Quality Inspection", qi_doc.name);
-        });
-      });
-    } else {
-      matched_items.forEach((item) => {
-        let qi_item = frappe.model.add_child(qi, "QC Items", "custom_qc_items");
-        qi_item.item_code = item.item_code;
-        qi_item.item_name = item.item_name;
-        qi_item.item_description = item.description;
-      });
-
-      frappe.db.insert(qi).then((qi_doc) => {
-        frm.set_value("quality_inspection", qi_doc.name);
-        frm.save().then(() => {
-          frappe.set_route("Form", "Quality Inspection", qi_doc.name);
-        });
-      });
-    }
-  });
 }
+
 
 function load_form_data(frm) {
   if (frm.doc.docstatus == 1) return;
@@ -761,3 +833,16 @@ frappe.ui.form.on("Job Card Opeartion Deatils", {
     }
   },
 });
+
+
+function add_qi_button_if_required(frm) {
+  frappe.db
+    .get_value("Operation", frm.doc.operation, "custom_quality_inspection_required")
+    .then((r) => {
+      if (r.message && r.message.custom_quality_inspection_required) {
+        frm.add_custom_button(__("Create QI"), function () {
+          create_quality_inspection(frm);
+        });
+      }
+    });
+}
