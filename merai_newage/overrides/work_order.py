@@ -362,8 +362,8 @@ def print_single_quality_inspection(qi_name, pdf_writer, default_letter_head, op
         if hasattr(qi_doc, 'custom_print_format') and qi_doc.custom_print_format:
             print_format = qi_doc.custom_print_format
             frappe.logger("print").info(f"Using QI custom print format: {print_format}")
-        elif operation_doc and hasattr(operation_doc, 'custom_qi_print_format') and operation_doc.custom_qi_print_format:
-            print_format = operation_doc.custom_qi_print_format
+        elif operation_doc and hasattr(operation_doc, 'custom_print_format') and operation_doc.custom_print_format:
+            print_format = operation_doc.custom_print_format
             frappe.logger("print").info(f"Using Operation custom print format: {print_format}")
         else:
             # Try to find a default Quality Inspection print format

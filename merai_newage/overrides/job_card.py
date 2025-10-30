@@ -1,7 +1,8 @@
 import frappe
 from erpnext.manufacturing.doctype.job_card.job_card import JobCard
 import json
-from frappe.utils import nowdate
+from frappe.query_builder import Criterion
+from frappe.utils import nowdate, add_to_date, get_datetime
 
 # class CustomJobCard(JobCard):
 @frappe.whitelist()
@@ -290,3 +291,63 @@ def check_full_dhr_rqd(doc):
 
     else:
         print("⚠️ No batch number found, skipping update.")
+
+
+def custom_get_time_logs(self, args, doctype, open_job_cards=None):
+	if args.get("remaining_time_in_mins") and get_datetime(args.from_time) >= get_datetime(args.to_time):
+		args.to_time = add_to_date(args.from_time, minutes=args.get("remaining_time_in_mins"))
+
+	jc = frappe.qb.DocType("Job Card")
+	jctl = frappe.qb.DocType(doctype)
+
+	time_conditions = [
+		((jctl.from_time < args.from_time) & (jctl.to_time > args.from_time)),
+		((jctl.from_time < args.to_time) & (jctl.to_time > args.to_time)),
+		((jctl.from_time >= args.from_time) & (jctl.to_time <= args.to_time)),
+	]
+
+	query = (
+		frappe.qb.from_(jctl)
+		.from_(jc)
+		.select(
+			jc.name.as_("name"),
+			jctl.name.as_("row_name"),
+			jctl.from_time,
+			jctl.to_time,
+			jc.workstation,
+			jc.workstation_type,
+		)
+		.where(
+			(jctl.parent == jc.name)
+			& (Criterion.any(time_conditions))
+			& (jctl.name != f"{args.name or 'No Name'}")
+			& (jc.name != f"{args.parent or 'No Name'}")
+			& (jc.docstatus < 2)
+		)
+		.orderby(jctl.to_time)
+	)
+
+	if self.workstation_type:
+		query = query.where(jc.workstation_type == self.workstation_type)
+
+	if self.workstation:
+		query = query.where(jc.workstation == self.workstation)
+
+	if args.get("employee"):
+		if not open_job_cards and doctype == "Job Card Scheduled Time":
+			return []
+
+		if doctype == "Job Card Time Log":
+			query = query.where(jctl.employee == args.get("employee"))
+		else:
+			query = query.where(jc.name.isin(open_job_cards))
+
+	# ✅ CUSTOM FIX: Only check draft job cards to prevent completed cards from blocking new work
+	if doctype == "Job Card Time Log":
+		query = query.where(jc.docstatus == 0)
+	else:
+		query = query.where((jc.docstatus == 0) & (jc.total_time_in_mins == 0))
+
+	time_logs = query.run(as_dict=True)
+
+	return time_logs
