@@ -13,7 +13,9 @@
   "verified",
   "ar_number",
   "batch_number",
-  "remarks"
+  "remarks",
+  "batch_no_common",
+  "work_order_reference"
  ],
  "fields": [
   {
@@ -55,20 +57,34 @@
    "depends_on": "eval:parent.custom_ar_no_reqd===1",
    "fieldname": "ar_number",
    "fieldtype": "Data",
-   "label": "AR Number"
+   "label": "AR Number",
+   "read_only_depends_on": "eval:parent.custom_ar_no_reqd===0"
   },
   {
    "depends_on": "eval:parent.custom_batch_no_reqd===1",
    "fieldname": "batch_number",
+   "fieldtype": "Link",
+   "label": "Batch Number",
+   "options": "Batch",
+   "read_only_depends_on": "eval: parent.custom_batch_no_reqd === 0"
+  },
+  {
+   "fieldname": "batch_no_common",
    "fieldtype": "Data",
-   "label": "Batch Number"
+   "label": "Batch No (Common)"
+  },
+  {
+   "fieldname": "work_order_reference",
+   "fieldtype": "Link",
+   "label": "Work Order Reference",
+   "options": "Work Order"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-10-13 17:08:41.872779",
+ "modified": "2025-10-25 12:52:29.489325",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Job Card Opeartion Deatils",

@@ -260,20 +260,27 @@ doctype_js = {
 
 doc_events = {
     "Work Order": {
-        # "before_insert": "merai_newage.merai_newage.doctype.batch_number_template.batch_number_template.generate_batch_number",
-        # "validate": "merai_newage.merai_newage.doctype.batch_number_template.batch_number_template.generate_batch_number",
         "before_insert": "merai_newage.overrides.work_order.before_insert",
+        "on_submit": "merai_newage.overrides.work_order.on_submit",
+    },
+    "Job Card": {
+        "before_submit": "merai_newage.overrides.job_card.before_submit",
+        "on_submit": "merai_newage.overrides.job_card.on_submit",
+        "before_insert": "merai_newage.overrides.job_card.before_insert",
 
-    }
+    },
+
 }
 
- 
+
 fixtures = [
     {"dt": "Batch Number Template"},
 # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
 ]
+page_js = {"print": "public/js/print.js"}
 
 
 override_doctype_class = {
-    "Job Card": "merai_newage.overrides.job_card.CustomJobCard"
+    # "Job Card": "merai_newage.overrides.job_card.CustomJobCard",
+    # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
 }

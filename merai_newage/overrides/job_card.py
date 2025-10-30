@@ -3,32 +3,53 @@ from erpnext.manufacturing.doctype.job_card.job_card import JobCard
 import json
 from frappe.utils import nowdate
 
-class CustomJobCard(JobCard):
-    def before_submit(self):
-        # is_qi_reqd = frappe.db.get_value("Opeartion",self.operation,"custom_quality_inspection_required")
-        is_qi_reqd = frappe.db.get_value(
-            "Operation", 
-            self.operation,  # assuming self.operation stores Operation name
-            "custom_quality_inspection_required"
-        )
-        if self.operation and "soft" in self.operation.lower():
-            self.custom_software = self.operation
+# class CustomJobCard(JobCard):
+@frappe.whitelist()
+def before_submit(self,method=None):
+    # is_qi_reqd = frappe.db.get_value("Opeartion",self.operation,"custom_quality_inspection_required")
+    is_qi_reqd = frappe.db.get_value(
+        "Operation",
+        self.operation,  # assuming self.operation stores Operation name
+        "custom_quality_inspection_required"
+    )
+    if self.operation and "soft" in self.operation.lower():
+        self.custom_software = self.operation
 
-        # print("is_qi_reqd========7===",is_qi_reqd)
-        if is_qi_reqd:
-            if not self.quality_inspection:
-                frappe.throw("Please create and submit a Quality Inspection before submitting the Job Card.")
+    # print("is_qi_reqd========7===",is_qi_reqd)
+    if is_qi_reqd:
+        if not self.quality_inspection:
+            frappe.throw("Please create and submit a Quality Inspection before submitting the Job Card.")
 
-            qi_doc = frappe.get_doc("Quality Inspection", self.quality_inspection)
+        qi_doc = frappe.get_doc("Quality Inspection", self.quality_inspection)
 
-            if qi_doc.docstatus != 1:
-                frappe.throw(f"Quality Inspection {qi_doc.name} must be submitted before submitting the Job Card.")
+        if qi_doc.docstatus != 1:
+            frappe.throw(f"Quality Inspection {qi_doc.name} must be submitted before submitting the Job Card.")
 
-        # super().before_submit()
-    def on_submit(self):
-        employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
-        self.custom_authorised_by = employee
+    # super().before_submit()
+@frappe.whitelist()
+def on_submit(self,method=None):
+    employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
+    self.custom_authorised_by = employee
+    self.custom_authorised_by_date = frappe.utils.nowdate()
+    if self.name:
         check_the_values_set_r_not(self.name)
+        check_full_dhr_rqd(self)
+
+# def after_insert(self):
+#     print("------34---in merai-",self.custom_software_reqd)
+#     if self.custom_software_reqd==1:
+#         self.custom_software = frappe.db.get_value("Operation",self.operation,"description")
+
+@frappe.whitelist()
+def before_insert(self,method=None):
+	if self.work_order:
+		work_order = frappe.get_doc("Work Order", self.work_order)
+		if work_order.planned_start_date:
+			self.posting_date = frappe.utils.getdate(work_order.planned_start_date)
+			self.db_set("posting_date", frappe.utils.getdate(work_order.planned_start_date), update_modified=False)
+	print("------39---in merai-", "\n\n\n\n\n\n", self.custom_software_reqd)
+	if getattr(self, "custom_software_reqd", None) == 1:
+		self.custom_software = frappe.db.get_value("Operation", self.operation, "description")
 
 
 @frappe.whitelist()
@@ -59,7 +80,7 @@ def update_user_detail_in_sign_table(doc):
                 "line_clearance_username":cur_user,
                 "line_clearance_userid":username
             })
-    
+
     elif doc.workflow_state == "Feasibility Verification Pending":
         duplicate = any(row.get("feasibility_test_username") == cur_user for row in doc.custom_job_card_signature_details)
         if not duplicate:
@@ -115,8 +136,6 @@ def update_user_detail_in_sign_table(doc):
 
 
 
-
-
 @frappe.whitelist()
 def get_employee_by_user():
     print("frappe.session.uer------120---",frappe.session.user)
@@ -149,7 +168,7 @@ def set_value_to_user_table(doc_name, user_id, document_state=None):
     cur_user = user_id
     if document_state == "Line Clearance Approved":
         # duplicate = any(row.get("line_clearance_username") == cur_user for row in doc.custom_job_card_signature_details)
-     
+
         row_data.update({
                 "line_clearance_user_fullname": full_name,
                 "line_clearance_date": today,
@@ -251,4 +270,23 @@ def check_the_values_set_r_not(docname):
         )
 
     # return "✅ All required checks are complete."
+def check_full_dhr_rqd(doc):
+    full_dhr = 0
+    print("------------257==============")
 
+    for i in doc.custom_jobcard_opeartion_deatils:
+        print("Row -------", i.name, "| Batch:", i.batch_number)
+        if i.batch_number:
+            full_dhr = 1
+            break
+
+    if full_dhr > 0 and doc.work_order:
+        workorder_doc = frappe.get_doc("Work Order", doc.work_order)
+        workorder_doc.custom_is_full_dhr = 1
+        workorder_doc.flags.ignore_permissions = True
+        workorder_doc.save(ignore_permissions=True)
+        frappe.db.commit()
+        print("✅ Work Order updated with full DHR = 1")
+
+    else:
+        print("⚠️ No batch number found, skipping update.")

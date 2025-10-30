@@ -1,6 +1,7 @@
 frappe.ui.form.on("Quality Inspection", {
     refresh: function(frm) {
         handle_software_fields(frm);
+       
     },
 
     after_save: function(frm) {

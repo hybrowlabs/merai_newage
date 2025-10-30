@@ -51,7 +51,7 @@ def exec_py_exp(py_exp, variables):
 	# Handle null or empty py_exp
 	if not py_exp or not py_exp.strip():
 		return None
-		
+
 	py_exp = py_exp.replace('\n', '\n  ')
 	py_exp = "def returned_function(variables):\n  " + py_exp
 	_g, _l = safe_exec(py_exp)
@@ -66,15 +66,15 @@ def create_batch_number(doc, variables={}):
 	try:
 		variables["doc"] = doc
 		print("36----",doc)
-		
+
 		item_code = doc.production_item
 		# print("item_code====46",item_code)
 		item_data = frappe.get_doc("Item",item_code)
 		# print("itemdata========",item_data)
-		
+
 		batch_number_template = frappe.get_doc("Batch Number Template", item_data.custom_batch_number_template)
 		print("batch_number_template======",batch_number_template)
-		
+
 		if not hasattr(batch_number_template, 'batch_number_logic') or not batch_number_template.batch_number_logic:
 			print("59---")
 			frappe.log_error(
@@ -82,7 +82,7 @@ def create_batch_number(doc, variables={}):
 				"Batch Number Generation"
 			)
 			return None
-		
+
 		# Execute the logic
 		result = exec_py_exp(batch_number_template.batch_number_logic, variables)
 		print("result===>64",result)
@@ -91,16 +91,16 @@ def create_batch_number(doc, variables={}):
 				f"Batch number logic returned None for template {batch_number_template.name}",
 				"Batch Number Generation"
 			)
-		
+
 		return result
-		
+
 	except frappe.DoesNotExistError as e:
 		frappe.log_error(
 			f"Document not found during batch number generation: {str(e)}",
 			"Batch Number Generation"
 		)
 		return None
-		
+
 	except Exception as e:
 		frappe.log_error(
 			f"Error in batch number generation: {str(e)}\nDocument: {doc.doctype} - {doc.name}",
