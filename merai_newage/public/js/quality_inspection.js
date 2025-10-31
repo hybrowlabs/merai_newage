@@ -3,6 +3,20 @@ frappe.ui.form.on("Quality Inspection", {
         handle_software_fields(frm);
        
     },
+before_save: function(frm) {
+  frappe.call({
+    method: "merai_newage.overrides.quality_inspection.get_employee_by_user",
+    args: {
+      user: frappe.session.user
+    },
+    callback: function(r) {
+      if (r.message) {
+        console.log("Employee:", r.message);
+      }
+    }
+  });
+},
+   
 
     after_save: function(frm) {
         handle_software_fields(frm);
