@@ -1,0 +1,133 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-10-31 11:31:05.302144",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_ldcx",
+  "naming_series",
+  "hospital_name",
+  "item_code",
+  "dispatch_date",
+  "column_break_wuyr",
+  "robot_classifcation",
+  "batch_no",
+  "invoice_no",
+  "work_order",
+  "standard_checklist_section",
+  "dispatch_standard_checklist",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_ldcx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "hospital_name",
+   "fieldtype": "Link",
+   "label": "Hospital Name",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "dispatch_date",
+   "fieldtype": "Date",
+   "label": "Dispatch Date"
+  },
+  {
+   "fieldname": "column_break_wuyr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "robot_classifcation",
+   "fieldtype": "Select",
+   "label": "Robot Classifcation",
+   "options": "\nDemo\nSales"
+  },
+  {
+   "fieldname": "batch_no",
+   "fieldtype": "Link",
+   "label": "Batch No",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "invoice_no",
+   "fieldtype": "Data",
+   "label": "Invoice No"
+  },
+  {
+   "fieldname": "standard_checklist_section",
+   "fieldtype": "Section Break",
+   "label": "Standard Checklist"
+  },
+  {
+   "fieldname": "dispatch_standard_checklist",
+   "fieldtype": "Table",
+   "label": "Dispatch Standard Checklist",
+   "options": "Dispatch Standard Checklist"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Dispatch",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "default": ".{hospital_name}./.{item_code}./.YY./.###",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Naming Series",
+   "options": ".{hospital_name}./.{item_code}./.YY./.###",
+   "reqd": 1
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "Work Order",
+   "options": "Work Order"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-10-31 12:46:53.045101",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Dispatch",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

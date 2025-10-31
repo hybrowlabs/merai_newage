@@ -1,0 +1,46 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-10-31 12:08:33.519313",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_love",
+  "product_name",
+  "product_description"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_love",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "product_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Product Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "product_description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Product Description"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-10-31 12:19:28.807934",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Dispatch Checklist Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

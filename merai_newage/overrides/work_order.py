@@ -49,8 +49,38 @@ from frappe.utils import (
 from pypdf import PdfWriter
 from pypika import functions as fn
 
+import frappe
+from frappe.model.naming import make_autoname
+
+def autoname(doc, method):
+    # pass
+    # """
+    # Dynamically set Work Order naming series based on custom prefix.
+    # """
+    # # Try to get the custom prefix from the related Item
+    if not doc.custom_work_order_prefix:
+        wo_prefix = frappe.db.get_value("Item", doc.production_item, "custom_work_order_prefix")
+        print("wo_prefix---------",wo_prefix)
+        if wo_prefix:
+            doc.custom_work_order_prefix = wo_prefix
+
+    # Build the naming series dynamically
+    if doc.custom_work_order_prefix:
+        naming_series = f"{doc.custom_work_order_prefix}.-.YYYY.-.####"
+    else:
+        naming_series = "MFG-WO-.YYYY.-.####"
+
+    # Generate the name using frappe’s make_autoname utility
+    doc.name = make_autoname(naming_series)
+
+
+
 def before_insert(doc, _method):
     # Check for back-dated transaction permission
+    wo_prefix = frappe.db.get_value("Item",doc.production_item,"custom_work_order_prefix")
+    print("wo_prefix=========57",wo_prefix)
+    if wo_prefix:
+        set_prefix_in_wo(doc)
     validate_back_dated_transaction(doc)
     item = doc.production_item
     batch_number = create_batch_number(doc)
@@ -116,6 +146,12 @@ def validate_back_dated_transaction(doc):
         )
 
 
+@frappe.whitelist()
+def set_prefix_in_wo(doc):
+    if not doc.custom_work_order_prefix:
+        wo_prefix = frappe.db.get_value("Item",doc.production_item,"custom_work_order_prefix")
+        if wo_prefix:
+            doc.custom_work_order_prefix = wo_prefix
 @frappe.whitelist()
 def print_work_order_async(name):
     task_id = str(uuid.uuid4())
