@@ -68,20 +68,20 @@ frappe.ui.form.on("Job Card", {
       manage_tab_visibility(frm);
     }, 1000);
   },
-  before_save: function (frm) {
-    frappe.call({
-      method: "merai_newage.overrides.job_card.get_employee_by_user",
-      callback: function (r) {
-        if (r.message) {
-          console.log("r---", r);
-          frm.doc.custom_signed_by = r.message;
-          frm.doc.custom_signed_by_date = frappe.datetime.now_datetime();
-          frm.refresh_field("custom_signed_by");
-          frm.refresh_field("custom_signed_by_date");
-        }
-      },
-    });
-  },
+  // before_save: function (frm) {
+  //   frappe.call({
+  //     method: "merai_newage.overrides.job_card.get_employee_by_user",
+  //     callback: function (r) {
+  //       if (r.message) {
+  //         console.log("r---", r);
+  //         frm.doc.custom_signed_by = r.message;
+  //         frm.doc.custom_signed_by_date = frappe.datetime.now_datetime();
+  //         frm.refresh_field("custom_signed_by");
+  //         frm.refresh_field("custom_signed_by_date");
+  //       }
+  //     },
+  //   });
+  // },
   onload: function (frm) {
     setTimeout(() => {
       manage_tab_visibility(frm);
@@ -343,7 +343,7 @@ function create_quality_inspection(frm) {
           indicator: "red",
           message: __(
             `A Quality Inspection already exists for this Job Card.<br>
-            <a href="#Form/Quality Inspection/${qi_name}" style="font-weight:bold; color:var(--blue-600);">
+            <a href="/app/quality-inspection/${qi_name}" style="font-weight:bold; color:var(--blue-600);">
               ${qi_name}
             </a>`
           ),

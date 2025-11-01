@@ -36,6 +36,13 @@ def on_submit(self,method=None):
         check_the_values_set_r_not(self.name)
         check_full_dhr_rqd(self)
 
+@frappe.whitelist()
+def before_save(self,method=None):
+    employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
+    print("employe------from server side ",employee)
+    self.custom_signed_by = employee
+    self.custom_signed_by_date = frappe.utils.nowdate()
+
 # def after_insert(self):
 #     print("------34---in merai-",self.custom_software_reqd)
 #     if self.custom_software_reqd==1:
