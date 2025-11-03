@@ -273,7 +273,8 @@ doc_events = {
 		"before_validate": "merai_newage.overrides.apply_job_card_overrides"
     },
     "Quality Inspection": {
-        "before_submit": "merai_newage.overrides.quality_inspection.before_submit"
+        "before_save": "merai_newage.overrides.quality_inspection.before_save",
+        "on_submit": "merai_newage.overrides.quality_inspection.on_submit",        
     }    
 
 }

@@ -18,14 +18,35 @@
 #     print("employe----------",employee)
 #     return employee   
 
+# import frappe
+# from frappe.utils import nowdate
+
+# def before_submit(doc, method=None):
+#     employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
+#     if employee:
+#         doc.custom_verification_done_by = employee
+#         doc.custom_verification_date = nowdate()
+#     else:
+#         # optional: block submit or just note it
+#         frappe.msgprint("No Employee mapped to the current user; verification fields left blank.")
+
 import frappe
 from frappe.utils import nowdate
 
-def before_submit(doc, method=None):
+def before_save(doc, method=None):
+    """Executed before document save"""
+    employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
+    frappe.logger().info(f"Employee found from server side: {employee}")
+    if employee:
+        doc.custom_inspection_done_by = employee
+        doc.custom_inspection_date = nowdate()
+
+def on_submit(doc, method=None):
+    """Executed when document is submitted"""
     employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
     if employee:
         doc.custom_verification_done_by = employee
         doc.custom_verification_date = nowdate()
+        doc.db_update()  # <-- important: persist changes made after submit
     else:
-        # optional: block submit or just note it
         frappe.msgprint("No Employee mapped to the current user; verification fields left blank.")
