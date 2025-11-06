@@ -25,6 +25,9 @@ def before_submit(self,method=None):
 
         if qi_doc.docstatus != 1:
             frappe.throw(f"Quality Inspection {qi_doc.name} must be submitted before submitting the Job Card.")
+    if self.name:
+        check_the_values_set_r_not(self.name)
+        check_full_dhr_rqd(self)
 
     # super().before_submit()
 @frappe.whitelist()
@@ -32,16 +35,31 @@ def on_submit(self,method=None):
     employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
     self.custom_authorised_by = employee
     self.custom_authorised_by_date = frappe.utils.nowdate()
-    if self.name:
-        check_the_values_set_r_not(self.name)
-        check_full_dhr_rqd(self)
+    self.flags.ignore_permissions = True
+    self.flags.ignore_validate_update_after_submit = True
+    self.save(ignore_permissions=True)
+    frappe.db.commit()
+    
 
-@frappe.whitelist()
-def before_save(self,method=None):
-    employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
-    print("employe------from server side ",employee)
-    self.custom_signed_by = employee
-    self.custom_signed_by_date = frappe.utils.nowdate()
+from frappe.utils import flt, now_datetime
+import frappe
+from frappe.utils import flt, now_datetime
+
+def before_save(self, method=None):
+    """Set custom_signed_by to the employee from the last valid completed time log."""
+    if not self.time_logs:
+        return
+
+    # Loop from last to first — find the last row with completed_qty > 0
+    for log in reversed(self.time_logs):
+        if flt(log.completed_qty) > 0 and log.employee:
+            # Set the values from that row
+            if self.custom_signed_by != log.employee:
+                self.custom_signed_by = log.employee
+                self.custom_signed_by_date = now_datetime()
+            break  # stop once a valid row is found
+
+        
 
 # def after_insert(self):
 #     print("------34---in merai-",self.custom_software_reqd)
@@ -153,6 +171,35 @@ def get_employee_by_user():
 
 
 
+
+
+# # override the make_time_log function to add custom_qty
+# @frappe.whitelist()
+# def make_time_log_override(args):
+#     if isinstance(args, str):
+#         args = json.loads(args)
+#     print("args--",args)
+#     args = frappe._dict(args)
+#     doc = frappe.get_doc("Job Card", args.job_card_id)
+#     doc.validate_sequence_id()
+#     doc.add_time_log(args)
+   
+#     # # if args.company and args.company.strip() == "Meril Life Sciences Pvt. Ltd.":
+#     # if hasattr(args, "custom_produces_qty"):
+#     #     # Get the most recently added time log (last one in the list)
+#     #     if args.status=="Complete":
+#     #         doc.custom_production_type = args.production_type
+#     #     if doc.time_logs:
+#     #         new_log = doc.time_logs[-1]
+#     #         new_log.custom_produces_qty = args.custom_produces_qty
+#     #         new_log.custom_rejected_qty = args.custom_rejected_qty
+#     #         new_log.custom_qc_sample_qty = args.custom_qc_sample_qty
+#     #         new_log.custom_production_type = args.production_type
+#     #     if doc.company=="Meril Life Sciences Pvt. Ltd." and args.production_type=="Partial Production" and args.status=="Complete":
+#     #         update_qty_for_next_jc(doc,method=None)
+
+#     doc.save(ignore_permissions=True)
+#     frappe.db.commit()
 
 
 @frappe.whitelist()

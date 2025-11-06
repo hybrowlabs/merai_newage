@@ -17,6 +17,8 @@ frappe.ui.form.on("Job Card", {
         });
       };
     }
+
+    
     setTimeout(() => set_batch_query(frm), 1000);
     // Prevent multiple refresh calls in short time
     if (frm._refresh_in_progress) return;
@@ -67,7 +69,17 @@ frappe.ui.form.on("Job Card", {
       // display_fields_in_ops(frm)
       manage_tab_visibility(frm);
     }, 1000);
+
+    
   },
+
+
+   onload_post_render: function(frm) {
+        frm.fields_dict['custom_jobcard_opeartion_deatils'].grid.refresh();
+    },
+    custom_batch_no_reqd: function(frm) {
+        frm.fields_dict['custom_jobcard_opeartion_deatils'].grid.refresh();
+    },
   // before_save: function (frm) {
   //   frappe.call({
   //     method: "merai_newage.overrides.job_card.get_employee_by_user",
