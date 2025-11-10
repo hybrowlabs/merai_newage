@@ -164,42 +164,14 @@ def update_user_detail_in_sign_table(doc):
 
 @frappe.whitelist()
 def get_employee_by_user():
-    print("frappe.session.uer------120---",frappe.session.user)
+    # print("frappe.session.uer------120---",frappe.session.user)
     employee = frappe.db.get_value("Employee", {"user_id": frappe.session.user}, "name")
-    print("employe----------",employee)
+    # print("employe----------",employee)
     return employee
 
 
 
 
-
-# # override the make_time_log function to add custom_qty
-# @frappe.whitelist()
-# def make_time_log_override(args):
-#     if isinstance(args, str):
-#         args = json.loads(args)
-#     print("args--",args)
-#     args = frappe._dict(args)
-#     doc = frappe.get_doc("Job Card", args.job_card_id)
-#     doc.validate_sequence_id()
-#     doc.add_time_log(args)
-   
-#     # # if args.company and args.company.strip() == "Meril Life Sciences Pvt. Ltd.":
-#     # if hasattr(args, "custom_produces_qty"):
-#     #     # Get the most recently added time log (last one in the list)
-#     #     if args.status=="Complete":
-#     #         doc.custom_production_type = args.production_type
-#     #     if doc.time_logs:
-#     #         new_log = doc.time_logs[-1]
-#     #         new_log.custom_produces_qty = args.custom_produces_qty
-#     #         new_log.custom_rejected_qty = args.custom_rejected_qty
-#     #         new_log.custom_qc_sample_qty = args.custom_qc_sample_qty
-#     #         new_log.custom_production_type = args.production_type
-#     #     if doc.company=="Meril Life Sciences Pvt. Ltd." and args.production_type=="Partial Production" and args.status=="Complete":
-#     #         update_qty_for_next_jc(doc,method=None)
-
-#     doc.save(ignore_permissions=True)
-#     frappe.db.commit()
 
 
 @frappe.whitelist()
