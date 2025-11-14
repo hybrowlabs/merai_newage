@@ -1,4 +1,15 @@
 frappe.ui.form.on("Work Order", {
+
+    on_submit(frm) {
+        frappe.show_alert({
+            message: __("Work Order Submitted"),
+            indicator: "green"
+        });
+
+        // Reload document to reflect server-side changes
+        frm.reload_doc();
+    }
+,
     refresh: function (frm) {
  setTimeout(function() {
         $('[data-original-title="Print"], .btn[title="Print"]').hide();
@@ -15,6 +26,8 @@ frappe.ui.form.on("Work Order", {
                     frm.remove_custom_button("Create Job Card");
                     frm.remove_custom_button("Material Consumption");
                     frm.remove_custom_button("Create Pick List");
+                    frm.remove_custom_button("Finish");
+
                 }
             });
         }

@@ -59,7 +59,30 @@ def before_save(self, method=None):
                 self.custom_signed_by_date = now_datetime()
             break  # stop once a valid row is found
 
-        
+@frappe.whitelist()
+def can_user_change_backdated():
+    allowed_role = frappe.db.get_single_value(
+        "Stock Settings",
+        "role_allowed_to_create_edit_back_dated_transactions"
+    )
+
+    if not allowed_role:
+        # pass
+        return {
+            "allowed": False,
+            "message": "No role configured to allow backdated entry."
+        }
+
+    user_roles = frappe.get_roles(frappe.session.user)
+
+    if allowed_role not in user_roles:
+        return {
+            "allowed": False,
+            "message": "You are not allowed to change the Date Entry."
+        }
+
+    return {"allowed": True}
+
 
 # def after_insert(self):
 #     print("------34---in merai-",self.custom_software_reqd)

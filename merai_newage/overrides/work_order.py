@@ -849,6 +849,7 @@ def on_submit(doc, method=None):
     create_stock_entry_for_received_material_on_submit(doc.name)
     create_stock_entry_on_submit(doc.name)
     frappe.msgprint(f"{doc.name} work order has been released")
+    # doc.reload()
 
 
 

@@ -1,3 +1,4 @@
+let old_value = null
 frappe.ui.form.on("Job Card", {
   refresh: function (frm) {
     if (frm.doc.custom_print_format) {
@@ -678,15 +679,24 @@ function handle_software_fields(frm) {
 
   frm.refresh_fields();
 }
-
 frappe.ui.form.on("Job Card", {
+  
   refresh: function (frm) {
+            old_value = frm.doc.custom_authorised_by_date;   // store initial value
+
     // Wait for default ERPNext buttons to load
     setTimeout(() => {
       control_default_button_visibility(frm);
     }, 1000);
   },
+custom_authorised_by_date: function(frm){
+ control_backdated_entry(frm)
+     },
+     custom_signed_by_date: function(frm){
+       control_backdated_entry(frm)
 
+     },
+     
   after_save: function (frm) {
     setTimeout(() => {
       control_default_button_visibility(frm);
@@ -856,5 +866,32 @@ function add_qi_button_if_required(frm) {
           create_quality_inspection(frm);
         });
       }
+    });
+}
+
+let is_reverting = false; // prevents event loop
+
+function control_backdated_entry(frm) {
+    if (is_reverting) return;  // stop recursion
+
+    frappe.call({
+        method: "merai_newage.overrides.job_card.can_user_change_backdated",
+        callback: function(r) {
+            if (r.message && !r.message.allowed) {
+                frappe.msgprint(r.message.message);
+
+                is_reverting = true;
+
+                frm.set_value("custom_authorised_by_date", old_value);
+
+                // reset flag after revert
+                setTimeout(() => {
+                    is_reverting = false;
+                }, 300);
+            } else {
+                // Update old_value ONLY if valid change
+                old_value = frm.doc.custom_authorised_by_date;
+            }
+        }
     });
 }
