@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:work_order",
+ "creation": "2025-11-20 16:19:36.786332",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_3cms",
+  "work_order",
+  "document_no",
+  "date",
+  "column_break_hcwn",
+  "batch_number",
+  "item_code",
+  "robot_tracker_details_section",
+  "robot_tracker_details"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_3cms",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "document_no",
+   "fieldtype": "Link",
+   "label": "Document No",
+   "options": "Work Order"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "batch_number",
+   "fieldtype": "Link",
+   "label": "Batch Number",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "robot_tracker_details",
+   "fieldtype": "Table",
+   "label": "Robot Tracker Details",
+   "options": "Robot Tracker Details"
+  },
+  {
+   "fieldname": "column_break_hcwn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "robot_tracker_details_section",
+   "fieldtype": "Section Break",
+   "label": "Robot Tracker Details"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "Work Order",
+   "options": "Work Order",
+   "unique": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-11-20 17:01:50.004953",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Robot Tracker",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

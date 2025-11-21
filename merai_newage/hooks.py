@@ -262,7 +262,10 @@ doc_events = {
     "Work Order": {
         "before_insert": "merai_newage.overrides.work_order.before_insert",
         "on_submit": "merai_newage.overrides.work_order.on_submit",
-        "autoname": "merai_newage.overrides.work_order.autoname"
+        "autoname": "merai_newage.overrides.work_order.autoname",
+        # "on_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
+
+        "on_update_after_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
 
     },
     "Job Card": {
