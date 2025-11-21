@@ -1,5 +1,9 @@
 let old_value = null
 frappe.ui.form.on("Job Card", {
+
+  custom_attach_label_here:function(frm){
+    sync_attachments_to_childtable(frm)
+  },
   refresh: function (frm) {
     if (frm.doc.custom_print_format) {
       let print_format = frm.doc.custom_print_format;
@@ -71,11 +75,9 @@ frappe.ui.form.on("Job Card", {
       manage_tab_visibility(frm);
     }, 1000);
 
-    
-  },
+      },
 
-
-   onload_post_render: function(frm) {
+    onload_post_render: function(frm) {
         frm.fields_dict['custom_jobcard_opeartion_deatils'].grid.refresh();
     },
     custom_batch_no_reqd: function(frm) {
