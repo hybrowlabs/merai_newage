@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class DispatchChecklistDetails(Document):
+class Installation(Document):
 	pass

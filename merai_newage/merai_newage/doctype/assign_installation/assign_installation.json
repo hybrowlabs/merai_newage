@@ -1,0 +1,140 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-11-27 17:16:35.126573",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "robot_classification",
+  "warrenty_start_date",
+  "engineer_name",
+  "hospital_name",
+  "city",
+  "status",
+  "column_break_vy08",
+  "item_code",
+  "warrenty_end_date",
+  "schedule_date",
+  "hospital_address",
+  "state",
+  "dispatch_no",
+  "naming_series",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "robot_classification",
+   "fieldtype": "Select",
+   "label": "Robot Classification",
+   "options": "\nDemo\nSales"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "warrenty_start_date",
+   "fieldtype": "Date",
+   "label": "Warrenty Start Date"
+  },
+  {
+   "fieldname": "warrenty_end_date",
+   "fieldtype": "Date",
+   "label": "Warrenty End Date"
+  },
+  {
+   "fieldname": "engineer_name",
+   "fieldtype": "Link",
+   "label": "Engineer Name",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "schedule_date",
+   "fieldtype": "Date",
+   "label": "Schedule Date"
+  },
+  {
+   "fieldname": "hospital_name",
+   "fieldtype": "Data",
+   "label": "Hospital Name"
+  },
+  {
+   "fieldname": "hospital_address",
+   "fieldtype": "Data",
+   "label": "Hospital Address"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Assigned\nPending"
+  },
+  {
+   "fieldname": "column_break_vy08",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "dispatch_no",
+   "fieldtype": "Link",
+   "label": "Dispatch No",
+   "options": "Dispatch"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "AINS-.YYYY.-"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Assign Installation",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-11-28 14:12:45.557618",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Assign Installation",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

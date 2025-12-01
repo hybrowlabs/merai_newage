@@ -1,0 +1,154 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-11-27 17:33:54.345436",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_hkbi",
+  "naming_series",
+  "item_code",
+  "hospital_name",
+  "installation_status",
+  "column_break_jygi",
+  "date",
+  "hospital_address",
+  "system_installation_remarks",
+  "section_break_rxbx",
+  "to_attach",
+  "section_break_m6py",
+  "tab_5_tab",
+  "column_break_sp6l",
+  "installation_procedure_and_verification_tab",
+  "installation_step_details",
+  "safety_check_and_precautions",
+  "system_packing_list_tab",
+  "instrument_tray_list_tab"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_hkbi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date"
+  },
+  {
+   "fieldname": "hospital_name",
+   "fieldtype": "Data",
+   "label": "Hospital Name"
+  },
+  {
+   "fieldname": "hospital_address",
+   "fieldtype": "Data",
+   "label": "Hospital Address"
+  },
+  {
+   "fieldname": "installation_status",
+   "fieldtype": "Select",
+   "label": "Installation status",
+   "options": "\nAssigned\nIn Progress\nPending\nFinished"
+  },
+  {
+   "fieldname": "system_installation_remarks",
+   "fieldtype": "Small Text",
+   "label": "System Installation Remarks"
+  },
+  {
+   "fieldname": "column_break_jygi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_rxbx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "to_attach",
+   "fieldtype": "Attach",
+   "label": "To Attach"
+  },
+  {
+   "fieldname": "installation_procedure_and_verification_tab",
+   "fieldtype": "Tab Break",
+   "label": "Installation Procedure And Verification"
+  },
+  {
+   "fieldname": "system_packing_list_tab",
+   "fieldtype": "Tab Break",
+   "label": "System Packing List"
+  },
+  {
+   "fieldname": "instrument_tray_list_tab",
+   "fieldtype": "Tab Break",
+   "label": "Instrument Tray List"
+  },
+  {
+   "fieldname": "tab_5_tab",
+   "fieldtype": "Tab Break",
+   "label": "Tab 5"
+  },
+  {
+   "fieldname": "section_break_m6py",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_sp6l",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "INS-.YYYY.-"
+  },
+  {
+   "fieldname": "installation_step_details",
+   "fieldtype": "Table",
+   "label": "Installation Step Details",
+   "options": "Installation Step Details"
+  },
+  {
+   "fieldname": "safety_check_and_precautions",
+   "fieldtype": "Table",
+   "label": "Safety Check And Precautions",
+   "options": "Safety Check And Precautions"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-11-28 16:49:45.065241",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Installation",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -788,27 +788,61 @@ if (typeof window.job_card_observer === "undefined") {
   });
 }
 
+// function set_batch_query(frm) {
+//   if (frm.fields_dict.custom_jobcard_opeartion_deatils) {
+//     console.log("570------------------");
+//     frm.fields_dict.custom_jobcard_opeartion_deatils.grid.get_field(
+//       "batch_number"
+//     ).get_query = function (doc, cdt, cdn) {
+//       const child = locals[cdt][cdn];
+
+//       if (!child.item_code) {
+//         return;
+//       }
+
+//       return {
+//         filters: {
+//           item: child.item_code,
+//           // disabled: 0
+//         },
+//       };
+//     };
+//   }
+// }
 function set_batch_query(frm) {
-  if (frm.fields_dict.custom_jobcard_opeartion_deatils) {
-    console.log("570------------------");
-    frm.fields_dict.custom_jobcard_opeartion_deatils.grid.get_field(
-      "batch_number"
-    ).get_query = function (doc, cdt, cdn) {
-      const child = locals[cdt][cdn];
+    if (frm.fields_dict.custom_jobcard_opeartion_deatils) {
 
-      if (!child.item_code) {
-        return;
-      }
+        frappe.call({
+            method: "merai_newage.overrides.job_card.get_used_batches_in_jobcards",
+            callback: function(r) {
+                let global_used_batches = r.message || [];
 
-      return {
-        filters: {
-          item: child.item_code,
-          // disabled: 0
-        },
-      };
-    };
-  }
+                console.log("Global used batches:", global_used_batches);
+
+                frm.fields_dict.custom_jobcard_opeartion_deatils.grid
+                    .get_field("batch_number")
+                    .get_query = function (doc, cdt, cdn) {
+
+                        const child = locals[cdt][cdn];
+
+                        if (!child.item_code) {
+                            return;
+                        }
+
+                        return {
+                            query: "merai_newage.overrides.job_card.get_available_batches",
+                            filters: {
+                                item_code: child.item_code,
+                                exclude_batches: global_used_batches
+                            }
+                        };
+                    };
+            }
+        });
+
+    }
 }
+
 
 frappe.ui.form.on("Job Card Opeartion Deatils", {
   batch_number: function (frm, cdt, cdn) {

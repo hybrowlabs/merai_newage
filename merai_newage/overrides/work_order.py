@@ -66,7 +66,7 @@ def autoname(doc, method):
 
     # Build the naming series dynamically
     if doc.custom_work_order_prefix:
-        naming_series = f"{doc.custom_work_order_prefix}.-.YYYY.-.####"
+        naming_series = f"{doc.custom_work_order_prefix}.-.#####"
     else:
         naming_series = "MFG-WO-.YYYY.-.####"
 
@@ -79,11 +79,13 @@ def before_insert(doc, _method):
     # Check for back-dated transaction permission
     wo_prefix = frappe.db.get_value("Item",doc.production_item,"custom_work_order_prefix")
     print("wo_prefix=========57",wo_prefix)
+    batch_number=None
     if wo_prefix:
         set_prefix_in_wo(doc)
     validate_back_dated_transaction(doc)
     item = doc.production_item
-    batch_number = create_batch_number(doc)
+    if doc.custom_manual_batch_no==0:
+        batch_number = create_batch_number(doc)
 
     if not batch_number:
         frappe.log_error(

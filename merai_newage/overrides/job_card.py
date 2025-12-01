@@ -400,3 +400,54 @@ def custom_get_time_logs(self, args, doctype, open_job_cards=None):
 	time_logs = query.run(as_dict=True)
 
 	return time_logs
+
+@frappe.whitelist()
+def get_used_batches_in_jobcards():
+    batch_list = frappe.db.sql("""
+        SELECT DISTINCT batch_number 
+        FROM `tabJob Card Opeartion Deatils`
+        WHERE batch_number IS NOT NULL AND batch_number != ''
+    """, as_list=True)
+
+    # batch_list = [('MI-V2-0001-10',), ('MI-CR2-0001-1',), ...]
+
+    flat_list = [row[0] for row in batch_list if row and row[0]]
+
+    print("flat_list=========", flat_list)
+    return flat_list
+
+
+@frappe.whitelist()
+def get_available_batches(doctype, txt, searchfield, start, page_len, filters):
+    filters = frappe.parse_json(filters)
+    item_code = filters.get("item_code")
+    exclude = filters.get("exclude_batches") or []
+
+    # ensure exclude is a flat list of strings
+    if isinstance(exclude, str):
+        try:
+            exclude = frappe.parse_json(exclude)
+        except Exception:
+            exclude = [exclude]
+
+    exclude = [b for b in exclude if b]
+
+    # if nothing to exclude, give a dummy value so NOT IN is valid
+    if not exclude:
+        exclude = ["__never__"]
+
+    return frappe.db.sql("""
+        SELECT name, name
+        FROM `tabBatch`
+        WHERE item = %(item)s
+        AND name NOT IN %(exclude)s
+        AND (name LIKE %(txt)s)
+        ORDER BY creation DESC
+        LIMIT %(start)s, %(page_len)s
+    """, {
+        "item": item_code,
+        "exclude": tuple(exclude),
+        "txt": "%%%s%%" % txt,
+        "start": start,
+        "page_len": page_len
+    })
