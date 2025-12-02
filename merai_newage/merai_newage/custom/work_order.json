@@ -166,7 +166,7 @@
    "label": "Batch Number",
    "length": 0,
    "link_filters": null,
-   "mandatory_depends_on": "",
+   "mandatory_depends_on": "eval:doc.custom_manual_batch_no==1",
    "modified": "2025-08-26 20:38:40.402271",
    "modified_by": "Administrator",
    "module": null,

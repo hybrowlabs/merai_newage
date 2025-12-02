@@ -409,7 +409,6 @@ def get_used_batches_in_jobcards():
         WHERE batch_number IS NOT NULL AND batch_number != ''
     """, as_list=True)
 
-    # batch_list = [('MI-V2-0001-10',), ('MI-CR2-0001-1',), ...]
 
     flat_list = [row[0] for row in batch_list if row and row[0]]
 
@@ -423,7 +422,6 @@ def get_available_batches(doctype, txt, searchfield, start, page_len, filters):
     item_code = filters.get("item_code")
     exclude = filters.get("exclude_batches") or []
 
-    # ensure exclude is a flat list of strings
     if isinstance(exclude, str):
         try:
             exclude = frappe.parse_json(exclude)
@@ -432,7 +430,6 @@ def get_available_batches(doctype, txt, searchfield, start, page_len, filters):
 
     exclude = [b for b in exclude if b]
 
-    # if nothing to exclude, give a dummy value so NOT IN is valid
     if not exclude:
         exclude = ["__never__"]
 
@@ -440,6 +437,7 @@ def get_available_batches(doctype, txt, searchfield, start, page_len, filters):
         SELECT name, name
         FROM `tabBatch`
         WHERE item = %(item)s
+        AND custom_from_work_order = 1 
         AND name NOT IN %(exclude)s
         AND (name LIKE %(txt)s)
         ORDER BY creation DESC
