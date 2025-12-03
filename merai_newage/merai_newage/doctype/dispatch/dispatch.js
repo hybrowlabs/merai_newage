@@ -4,32 +4,34 @@
 let used_batches_cache = null;
 frappe.ui.form.on("Dispatch", {
 
-    
     item_code(frm) {
-        if (!frm.doc.item_code) return;
+    if (!frm.doc.item_code) return;
 
-        // Fetch Item document (including its child table)
-        frappe.db.get_doc("Item", frm.doc.item_code)
-            .then(item_doc => {
-                // Clear existing checklist in Dispatch
-                frm.clear_table("dispatch_standard_checklist");
+    frappe.db.get_doc("Item", frm.doc.item_code)
+        .then(item_doc => {
+            // Clear existing rows
+            frm.clear_table("dispatch_standard_checklist");
 
-                (item_doc.custom_dispatch_checklist_details || []).forEach(row => {
-                    console.log("row-----",row)
-                    let new_row = frm.add_child("dispatch_standard_checklist");
-                    new_row.product_code = row.product_name;
-                    new_row.product_description = row.product_description;
-                    // Add more fields here if needed
-                });
+            (item_doc.custom_dispatch_checklist_details || []).forEach(row => {
 
-                // Refresh child table to show new rows
-                frm.refresh_field("dispatch_standard_checklist");
-            })
-            .catch(err => {
-                frappe.msgprint(`Failed to fetch checklist details: ${err}`);
+                let new_row = frm.add_child("dispatch_standard_checklist");
+
+                // Get product_code from child table
+                new_row.product_code = row.product_name;
+
+                // Fetch description from Item master (not child)
+                frappe.db.get_value("Item", row.product_name, "description")
+                    .then(r => {
+                        new_row.product_description = r.message.description;
+                        frm.refresh_field("dispatch_standard_checklist");
+                    });
             });
-    },
-
+        })
+        .catch(err => {
+            frappe.msgprint(`Failed to fetch checklist details: ${err}`);
+        });
+}
+,
 
 refresh(frm) {
     frappe.call({
@@ -76,6 +78,7 @@ refresh(frm) {
 ,
 
   batch_no(frm) {
+    console.log("batch_no-----------------",frm.doc.batch_no)
     if (!frm.doc.batch_no) return;
 
     frappe.call({
@@ -107,6 +110,7 @@ refresh(frm) {
                     let child = frm.add_child("dispatch_standard_checklist");
                     child.product_code = jc_row.product_code;
                     child.batch_no = jc_row.batch_no;
+                    child.product_description = jc_row.description
                 }
             });
 

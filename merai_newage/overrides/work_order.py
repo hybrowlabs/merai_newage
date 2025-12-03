@@ -747,7 +747,11 @@ def create_stock_entry_for_received_material_on_submit(doc_name):
     stock_entry.stock_entry_type = "Material Receipt"
     stock_entry.posting_date = frappe.utils.nowdate()
     stock_entry.posting_time = frappe.utils.nowtime()
-    stock_entry.company = "Merai Newage Pvt. Ltd." or "Merai Newage Private Limited"
+    default_company = frappe.db.get_single_value("Global Defaults", "default_company")
+
+    print("====================750============",default_company)
+
+    stock_entry.company = default_company
 
     for item in doc.required_items:
         batch = frappe.get_value("Item", item.item_code, "has_batch_no")
@@ -796,7 +800,9 @@ def create_stock_entry_on_submit(doc_name):
     stock_entry.work_order = doc_name
     stock_entry.posting_date = frappe.utils.nowdate()
     stock_entry.posting_time = frappe.utils.nowtime()
-    stock_entry.company = "Merai Newage Pvt. Ltd." or "Merai Newage Private Limited"
+    default_company = frappe.db.get_single_value("Global Defaults", "default_company")
+
+    stock_entry.company =default_company
     stock_entry.from_bom = 1
     stock_entry.use_multi_level_bom = 1
     stock_entry.bom_no = doc.bom_no
@@ -838,7 +844,10 @@ def complete_work_order(doc_name):
     stock_entry.work_order = doc_name
     stock_entry.posting_date = frappe.utils.nowdate()
     stock_entry.posting_time = frappe.utils.nowtime()
-    stock_entry.company = "Merai Newage Pvt. Ltd." or "Merai Newage Private Limited"
+    print("====================841============",frappe.defaults.get_global_default("default_company"))
+    default_company = frappe.db.get_single_value("Global Defaults", "default_company")
+
+    stock_entry.company = default_company
     stock_entry.from_bom = 1
     stock_entry.use_multi_level_bom = 1
     stock_entry.bom_no = doc.bom_no
@@ -913,8 +922,10 @@ def create_fg_consumption_entry(doc_name, batch_no):
     stock_entry = frappe.new_doc("Stock Entry")
 
     stock_entry.stock_entry_type = "Material Issue"
+    default_company = frappe.db.get_single_value("Global Defaults", "default_company")
+
     stock_entry.t_warehouse = doc.fg_warehouse
-    stock_entry.company = "Merai Newage Pvt. Ltd." or "Merai Newage Private Limited"
+    stock_entry.company = default_company
     stock_entry.posting_date = frappe.utils.nowdate()
     stock_entry.posting_time = frappe.utils.nowtime()
 
