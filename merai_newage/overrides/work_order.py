@@ -74,25 +74,25 @@ def autoname(doc, method):
     doc.name = make_autoname(naming_series)
 
 
-
-def before_insert(doc, _method):
+def create_manual_batch(doc, _method):
     # Check for back-dated transaction permission
     wo_prefix = frappe.db.get_value("Item",doc.production_item,"custom_work_order_prefix")
     print("wo_prefix=========57",wo_prefix)
     batch_number=None
-    if wo_prefix:
-        set_prefix_in_wo(doc)
-    validate_back_dated_transaction(doc)
-    item = doc.production_item
-    if doc.custom_manual_batch_no==0:
-        batch_number = create_batch_number(doc)
-
+    manual_work_order_check = 1
+    item = doc.production_item 
+    if doc.custom_manual_batch_no==1:
+        # batch_number= create_manual_batch_number(doc)
+        batch_number = f"{item}-{doc.custom_batch_number}"
+        manual_work_order_check=1
+    print("batch number====124=",batch_number)
     if not batch_number:
         frappe.log_error(
-            f"Batch number generation failed for Work Order {doc.name}, item {item}. Skipping batch creation.",
+            f"Manual Batch number generation failed for Work Order {doc.name}, item {item}. Skipping batch creation.",
             "Work Order Batch Creation"
         )
         return
+    print("batch_number------------131",batch_number)
 
     try:
         batch = frappe.new_doc("Batch")
@@ -102,11 +102,60 @@ def before_insert(doc, _method):
         batch.item = item
         if doc.planned_start_date:
             batch.manufacturing_date = frappe.utils.getdate(doc.planned_start_date)
-        batch.save(ignore_permissions=True)
         batch.batch_qty = doc.qty
 
         doc.custom_batch = batch.batch_id
         doc.custom_batch_number = batch_number.replace(item+"-", "")
+        batch.custom_from_work_order=manual_work_order_check
+        batch.save(ignore_permissions=True)
+
+    except Exception as e:
+        frappe.log_error(
+            f"Error creating batch for Work Order {doc.name}: {str(e)}",
+            "Work Order Batch Creation"
+        )
+        pass
+
+
+def before_insert(doc, _method):
+    # Check for back-dated transaction permission
+    wo_prefix = frappe.db.get_value("Item",doc.production_item,"custom_work_order_prefix")
+    print("wo_prefix=========57",wo_prefix)
+    batch_number=None
+    manual_work_order_check = 1
+    if wo_prefix:
+        set_prefix_in_wo(doc)
+    validate_back_dated_transaction(doc)
+    item = doc.production_item
+    if doc.custom_manual_batch_no==0:
+        batch_number = create_batch_number(doc)
+    # elif doc.custom_manual_batch_no==1:
+    #     # batch_number= create_manual_batch_number(doc)
+    #     batch_number = f"{item}-{doc.custom_batch_number}"
+    #     manual_work_order_check=1
+    print("batch number====124=",batch_number)
+    if not batch_number:
+        frappe.log_error(
+            f"Batch number generation failed for Work Order {doc.name}, item {item}. Skipping batch creation.",
+            "Work Order Batch Creation"
+        )
+        return
+    print("batch_number------------131",batch_number)
+
+    try:
+        batch = frappe.new_doc("Batch")
+        batch.batch_id = batch_number
+        batch.custom_work_order = doc.name
+        batch.custom_batch_number = batch_number.replace(item+"-", "")
+        batch.item = item
+        if doc.planned_start_date:
+            batch.manufacturing_date = frappe.utils.getdate(doc.planned_start_date)
+        batch.batch_qty = doc.qty
+
+        doc.custom_batch = batch.batch_id
+        doc.custom_batch_number = batch_number.replace(item+"-", "")
+        batch.custom_from_work_order=manual_work_order_check
+        batch.save(ignore_permissions=True)
 
     except Exception as e:
         frappe.log_error(
@@ -698,7 +747,7 @@ def create_stock_entry_for_received_material_on_submit(doc_name):
     stock_entry.stock_entry_type = "Material Receipt"
     stock_entry.posting_date = frappe.utils.nowdate()
     stock_entry.posting_time = frappe.utils.nowtime()
-    stock_entry.company = "Merai Newage Private Limited"
+    stock_entry.company = frappe.defaults.get_global_default("company")
 
     for item in doc.required_items:
         batch = frappe.get_value("Item", item.item_code, "has_batch_no")
@@ -747,7 +796,7 @@ def create_stock_entry_on_submit(doc_name):
     stock_entry.work_order = doc_name
     stock_entry.posting_date = frappe.utils.nowdate()
     stock_entry.posting_time = frappe.utils.nowtime()
-    stock_entry.company = "Merai Newage Private Limited"
+    stock_entry.company = frappe.defaults.get_global_default("company")
     stock_entry.from_bom = 1
     stock_entry.use_multi_level_bom = 1
     stock_entry.bom_no = doc.bom_no
@@ -789,7 +838,7 @@ def complete_work_order(doc_name):
     stock_entry.work_order = doc_name
     stock_entry.posting_date = frappe.utils.nowdate()
     stock_entry.posting_time = frappe.utils.nowtime()
-    stock_entry.company = "Merai Newage Private Limited"
+    stock_entry.company = frappe.defaults.get_global_default("company")
     stock_entry.from_bom = 1
     stock_entry.use_multi_level_bom = 1
     stock_entry.bom_no = doc.bom_no
@@ -848,6 +897,8 @@ def complete_work_order(doc_name):
 # class CustomWorkOrder(WorkOrder):
 @frappe.whitelist()
 def on_submit(doc, method=None):
+    # create_manual_batch_number(doc)
+    create_manual_batch(doc,_method=None)
     create_stock_entry_for_received_material_on_submit(doc.name)
     create_stock_entry_on_submit(doc.name)
     frappe.msgprint(f"{doc.name} work order has been released")
@@ -863,7 +914,7 @@ def create_fg_consumption_entry(doc_name, batch_no):
 
     stock_entry.stock_entry_type = "Material Issue"
     stock_entry.t_warehouse = doc.fg_warehouse
-    stock_entry.company = "Merai Newage Private Limited"
+    stock_entry.company = frappe.defaults.get_global_default("company")
     stock_entry.posting_date = frappe.utils.nowdate()
     stock_entry.posting_time = frappe.utils.nowtime()
 
