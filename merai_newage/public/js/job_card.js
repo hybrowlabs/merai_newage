@@ -868,24 +868,45 @@ frappe.ui.form.on("Job Card Opeartion Deatils", {
           frappe.model.set_value(cdt, cdn, "batch_no_common", "");
         });
 
-      frappe.db
-        .get_value("Work Order", { custom_batch: row.batch_number }, "name")
-        .then((r) => {
-          if (r.message && r.message.name) {
-            frappe.model.set_value(
-              cdt,
-              cdn,
-              "work_order_reference",
-              r.message.name
-            );
-          } else {
-            frappe.model.set_value(cdt, cdn, "work_order_reference", "");
-          }
-        })
-        .catch((err) => {
-          console.error("Error fetching custom_batch_no:", err);
-          frappe.model.set_value(cdt, cdn, "work_order_reference", "");
-        });
+      frappe.db.get_value(
+              "Work Order",
+              { custom_batch: row.batch_number },
+              "name"
+          ).then((r) => {
+              console.log("r------------in if-------",r)
+              if (r.message && r.message.name) {
+                console.log("in if======r.message=======",r.message)
+                  // First search success
+                  frappe.model.set_value(cdt, cdn, "work_order_reference", r.message.name);
+
+              } else {
+
+                  frappe.db.get_value(
+                      "Work Order",
+                      {
+                          custom_batch_number: row.batch_no_common,
+                          production_item: row.item_code
+                      },
+                      "name"
+                  ).then((res) => {
+                    console.log("res==========else========",res)
+                      if (res.message && res.message.name) {
+                          frappe.model.set_value(cdt, cdn, "work_order_reference", res.message.name);
+                      } else {
+                          frappe.model.set_value(cdt, cdn, "work_order_reference", "");
+                      }
+
+                  }).catch(err => {
+                      console.error("Fallback Work Order search error:", err);
+                      frappe.model.set_value(cdt, cdn, "work_order_reference", "");
+                  });
+              }
+
+          }).catch((err) => {
+              console.error("Error fetching Work Order by batch_number:", err);
+              frappe.model.set_value(cdt, cdn, "work_order_reference", "");
+          });
+
     } else {
       frappe.model.set_value(cdt, cdn, "batch_no_common", "");
     }

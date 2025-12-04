@@ -265,7 +265,7 @@ doc_events = {
         "autoname": "merai_newage.overrides.work_order.autoname",
         # "on_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
 
-        "on_update_after_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
+        # "on_update_after_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
 
     },
     "Job Card": {
@@ -294,3 +294,6 @@ override_doctype_class = {
     # "Job Card": "merai_newage.overrides.job_card.CustomJobCard",
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
 }
+app_include_css = [
+    "merai_newage.public.css.safety_check_custom.css"
+]

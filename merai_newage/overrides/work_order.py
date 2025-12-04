@@ -51,7 +51,7 @@ from pypika import functions as fn
 
 import frappe
 from frappe.model.naming import make_autoname
-
+from merai_newage.merai_newage.doctype.robot_tracker.robot_tracker import create_robot_tracker
 def autoname(doc, method):
     # pass
     # """
@@ -559,7 +559,7 @@ def print_full_bmr(name):
         name,
         as_dict=1
     )
-    # print("======job_card======475", job_cards)
+    print("======job_card======475", job_cards)
 
     # Collect unique linked work orders (excluding current work order)
     linked_work_orders = set()
@@ -892,7 +892,8 @@ def complete_work_order(doc_name):
     stock_entry.insert()
     stock_entry.submit()
     frappe.db.commit()
-
+    if doc.custom_is_full_dhr==1:
+        create_robot_tracker(doc,method=None)
     return {
         "status": "success",
         "stock_entry": stock_entry.name,
