@@ -9,17 +9,13 @@ frappe.ui.form.on("Dispatch", {
 
     frappe.db.get_doc("Item", frm.doc.item_code)
         .then(item_doc => {
-            // Clear existing rows
             frm.clear_table("dispatch_standard_checklist");
-
             (item_doc.custom_dispatch_checklist_details || []).forEach(row => {
 
                 let new_row = frm.add_child("dispatch_standard_checklist");
 
-                // Get product_code from child table
                 new_row.product_code = row.product_name;
 
-                // Fetch description from Item master (not child)
                 frappe.db.get_value("Item", row.product_name, "description")
                     .then(r => {
                         new_row.product_description = r.message.description;
@@ -34,22 +30,36 @@ frappe.ui.form.on("Dispatch", {
 ,
 
 refresh(frm) {
-    frappe.call({
-        method: "merai_newage.merai_newage.doctype.dispatch.dispatch.get_used_batch_numbers",
-        callback: function(r) {
-            let used_batches = r.message || [];
+        setTimeout(() => {
+        frappe.call({
+            method: "merai_newage.merai_newage.doctype.dispatch.dispatch.get_used_batch_numbers",
+            callback: function(r) {
+                let used_batches = r.message || [];
 
-            frm.set_query("batch_no", () => {
-                return {
-                    query: "merai_newage.merai_newage.doctype.dispatch.dispatch.get_available_batches",
-                    filters: {
-                        item_code: frm.doc.item_code || "",
-                        exclude_batches: used_batches
-                    }
-                };
-            });
-        }
-    });
+                frm.set_query("batch_no", () => {
+                    return {
+                        query: "merai_newage.merai_newage.doctype.dispatch.dispatch.get_available_batches",
+                        filters: {
+                            item_code: frm.doc.item_code || "",
+                            exclude_batches: used_batches
+                        }
+                    };
+                });
+            }
+        });
+    }, 2000);
+
+   
+        frm.set_query("item_code", () => {
+            return {
+                filters: {
+                    custom_dispatch_item: 1
+                }
+            };
+        });
+
+
+
 
     if (frm.doc.docstatus==1) {
                     frm.add_custom_button(

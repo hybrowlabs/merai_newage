@@ -12,6 +12,7 @@
   "date",
   "column_break_hcwn",
   "batch_number",
+  "batch_no",
   "item_code",
   "robot_tracker_details_section",
   "robot_tracker_details"
@@ -65,12 +66,18 @@
    "label": "Work Order",
    "options": "Work Order",
    "unique": 1
+  },
+  {
+   "fieldname": "batch_no",
+   "fieldtype": "Data",
+   "label": "Batch No.",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-20 17:01:50.004953",
+ "modified": "2025-11-28 12:12:55.698353",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Tracker",
@@ -86,6 +93,7 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
    "share": 1,
    "write": 1
   }

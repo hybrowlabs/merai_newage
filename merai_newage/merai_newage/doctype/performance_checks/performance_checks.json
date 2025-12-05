@@ -1,0 +1,40 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-05 16:16:08.775290",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_cxpc",
+  "performance_check"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_cxpc",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "performance_check",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Performance Check",
+   "options": "Safety Check List Master"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-12-05 16:17:14.847365",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Performance Checks",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

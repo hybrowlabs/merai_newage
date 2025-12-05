@@ -11,20 +11,23 @@
   "item_code",
   "hospital_name",
   "installation_status",
+  "assign_installation",
   "column_break_jygi",
   "date",
   "hospital_address",
   "system_installation_remarks",
   "section_break_rxbx",
   "to_attach",
-  "section_break_m6py",
-  "tab_5_tab",
-  "column_break_sp6l",
   "installation_procedure_and_verification_tab",
   "installation_step_details",
   "safety_check_and_precautions",
+  "performance_check_details",
+  "description",
+  "remarks",
   "system_packing_list_tab",
-  "instrument_tray_list_tab"
+  "system_packaging_list",
+  "instrument_tray_list_tab",
+  "instrument_tray_list"
  ],
  "fields": [
   {
@@ -92,19 +95,6 @@
    "label": "Instrument Tray List"
   },
   {
-   "fieldname": "tab_5_tab",
-   "fieldtype": "Tab Break",
-   "label": "Tab 5"
-  },
-  {
-   "fieldname": "section_break_m6py",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "column_break_sp6l",
-   "fieldtype": "Column Break"
-  },
-  {
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming Series",
@@ -121,12 +111,46 @@
    "fieldtype": "Table",
    "label": "Safety Check And Precautions",
    "options": "Safety Check And Precautions"
+  },
+  {
+   "fieldname": "system_packaging_list",
+   "fieldtype": "Table",
+   "label": "System Packaging List",
+   "options": "System Packaging List"
+  },
+  {
+   "fieldname": "instrument_tray_list",
+   "fieldtype": "Table",
+   "label": "Instrument Tray List",
+   "options": "Instrument Tray List"
+  },
+  {
+   "fieldname": "assign_installation",
+   "fieldtype": "Link",
+   "label": "Assign Installation(Reference)",
+   "options": "Assign Installation"
+  },
+  {
+   "fieldname": "performance_check_details",
+   "fieldtype": "Table",
+   "label": "Performance Check Details",
+   "options": "Performance Check Details"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "label": "Remarks"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-28 16:49:45.065241",
+ "modified": "2025-12-05 16:42:01.077674",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Installation",
@@ -142,6 +166,7 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
    "share": 1,
    "write": 1
   }

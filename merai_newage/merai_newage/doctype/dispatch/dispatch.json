@@ -14,9 +14,9 @@
   "work_order",
   "column_break_wuyr",
   "robot_classifcation",
+  "invoice_no",
   "batch_no",
   "batch_number",
-  "invoice_no",
   "standard_checklist_section",
   "dispatch_standard_checklist",
   "amended_from"
@@ -30,7 +30,7 @@
    "fieldname": "hospital_name",
    "fieldtype": "Link",
    "label": "Hospital Name",
-   "options": "Customer"
+   "options": "Account Master"
   },
   {
    "fieldname": "item_code",
@@ -54,15 +54,10 @@
    "options": "\nDemo\nSales"
   },
   {
-   "fieldname": "batch_no",
-   "fieldtype": "Link",
-   "label": "Batch No Ref",
-   "options": "Batch"
-  },
-  {
    "fieldname": "invoice_no",
    "fieldtype": "Data",
-   "label": "Invoice No"
+   "label": "Invoice No",
+   "placeholder": "Invoice No."
   },
   {
    "fieldname": "standard_checklist_section",
@@ -102,6 +97,12 @@
    "options": "Work Order"
   },
   {
+   "fieldname": "batch_no",
+   "fieldtype": "Link",
+   "label": "Batch No",
+   "options": "Batch"
+  },
+  {
    "fieldname": "batch_number",
    "fieldtype": "Data",
    "label": "Batch Number",
@@ -112,7 +113,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-11-27 16:10:27.446737",
+ "modified": "2025-12-05 12:48:15.940530",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Dispatch",

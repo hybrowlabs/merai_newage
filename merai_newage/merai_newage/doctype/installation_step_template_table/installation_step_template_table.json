@@ -1,0 +1,40 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-28 10:52:04.703341",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_9stw",
+  "installation_steps"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_9stw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "installation_steps",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Installation Steps",
+   "options": "Installation Steps"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-11-28 10:53:49.733197",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Installation Step Template Table",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

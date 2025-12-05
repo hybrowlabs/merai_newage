@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class RobotTrackerDetails(Document):
+class SafetyCheckAndPrecautionsTable(Document):
 	pass

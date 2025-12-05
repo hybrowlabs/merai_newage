@@ -8,28 +8,29 @@ from frappe.utils import nowdate
 
 class Dispatch(Document):
     def on_submit(self):
-        robot_tracker_name = frappe.db.get_value(
-            "Robot Tracker",
-            {
-                "document_no": self.get("work_order"),
-                "batch_number": self.batch_no
-            },
-            "name"
-        )
+        pass
+        # robot_tracker_name = frappe.db.get_value(
+        #     "Robot Tracker",
+        #     {
+        #         "document_no": self.get("work_order"),
+        #         "batch_number": self.batch_no
+        #     },
+        #     "name"
+        # )
 
-        if not robot_tracker_name:
-            frappe.throw("Robot Tracker not found for this Work Order & Batch No.")
+        # if not robot_tracker_name:
+        #     frappe.msgprint("Robot Tracker not found for this Work Order & Batch No.")
 
-        tracker = frappe.get_doc("Robot Tracker", robot_tracker_name)
+        # tracker = frappe.get_doc("Robot Tracker", robot_tracker_name)
 
-        new_row = tracker.append("robot_tracker_details", {})
-        new_row.document_no = self.name
-        new_row.date = nowdate()
-        new_row.location = self.hospital_name
-        new_row.robot_status = "Dispatched"
+        # new_row = tracker.append("robot_tracker_details", {})
+        # new_row.document_no = self.name
+        # new_row.date = nowdate()
+        # new_row.location = self.hospital_name
+        # new_row.robot_status = "Dispatched"
 
-        tracker.save(ignore_permissions=True)
-        frappe.db.commit()
+        # tracker.save(ignore_permissions=True)
+        # frappe.db.commit()
 
         
 @frappe.whitelist()

@@ -1,0 +1,81 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:item_group",
+ "creation": "2025-11-28 10:43:20.433023",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_szbp",
+  "item_group",
+  "instllation_steps",
+  "safety_check_and_precautions",
+  "performance_checks",
+  "system_electrical_ratings"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_szbp",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "instllation_steps",
+   "fieldtype": "Table",
+   "label": "Instllation Steps",
+   "options": "Installation Step Template Table"
+  },
+  {
+   "fieldname": "safety_check_and_precautions",
+   "fieldtype": "Table",
+   "label": "Safety Check And Precautions",
+   "options": "Safety Check And Precautions Table"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group",
+   "unique": 1
+  },
+  {
+   "fieldname": "system_electrical_ratings",
+   "fieldtype": "Text Editor",
+   "label": "System Electrical Ratings(Misso System)"
+  },
+  {
+   "fieldname": "performance_checks",
+   "fieldtype": "Table",
+   "label": "Performance Checks",
+   "options": "Performance Checks"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-12-05 16:42:34.278502",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Installation Procedure And Verification Template",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

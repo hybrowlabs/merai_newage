@@ -31,9 +31,12 @@ def create_robot_tracker(doc, method=None):
             rt = frappe.get_doc("Robot Tracker", existing_rt)
             print("batch====",doc.get("custom_batch"))
             rt.batch_number = doc.get("custom_batch")
-            rt.date = nowdate()
+            rt.batch_no = doc.get("custom_batch_number")
+            rt.date = doc.get("planned_start_date")
             rt.item_code = doc.get("production_item")
             rt.document_no = doc.get("name")
+            rt.batch_no= doc.get('custom_batch_number')
+
 
             rt.robot_tracker_details = []
 
@@ -52,15 +55,20 @@ def create_robot_tracker(doc, method=None):
         rt = frappe.new_doc("Robot Tracker")
         rt.work_order = wo_name
         rt.batch_number = doc.get("custom_batch")
-        rt.date = nowdate()
+        rt.date = doc.get("planned_start_date")
         rt.item_code = doc.get("production_item")
         rt.document_no = doc.get("name")
+        rt.batch_no= doc.get('custom_batch_number')
+        if doc.custom_manual_batch_no==1:
+            rt.batch_number = frappe.db.get_value("Batch",{"item":doc.production_item,"custom_batch_number":doc.custom_batch_number},"name")
+
+             
 
         # Add 1 new row
         row = rt.append("robot_tracker_details", {})
         row.document_no = doc.get("name")
         row.location = doc.get("company")
-        row.date = nowdate()
+        row.date = doc.get("planned_start_date")
         row.robot_status = "Manufactured"
 
         rt.save(ignore_permissions=True)

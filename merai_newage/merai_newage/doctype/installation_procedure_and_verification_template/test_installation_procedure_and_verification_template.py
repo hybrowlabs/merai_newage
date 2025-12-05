@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestRobotTracker(FrappeTestCase):
+class TestInstallationProcedureAndVerificationTemplate(FrappeTestCase):
 	pass
