@@ -81,13 +81,12 @@
    "search_index": 1
   },
   {
-   "default": ".{hospital_name}./.{item_code}./.YY./.###",
+   "default": ".{item_code}./.YY./.###",
    "fieldname": "naming_series",
    "fieldtype": "Select",
-   "hidden": 1,
    "in_list_view": 1,
    "label": "Naming Series",
-   "options": ".{hospital_name}./.{item_code}./.YY./.###",
+   "options": ".{item_code}./.YY./.###",
    "reqd": 1
   },
   {
@@ -113,7 +112,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-05 12:48:15.940530",
+ "modified": "2025-12-08 10:42:03.376907",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Dispatch",
@@ -129,6 +128,7 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1

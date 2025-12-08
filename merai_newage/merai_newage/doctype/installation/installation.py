@@ -3,11 +3,39 @@
 
 import frappe
 from frappe.model.document import Document
+from frappe.utils import nowdate
 
 
 class Installation(Document):
-	pass
+	def on_submit(self):
+            update_robot_tracker(self)
 
+
+def update_robot_tracker(self):
+        robot_tracker_name = frappe.db.get_value(
+            "Robot Tracker",
+            {
+                "document_no": self.get("work_order"),
+                # "batch_number": self.batch_no
+            },
+            "name"
+        )
+
+        if not robot_tracker_name:
+            frappe.msgprint("Robot Tracker not found for this Work Order & Batch No.")
+            return
+        
+
+        tracker = frappe.get_doc("Robot Tracker", robot_tracker_name)
+
+        new_row = tracker.append("robot_tracker_details", {})
+        new_row.document_no = self.name
+        new_row.date = nowdate()
+        new_row.location = self.hospital_name
+        new_row.robot_status = "Installed"
+
+        tracker.save(ignore_permissions=True)
+        frappe.db.commit()
 
 @frappe.whitelist()
 def get_safety_check_items(safety_steps):

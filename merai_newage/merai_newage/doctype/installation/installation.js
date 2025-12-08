@@ -34,38 +34,6 @@ frappe.ui.form.on("Safety Check And Precautions", {
 });
 
 
-// function show_safety_popup(items, frm, row) {
-//     let fields = [];
-
-//     items.forEach(item => {
-//         fields.push({
-//             fieldname: item.check_name,
-//             label: item.check_name,
-//             fieldtype: "Select",
-//             options: "Yes\nNo",
-//             reqd: 1
-//         });
-//     });
-
-//     let d = new frappe.ui.Dialog({
-//         title: "Safety Check Verification",
-//         fields: fields,
-//         primary_action_label: "Save",
-//         primary_action(values) {
-//             console.log("Selected Values:", values);
-
-//             // If you want to store results in row fields:
-//             row.verification_result = JSON.stringify(values);
-//             frm.refresh_fields("safety_check_and_precautions");
-
-//             d.hide();
-//         }
-//     });
-
-//     d.show();
-// }
-
-
 function show_safety_popup(items, frm, row) {
 
     let question_html = "<ul style='padding-left:15px;'>";
@@ -106,6 +74,12 @@ function show_safety_popup(items, frm, row) {
             row.status = values.verification || "";  
 
             frm.refresh_field("safety_check_and_precautions");
+            frm.refresh_field("performance_check_details");
+            // frm.save();
+            frm.dirty();
+frm.save_or_update();
+
+
 
             dialog.hide();
         }

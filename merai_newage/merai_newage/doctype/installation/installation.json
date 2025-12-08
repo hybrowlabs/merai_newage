@@ -12,12 +12,14 @@
   "hospital_name",
   "installation_status",
   "assign_installation",
+  "work_order",
   "column_break_jygi",
   "date",
   "hospital_address",
   "system_installation_remarks",
   "section_break_rxbx",
   "to_attach",
+  "table_lckd",
   "installation_procedure_and_verification_tab",
   "installation_step_details",
   "safety_check_and_precautions",
@@ -27,7 +29,8 @@
   "system_packing_list_tab",
   "system_packaging_list",
   "instrument_tray_list_tab",
-  "instrument_tray_list"
+  "instrument_tray_list",
+  "amended_from"
  ],
  "fields": [
   {
@@ -145,12 +148,35 @@
    "fieldname": "remarks",
    "fieldtype": "Data",
    "label": "Remarks"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "Work Order",
+   "options": "Work Order"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Installation",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "table_lckd",
+   "fieldtype": "Table",
+   "label": "Installation Attachment Details",
+   "options": "Installation Attachment Details"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-12-05 16:42:01.077674",
+ "modified": "2025-12-08 12:00:54.821167",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Installation",

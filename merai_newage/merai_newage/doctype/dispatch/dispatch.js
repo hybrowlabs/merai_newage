@@ -120,7 +120,8 @@ refresh(frm) {
                     let child = frm.add_child("dispatch_standard_checklist");
                     child.product_code = jc_row.product_code;
                     child.batch_no = jc_row.batch_no;
-                    child.product_description = jc_row.description
+                    child.product_description = jc_row.description,
+                    child.std_qty = jc_row.qty
                 }
             });
 

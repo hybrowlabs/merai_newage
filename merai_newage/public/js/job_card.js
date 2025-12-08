@@ -263,11 +263,12 @@ function manage_tab_visibility(frm) {
     "hidden",
     is_software_operation || !has_operation_details ? 1 : 0
   );
-  frm.set_df_property(
-    "custom_jobcard_opeartion_deatils",
-    "hidden",
-    is_software_operation || !has_operation_details ? 1 : 0
-  );
+
+  // frm.set_df_property(
+  //   "custom_jobcard_opeartion_deatils",
+  //   "hidden",
+  // !has_operation_details ? 1 : 0
+  // );
 
   // Line Clearance - Hide if: No template OR no data
   // Show only if: Has template AND has data
@@ -870,7 +871,9 @@ frappe.ui.form.on("Job Card Opeartion Deatils", {
 
       frappe.db.get_value(
               "Work Order",
-              { custom_batch: row.batch_number },
+              { custom_batch: row.batch_number ,
+                status:"Completed"
+              },
               "name"
           ).then((r) => {
               console.log("r------------in if-------",r)
@@ -885,7 +888,8 @@ frappe.ui.form.on("Job Card Opeartion Deatils", {
                       "Work Order",
                       {
                           custom_batch_number: row.batch_no_common,
-                          production_item: row.item_code
+                          production_item: row.item_code,
+                          status:"Completed"
                       },
                       "name"
                   ).then((res) => {
@@ -911,6 +915,32 @@ frappe.ui.form.on("Job Card Opeartion Deatils", {
       frappe.model.set_value(cdt, cdn, "batch_no_common", "");
     }
   },
+
+   batch_no_common: function (frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+
+        if (!row.batch_no_common) return;
+
+        frappe.db.get_value(
+            "Work Order",
+            {
+                custom_batch_number: row.batch_no_common,
+                production_item: row.item_code,
+                status: "Completed"
+            },
+            "name"
+        ).then(res => {
+            frappe.model.set_value(
+                cdt,
+                cdn,
+                "work_order_reference",
+                res.message?.name || ""
+            );
+        }).catch(err => {
+            console.error("Error fetching Work Order by batch_no_common:", err);
+        });
+    }
+  
 });
 
 
@@ -926,11 +956,10 @@ function add_qi_button_if_required(frm) {
     });
 }
 
-let is_reverting = false; // prevents event loop
+let is_reverting = false; 
 
 function control_backdated_entry(frm) {
-    if (is_reverting) return;  // stop recursion
-
+    if (is_reverting) return;
     frappe.call({
         method: "merai_newage.overrides.job_card.can_user_change_backdated",
         callback: function(r) {
@@ -941,12 +970,10 @@ function control_backdated_entry(frm) {
 
                 frm.set_value("custom_authorised_by_date", old_value);
 
-                // reset flag after revert
                 setTimeout(() => {
                     is_reverting = false;
                 }, 300);
             } else {
-                // Update old_value ONLY if valid change
                 old_value = frm.doc.custom_authorised_by_date;
             }
         }

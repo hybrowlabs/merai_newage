@@ -12,6 +12,7 @@
   "hospital_name",
   "city",
   "status",
+  "work_order",
   "column_break_vy08",
   "item_code",
   "warrenty_end_date",
@@ -107,6 +108,12 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "Work Order",
+   "options": "Work Order"
   }
  ],
  "grid_page_length": 50,
@@ -118,7 +125,7 @@
    "link_fieldname": "assign_installation"
   }
  ],
- "modified": "2025-12-05 12:51:35.810928",
+ "modified": "2025-12-08 11:51:54.192081",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Assign Installation",

@@ -17,6 +17,7 @@ class AssignInstallation(Document):
         new_installation.date = nowdate()
         new_installation.status = "Assigned"
         new_installation.assign_installation = self.name
+        new_installation.work_order = self.work_order
 
         item_group = frappe.db.get_value("Item", self.item_code, "item_group")
         template_name = frappe.db.get_value(
@@ -64,14 +65,63 @@ class AssignInstallation(Document):
         
 
         new_installation.insert(ignore_permissions=True)
+        update_robot_tracker(self)
+        create_todo_for_engineer(self, new_installation.name)
 
         return new_installation.name
 
 
 
 
+def update_robot_tracker(self):
+        robot_tracker_name = frappe.db.get_value(
+            "Robot Tracker",
+            {
+                "document_no": self.get("work_order"),
+                # "batch_number": self.batch_no
+            },
+            "name"
+        )
 
+        if not robot_tracker_name:
+            frappe.msgprint("Robot Tracker not found for this Work Order & Batch No.")
+            return
+        
 
+        tracker = frappe.get_doc("Robot Tracker", robot_tracker_name)
+
+        new_row = tracker.append("robot_tracker_details", {})
+        new_row.document_no = self.name
+        new_row.date = nowdate()
+        new_row.location = self.hospital_name
+        new_row.robot_status = "Engineer Assigned"
+
+        tracker.save(ignore_permissions=True)
+        frappe.db.commit()
+
+def create_todo_for_engineer(assign_doc, installation_name):
+    if not assign_doc.assigned_engineer:
+        frappe.throw("Assigned Engineer is not selected!")
+
+    todo = frappe.get_doc({
+        "doctype": "ToDo",
+        "description": f"Complete Installation: {installation_name}",
+        "reference_type": "Installation",
+        "reference_name": installation_name,
+        "owner": assign_doc.assigned_engineer,
+        "allocated_to": assign_doc.assigned_engineer,
+        "status": "Open",
+        "date": nowdate()
+    })
+    todo.insert(ignore_permissions=True)
+
+    # Notification
+    frappe.notify(
+        title="New Installation Assigned",
+        message=f"You have been assigned a new Installation task: {installation_name}",
+        notification_type="Alert",
+        user=assign_doc.assigned_engineer
+    )
 
 
 @frappe.whitelist()
@@ -83,6 +133,7 @@ def create_assign_installation(doc):
     new_assign_installation.item_code = doc.get("item_code")
     new_assign_installation.dispatch_no = doc.get("name")
     new_assign_installation.hospital_name = doc.get("hospital_name")
+    new_assign_installation.work_order = doc.get("work_order")
 
     new_assign_installation.insert(ignore_permissions=True)  # Save the doc
 
