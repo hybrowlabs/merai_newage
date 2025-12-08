@@ -672,8 +672,8 @@ function handle_software_fields(frm) {
     //     frm.refresh_field("custom_software");
     // }
 
-    frm.clear_table("custom_jobcard_opeartion_deatils");
-    frm.refresh_field("custom_jobcard_opeartion_deatils");
+    // frm.clear_table("custom_jobcard_opeartion_deatils");
+    // frm.refresh_field("custom_jobcard_opeartion_deatils");
   } else {
     frm.set_df_property("custom_software", "hidden", 1);
     frm.set_df_property("custom_version", "hidden", 1);
