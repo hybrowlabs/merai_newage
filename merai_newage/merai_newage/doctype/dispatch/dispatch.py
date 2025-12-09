@@ -23,7 +23,7 @@ class Dispatch(Document):
         
 
         tracker = frappe.get_doc("Robot Tracker", robot_tracker_name)
-
+        tracker.robot_classification = self.robot_classifcation
         new_row = tracker.append("robot_tracker_details", {})
         new_row.document_no = self.name
         new_row.date = nowdate()

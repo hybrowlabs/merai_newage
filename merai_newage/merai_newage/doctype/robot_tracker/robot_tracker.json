@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:work_order",
+ "autoname": "field:batch_number",
  "creation": "2025-11-20 16:19:36.786332",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -14,6 +14,7 @@
   "batch_number",
   "batch_no",
   "item_code",
+  "robot_classification",
   "robot_tracker_details_section",
   "robot_tracker_details"
  ],
@@ -37,7 +38,8 @@
    "fieldname": "batch_number",
    "fieldtype": "Link",
    "label": "Batch Number",
-   "options": "Batch"
+   "options": "Batch",
+   "unique": 1
   },
   {
    "fieldname": "item_code",
@@ -72,12 +74,18 @@
    "fieldtype": "Data",
    "label": "Batch No.",
    "read_only": 1
+  },
+  {
+   "fieldname": "robot_classification",
+   "fieldtype": "Select",
+   "label": "Robot Classification",
+   "options": "\nDemo\nSales"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-28 12:12:55.698353",
+ "modified": "2025-12-09 11:55:40.470241",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Tracker",

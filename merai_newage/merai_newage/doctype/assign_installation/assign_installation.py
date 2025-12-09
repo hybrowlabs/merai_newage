@@ -98,30 +98,48 @@ def update_robot_tracker(self):
 
         tracker.save(ignore_permissions=True)
         frappe.db.commit()
+import frappe
+from frappe.utils import nowdate
 
 def create_todo_for_engineer(assign_doc, installation_name):
-    if not assign_doc.assigned_engineer:
+    if not assign_doc.engineer_name:
         frappe.throw("Assigned Engineer is not selected!")
+
+    # Fetch linked user from Employee
+    user_id = frappe.db.get_value(
+        "Employee",
+        assign_doc.engineer_name,
+        "user_id"
+    )
+
+    if not user_id:
+        frappe.throw("Selected Engineer is not linked to a User account!")
 
     todo = frappe.get_doc({
         "doctype": "ToDo",
         "description": f"Complete Installation: {installation_name}",
         "reference_type": "Installation",
         "reference_name": installation_name,
-        "owner": assign_doc.assigned_engineer,
-        "allocated_to": assign_doc.assigned_engineer,
+        "assigned_by": frappe.session.user,
+        "owner": user_id,
+        "allocated_to": user_id,
         "status": "Open",
         "date": nowdate()
     })
     todo.insert(ignore_permissions=True)
+    frappe.db.commit()
 
-    # Notification
-    frappe.notify(
-        title="New Installation Assigned",
-        message=f"You have been assigned a new Installation task: {installation_name}",
-        notification_type="Alert",
-        user=assign_doc.assigned_engineer
-    )
+    # Create notification log instead of frappe.notify()
+    frappe.get_doc({
+        "doctype": "Notification Log",
+        "subject": "New Installation Assigned",
+        "email_content": f"You have been assigned a new Installation task: {installation_name}",
+        "for_user": user_id,
+        "type": "Alert",
+        "document_type": "Installation",
+        "document_name": installation_name,
+    }).insert(ignore_permissions=True)
+
 
 
 @frappe.whitelist()
