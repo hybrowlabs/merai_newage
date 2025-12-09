@@ -33,7 +33,7 @@ def update_robot_tracker(self):
         new_row = tracker.append("robot_tracker_details", {})
         new_row.document_no = self.name
         new_row.date = nowdate()
-        new_row.location = self.hospital_name
+        new_row.location = self.to_location
         new_row.robot_status = "Transfered"
         
 
