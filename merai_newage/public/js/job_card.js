@@ -618,15 +618,15 @@ function load_line_clearnce_from_template(
 }
 
 function load_bom_operation_details(frm) {
-  if (frm.doc.custom_software_reqd) {
-    frm.clear_table("custom_jobcard_opeartion_deatils");
-    frm.refresh_field("custom_jobcard_opeartion_deatils");
+  // if (frm.doc.custom_software_reqd) {
+  //   frm.clear_table("custom_jobcard_opeartion_deatils");
+  //   frm.refresh_field("custom_jobcard_opeartion_deatils");
 
-    frm._last_bom_operation = frm.doc.operation;
-    frm._last_bom_no = frm.doc.bom_no;
+  //   frm._last_bom_operation = frm.doc.operation;
+  //   frm._last_bom_no = frm.doc.bom_no;
 
-    return Promise.resolve();
-  }
+  //   return Promise.resolve();
+  // }
 
   if (!frm.doc.bom_no) {
     return Promise.resolve();
@@ -672,8 +672,8 @@ function handle_software_fields(frm) {
     //     frm.refresh_field("custom_software");
     // }
 
-    frm.clear_table("custom_jobcard_opeartion_deatils");
-    frm.refresh_field("custom_jobcard_opeartion_deatils");
+    // frm.clear_table("custom_jobcard_opeartion_deatils");
+    // frm.refresh_field("custom_jobcard_opeartion_deatils");
   } else {
     frm.set_df_property("custom_software", "hidden", 1);
     frm.set_df_property("custom_version", "hidden", 1);
