@@ -49,6 +49,7 @@
   {
    "fieldname": "engineer_name",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Engineer Name",
    "options": "Employee"
   },
@@ -60,7 +61,9 @@
   {
    "fieldname": "hospital_name",
    "fieldtype": "Data",
-   "label": "Hospital Name"
+   "in_list_view": 1,
+   "label": "Hospital Name",
+   "reqd": 1
   },
   {
    "fieldname": "hospital_address",
@@ -125,7 +128,7 @@
    "link_fieldname": "assign_installation"
   }
  ],
- "modified": "2025-12-08 11:51:54.192081",
+ "modified": "2025-12-09 17:09:30.149516",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Assign Installation",

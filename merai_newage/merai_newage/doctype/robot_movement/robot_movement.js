@@ -31,6 +31,7 @@ frappe.ui.form.on("Robot Movement", {
                 frm.set_value("batch", r.message.batch);
                 frm.set_value("robot_status", r.message.robot_status);
                 frm.set_value("from_location", r.message.from_location);
+                frm.set_value("work_order",r.message.work_order)
             }
         }
     });

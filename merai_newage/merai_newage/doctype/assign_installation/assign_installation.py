@@ -105,7 +105,6 @@ def create_todo_for_engineer(assign_doc, installation_name):
     if not assign_doc.engineer_name:
         frappe.throw("Assigned Engineer is not selected!")
 
-    # Fetch linked user from Employee
     user_id = frappe.db.get_value(
         "Employee",
         assign_doc.engineer_name,
@@ -129,7 +128,6 @@ def create_todo_for_engineer(assign_doc, installation_name):
     todo.insert(ignore_permissions=True)
     frappe.db.commit()
 
-    # Create notification log instead of frappe.notify()
     frappe.get_doc({
         "doctype": "Notification Log",
         "subject": "New Installation Assigned",
@@ -152,6 +150,9 @@ def create_assign_installation(doc):
     new_assign_installation.dispatch_no = doc.get("name")
     new_assign_installation.hospital_name = doc.get("hospital_name")
     new_assign_installation.work_order = doc.get("work_order")
+    new_assign_installation.hospital_address = frappe.db.get_value("Account Master",doc.hospital_name,"address")
+    new_assign_installation.city = frappe.db.get_value("Account Master",doc.hospital_name,"city")
+    new_assign_installation.state = frappe.db.get_value("Account Master",doc.hospital_name,"state")
 
     new_assign_installation.insert(ignore_permissions=True)  # Save the doc
 

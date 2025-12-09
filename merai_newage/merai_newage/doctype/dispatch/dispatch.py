@@ -12,13 +12,12 @@ class Dispatch(Document):
             "Robot Tracker",
             {
                 "document_no": self.get("work_order"),
-                "batch_no": self.batch_number
             },
             "name"
         )
 
         if not robot_tracker_name:
-            frappe.msgprint("Robot Tracker not found for this Work Order & Batch No.")
+            frappe.msgprint("Robot Tracker not found for this Work Order")
             return
         
 

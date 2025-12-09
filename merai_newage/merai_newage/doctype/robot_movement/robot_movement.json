@@ -16,7 +16,8 @@
   "robot_name",
   "batch",
   "to_location",
-  "naming_series"
+  "naming_series",
+  "work_order"
  ],
  "fields": [
   {
@@ -89,13 +90,19 @@
    "fieldtype": "Link",
    "label": "Robot Name",
    "options": "Robot Tracker"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "Work Order",
+   "options": "Work Order"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-09 15:32:23.394429",
+ "modified": "2025-12-09 16:05:02.082246",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Movement",

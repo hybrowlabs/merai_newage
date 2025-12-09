@@ -30,7 +30,8 @@
    "fieldname": "hospital_name",
    "fieldtype": "Link",
    "label": "Hospital Name",
-   "options": "Account Master"
+   "options": "Account Master",
+   "reqd": 1
   },
   {
    "fieldname": "item_code",
@@ -41,7 +42,8 @@
   {
    "fieldname": "dispatch_date",
    "fieldtype": "Date",
-   "label": "Dispatch Date"
+   "label": "Dispatch Date",
+   "reqd": 1
   },
   {
    "fieldname": "column_break_wuyr",
@@ -112,7 +114,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-08 10:42:03.376907",
+ "modified": "2025-12-09 16:58:42.100404",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Dispatch",
