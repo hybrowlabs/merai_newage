@@ -69,17 +69,20 @@
   {
    "fieldname": "hospital_address",
    "fieldtype": "Data",
-   "label": "Hospital Address"
+   "label": "Hospital Address",
+   "read_only": 1
   },
   {
    "fieldname": "state",
    "fieldtype": "Data",
-   "label": "State"
+   "label": "State",
+   "read_only": 1
   },
   {
    "fieldname": "city",
    "fieldtype": "Data",
-   "label": "City"
+   "label": "City",
+   "read_only": 1
   },
   {
    "fieldname": "status",
@@ -95,7 +98,8 @@
    "fieldname": "dispatch_no",
    "fieldtype": "Link",
    "label": "Dispatch No",
-   "options": "Dispatch"
+   "options": "Dispatch",
+   "read_only": 1
   },
   {
    "fieldname": "naming_series",
@@ -117,7 +121,8 @@
    "fieldname": "work_order",
    "fieldtype": "Link",
    "label": "Robot Serial No",
-   "options": "Work Order"
+   "options": "Work Order",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
@@ -129,7 +134,7 @@
    "link_fieldname": "assign_installation"
   }
  ],
- "modified": "2025-12-10 15:18:15.849762",
+ "modified": "2025-12-10 15:43:50.833159",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Assign Installation",

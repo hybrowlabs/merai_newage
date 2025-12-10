@@ -96,6 +96,7 @@ def update_robot_tracker(self):
         new_row.document_no = self.name
         new_row.date = nowdate()
         new_row.location = self.hospital_name
+        new_row.doctype_name="Assign Installation"
         new_row.robot_status = "Engineer Assigned"
         tracker.robot_status = "Engineer Assigned"
 

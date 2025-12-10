@@ -28,6 +28,7 @@ class Dispatch(Document):
         new_row.date = nowdate()
         new_row.location = self.hospital_name
         new_row.robot_status = "Dispatched"
+        new_row.doctype_name="Dispatch"
         tracker.robot_status = "Dispatched"
         tracker.save(ignore_permissions=True)
         frappe.db.commit()

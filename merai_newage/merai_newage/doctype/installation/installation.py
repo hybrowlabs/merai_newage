@@ -33,6 +33,7 @@ def update_robot_tracker(self):
         new_row.date = nowdate()
         new_row.location = self.hospital_name
         new_row.robot_status = "Installed"
+        new_row.doctype_name="Installation"
         tracker.robot_status = "Installed"
 
         tracker.save(ignore_permissions=True)

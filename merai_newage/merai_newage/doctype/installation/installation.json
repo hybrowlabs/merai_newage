@@ -133,7 +133,8 @@
    "fieldname": "assign_installation",
    "fieldtype": "Link",
    "label": "Assign Installation(Reference)",
-   "options": "Assign Installation"
+   "options": "Assign Installation",
+   "read_only": 1
   },
   {
    "fieldname": "performance_check_details",
@@ -155,7 +156,8 @@
    "fieldname": "work_order",
    "fieldtype": "Link",
    "label": "Robot Serial No",
-   "options": "Work Order"
+   "options": "Work Order",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -184,7 +186,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-10 15:17:32.566762",
+ "modified": "2025-12-10 15:48:43.592090",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Installation",
