@@ -94,6 +94,12 @@ def create_manual_batch(doc, _method):
         return
     print("batch_number------------131",batch_number)
 
+    batch_number_exists = frappe.db.exists("Batch",batch_number)
+    print("batch_number_exists-----",batch_number_exists)
+    if batch_number_exists:
+        frappe.throw(f"Batch Already Exists for this item {item} and Batch No is {doc.custom_batch_number},Document No is {batch_number_exists}")
+    if batch_number_exists and doc.amended_from:
+        return
     try:
         batch = frappe.new_doc("Batch")
         batch.batch_id = batch_number

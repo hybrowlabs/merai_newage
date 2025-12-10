@@ -1,0 +1,168 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-12-09 16:16:37.500858",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_w4wg",
+  "sales_owner",
+  "installed_robot",
+  "citytown",
+  "csrs",
+  "surgery_type",
+  "type_of_implantrs",
+  "final_result_of_surgery",
+  "feedbackremarks",
+  "column_break_hzx1",
+  "date_of_surgery",
+  "hospital_name",
+  "contactdocotoroperatorsurgeon",
+  "clinical_application_specialists",
+  "robot_surgery_start_time",
+  "robot_surgery_end_time",
+  "overal_robotic_surgery_time_minutes",
+  "any_robotic_issues_if_yeselaboarte",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_w4wg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "installed_robot",
+   "fieldtype": "Link",
+   "label": "Installed Robot",
+   "options": "Robot Tracker"
+  },
+  {
+   "fieldname": "column_break_hzx1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sales_owner",
+   "fieldtype": "Data",
+   "label": "Sales Owner",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "hospital_name.city",
+   "fieldname": "citytown",
+   "fieldtype": "Data",
+   "label": "City/Town"
+  },
+  {
+   "fieldname": "date_of_surgery",
+   "fieldtype": "Date",
+   "label": "Date Of Surgery"
+  },
+  {
+   "fieldname": "hospital_name",
+   "fieldtype": "Link",
+   "label": "Hospital Name",
+   "options": "Account Master"
+  },
+  {
+   "fieldname": "csrs",
+   "fieldtype": "Link",
+   "label": "CSR(s)",
+   "options": "Contact"
+  },
+  {
+   "fieldname": "surgery_type",
+   "fieldtype": "Link",
+   "label": "Surgery Type",
+   "options": "Surgery Type"
+  },
+  {
+   "fieldname": "type_of_implantrs",
+   "fieldtype": "Link",
+   "label": "Type Of Implant(RS)",
+   "options": "Type Of Implant Master"
+  },
+  {
+   "fieldname": "contactdocotoroperatorsurgeon",
+   "fieldtype": "Link",
+   "label": "Contact(Docotor/Operator/Surgeon)",
+   "options": "Contact"
+  },
+  {
+   "fieldname": "clinical_application_specialists",
+   "fieldtype": "Link",
+   "label": "Clinical Application Specialist(s)",
+   "options": "Contact"
+  },
+  {
+   "fieldname": "robot_surgery_start_time",
+   "fieldtype": "Time",
+   "label": "Robot Surgery Start Time"
+  },
+  {
+   "fieldname": "robot_surgery_end_time",
+   "fieldtype": "Time",
+   "label": "Robot Surgery End Time"
+  },
+  {
+   "fieldname": "overal_robotic_surgery_time_minutes",
+   "fieldtype": "Data",
+   "label": "Overal Robotic Surgery Time (Minutes)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "final_result_of_surgery",
+   "fieldtype": "Data",
+   "label": "Final Result Of Surgery"
+  },
+  {
+   "fieldname": "feedbackremarks",
+   "fieldtype": "Data",
+   "label": "Feedback/Remarks"
+  },
+  {
+   "fieldname": "any_robotic_issues_if_yeselaboarte",
+   "fieldtype": "Data",
+   "label": "Any Robotic Issues ? If Yes,Elaboarte"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Surgery",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-12-10 12:12:40.121899",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Surgery",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

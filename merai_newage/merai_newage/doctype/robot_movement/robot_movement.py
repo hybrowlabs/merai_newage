@@ -35,6 +35,7 @@ def update_robot_tracker(self):
         new_row.date = nowdate()
         new_row.location = self.to_location
         new_row.robot_status = "Transfered"
+        tracker.robot_status = "Transfered"
         
 
         tracker.save(ignore_permissions=True)

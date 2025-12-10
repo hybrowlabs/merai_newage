@@ -10,6 +10,7 @@
   "work_order",
   "document_no",
   "date",
+  "robot_status",
   "column_break_hcwn",
   "batch_number",
   "batch_no",
@@ -80,12 +81,18 @@
    "fieldtype": "Select",
    "label": "Robot Classification",
    "options": "\nDemo\nSales"
+  },
+  {
+   "fieldname": "robot_status",
+   "fieldtype": "Select",
+   "label": "Robot Status",
+   "options": "\nManufactured\nDispatched\nEngineer Assigned\nInstalled\nTransfered"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-09 11:55:40.470241",
+ "modified": "2025-12-10 11:25:59.373770",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Tracker",
