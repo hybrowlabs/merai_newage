@@ -42,7 +42,8 @@
    "fieldname": "item_code",
    "fieldtype": "Link",
    "label": "Item Code",
-   "options": "Item"
+   "options": "Item",
+   "read_only": 1
   },
   {
    "fieldname": "date",
@@ -153,7 +154,7 @@
   {
    "fieldname": "work_order",
    "fieldtype": "Link",
-   "label": "Work Order",
+   "label": "Robot Serial No",
    "options": "Work Order"
   },
   {
@@ -183,7 +184,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-10 10:20:48.427031",
+ "modified": "2025-12-10 15:17:32.566762",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Installation",
@@ -208,5 +209,6 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

@@ -34,7 +34,8 @@
    "fieldname": "item_code",
    "fieldtype": "Link",
    "label": "Item Code",
-   "options": "Item"
+   "options": "Item",
+   "read_only": 1
   },
   {
    "fieldname": "warrenty_start_date",
@@ -115,7 +116,7 @@
   {
    "fieldname": "work_order",
    "fieldtype": "Link",
-   "label": "Work Order",
+   "label": "Robot Serial No",
    "options": "Work Order"
   }
  ],
@@ -128,10 +129,11 @@
    "link_fieldname": "assign_installation"
   }
  ],
- "modified": "2025-12-09 17:09:30.149516",
+ "modified": "2025-12-10 15:18:15.849762",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Assign Installation",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
@@ -152,5 +154,6 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
