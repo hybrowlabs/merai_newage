@@ -36,7 +36,8 @@
    "fieldname": "item_code",
    "fieldtype": "Link",
    "label": "Item Code",
-   "options": "Item"
+   "options": "Item",
+   "read_only": 1
   },
   {
    "fieldname": "warrenty_start_date",
@@ -70,17 +71,20 @@
   {
    "fieldname": "hospital_address",
    "fieldtype": "Data",
-   "label": "Hospital Address"
+   "label": "Hospital Address",
+   "read_only": 1
   },
   {
    "fieldname": "state",
    "fieldtype": "Data",
-   "label": "State"
+   "label": "State",
+   "read_only": 1
   },
   {
    "fieldname": "city",
    "fieldtype": "Data",
-   "label": "City"
+   "label": "City",
+   "read_only": 1
   },
   {
    "fieldname": "status",
@@ -96,7 +100,8 @@
    "fieldname": "dispatch_no",
    "fieldtype": "Link",
    "label": "Dispatch No",
-   "options": "Dispatch"
+   "options": "Dispatch",
+   "read_only": 1
   },
   {
    "fieldname": "naming_series",
@@ -117,8 +122,9 @@
   {
    "fieldname": "work_order",
    "fieldtype": "Link",
-   "label": "Work Order",
-   "options": "Work Order"
+   "label": "Robot Serial No",
+   "options": "Work Order",
+   "read_only": 1
   },
   {
    "fetch_from": "item_code.item_group",
@@ -150,6 +156,7 @@
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Assign Installation",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
@@ -170,5 +177,6 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

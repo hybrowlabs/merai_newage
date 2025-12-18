@@ -32,6 +32,7 @@
   "system_packing_list_tab",
   "system_packaging_list",
   "instrument_tray_list_tab",
+  "instrument_tray",
   "instrument_tray_list",
   "amended_from"
  ],
@@ -44,7 +45,8 @@
    "fieldname": "item_code",
    "fieldtype": "Link",
    "label": "Item Code",
-   "options": "Item"
+   "options": "Item",
+   "read_only": 1
   },
   {
    "fieldname": "date",
@@ -134,7 +136,8 @@
    "fieldname": "assign_installation",
    "fieldtype": "Link",
    "label": "Assign Installation(Reference)",
-   "options": "Assign Installation"
+   "options": "Assign Installation",
+   "read_only": 1
   },
   {
    "fieldname": "performance_check_details",
@@ -155,8 +158,9 @@
   {
    "fieldname": "work_order",
    "fieldtype": "Link",
-   "label": "Work Order",
-   "options": "Work Order"
+   "label": "Robot Serial No",
+   "options": "Work Order",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -173,6 +177,12 @@
    "fieldtype": "Table",
    "label": "Installation Attachment Details",
    "options": "Installation Attachment Details"
+  },
+  {
+   "fieldname": "instrument_tray",
+   "fieldtype": "Select",
+   "label": "Instrument Tray",
+   "options": "Instrument Tray-A\nInstrument Tray-B\nInstrument Tray-C"
   },
   {
    "fetch_from": "item_code.item_group",
@@ -195,6 +205,7 @@
    "print_hide": 1,
    "read_only": 1
   }
+
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
@@ -225,5 +236,6 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

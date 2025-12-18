@@ -46,7 +46,8 @@ def create_robot_tracker(doc, method=None):
             row.location = doc.get("company")
             row.date = nowdate()
             row.robot_status = "Manufactured"
-
+            row.doctype_name="Work Order"
+            rt.robot_status = "Manufactured"
             rt.save(ignore_permissions=True)
             frappe.db.commit()
 
@@ -64,12 +65,13 @@ def create_robot_tracker(doc, method=None):
 
              
 
-        # Add 1 new row
         row = rt.append("robot_tracker_details", {})
         row.document_no = doc.get("name")
         row.location = doc.get("company")
         row.date = doc.get("planned_start_date")
         row.robot_status = "Manufactured"
+        row.doctype_name="Work Order"
+        rt.robot_status = "Manufactured"
 
         rt.save(ignore_permissions=True)
         frappe.db.commit()

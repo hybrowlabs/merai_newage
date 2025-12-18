@@ -85,18 +85,18 @@
    "search_index": 1
   },
   {
-   "default": ".{item_code}./.YY./.###",
+   "default": "{item_code}./.YY./.###",
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Naming Series",
-   "options": ".{item_code}./.YY./.###",
+   "options": "{item_code}./.YY./.###",
    "reqd": 1
   },
   {
    "fieldname": "work_order",
    "fieldtype": "Link",
-   "label": "Work Order",
+   "label": "Robot Serial No",
    "options": "Work Order"
   },
   {
@@ -158,5 +158,6 @@
  "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }

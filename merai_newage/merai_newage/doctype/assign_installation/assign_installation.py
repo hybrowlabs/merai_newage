@@ -32,9 +32,11 @@ class AssignInstallation(Document):
         new_installation.dispatch_no = self.name
         new_installation.hospital_name = self.hospital_name
         new_installation.date = nowdate()
-        new_installation.status = "Assigned"
+        new_installation.installation_status = "Assigned"
         new_installation.assign_installation = self.name
         new_installation.work_order = self.work_order
+        new_installation.hospital_address = frappe.db.get_value("Account Master",dispatch_doc.hospital_name,"address")
+
 
         item_group = frappe.db.get_value("Item", self.item_code, "item_group")
         template_name = frappe.db.get_value(
@@ -111,7 +113,9 @@ def update_robot_tracker(self):
         new_row.document_no = self.name
         new_row.date = nowdate()
         new_row.location = self.hospital_name
+        new_row.doctype_name="Assign Installation"
         new_row.robot_status = "Engineer Assigned"
+        tracker.robot_status = "Engineer Assigned"
 
         tracker.save(ignore_permissions=True)
         frappe.db.commit()

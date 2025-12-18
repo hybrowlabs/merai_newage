@@ -27,9 +27,10 @@
   },
   {
    "fieldname": "document_no",
-   "fieldtype": "Data",
+   "fieldtype": "Dynamic Link",
    "in_list_view": 1,
-   "label": "Document No"
+   "label": "Document No",
+   "options": "doctype_name"
   },
   {
    "fieldname": "date",
@@ -61,7 +62,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-08 11:30:26.551095",
+ "modified": "2025-12-10 16:41:02.695302",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Tracker Details",

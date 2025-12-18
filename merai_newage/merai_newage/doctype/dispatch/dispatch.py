@@ -46,7 +46,8 @@ class Dispatch(Document):
         new_row.date = nowdate()
         new_row.location = self.hospital_name
         new_row.robot_status = "Dispatched"
-
+        new_row.doctype_name="Dispatch"
+        tracker.robot_status = "Dispatched"
         tracker.save(ignore_permissions=True)
         frappe.db.commit()
 
@@ -77,25 +78,19 @@ def update_dispatch_details(doc):
     doc = frappe.parse_json(doc)
     batch_no = doc.get("batch_no")
 
-    # Get standard batch number
     std_batch_no = frappe.db.get_value("Batch", {"name": batch_no}, "custom_batch_number")
 
-    # 1️⃣ Resolve Work Order
     wo = None
 
-    # First priority: Batch custom_work_order
     batch_wo = frappe.db.get_value("Batch", {"name": batch_no}, "custom_work_order")
     if batch_wo:
         wo = batch_wo
     else:
-        # Second priority: Work Order where custom_batch matches
         wo = frappe.db.get_value("Work Order", {"custom_batch": batch_no}, "name")
 
-        # Third priority: Work Order where custom_batch_number matches
         if not wo:
             wo = frappe.db.get_value("Work Order", {"custom_batch_number": std_batch_no}, "name")
 
-    # Nothing found
     if not wo:
         return {
             "work_order": None,
