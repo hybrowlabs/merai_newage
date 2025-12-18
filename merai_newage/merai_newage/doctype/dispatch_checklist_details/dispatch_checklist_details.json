@@ -7,7 +7,11 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_love",
-  "product_name"
+  "product_name",
+  "product_description",
+  "qty",
+  "type",
+  "attach"
  ],
  "fields": [
   {
@@ -20,19 +24,46 @@
    "in_list_view": 1,
    "label": "Product Name",
    "options": "Item"
+  },
+  {
+   "fetch_from": "product_name.item_name",
+   "fieldname": "product_description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Product Description"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Qty"
+  },
+  {
+   "fieldname": "type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Type",
+   "options": "Dispatch packing master"
+  },
+  {
+   "fieldname": "attach",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "Attach"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-08 11:45:22.815678",
+ "modified": "2025-12-18 14:15:06.545731",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Dispatch Checklist Details",
  "owner": "Administrator",
  "permissions": [],
  "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
