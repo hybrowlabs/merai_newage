@@ -7,7 +7,24 @@ from frappe.utils import nowdate
 
 
 class RobotMovement(Document):
-	def on_submit(self):
+     
+    def validate(self):
+        self.set_print_format_from_item_group()
+   
+    def set_print_format_from_item_group(self):
+        if self.item_group:
+            robot_movement__print_format = frappe.db.get_value(
+                "Item Group",
+                self.item_group,
+                "custom_robot_movement_print_format"
+            )
+
+            if robot_movement__print_format:
+                self.custom_print_format = robot_movement__print_format
+            else:
+                self.custom_print_format = None     
+
+    def on_submit(self):
           update_robot_tracker(self)
           
 

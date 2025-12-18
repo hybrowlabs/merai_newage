@@ -15,11 +15,14 @@
   "work_order",
   "column_break_jygi",
   "date",
+  "timing",
   "hospital_address",
   "system_installation_remarks",
+  "item_group",
   "section_break_rxbx",
   "to_attach",
   "table_lckd",
+  "custom_print_format",
   "installation_procedure_and_verification_tab",
   "installation_step_details",
   "safety_check_and_precautions",
@@ -170,13 +173,34 @@
    "fieldtype": "Table",
    "label": "Installation Attachment Details",
    "options": "Installation Attachment Details"
+  },
+  {
+   "fetch_from": "item_code.item_group",
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "timing",
+   "fieldtype": "Time",
+   "label": "Timing"
+  },
+  {
+   "fieldname": "custom_print_format",
+   "fieldtype": "Link",
+   "label": "Print Format",
+   "options": "Print Format",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-08 12:00:54.821167",
+ "modified": "2025-12-17 14:46:08.882221",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Installation",

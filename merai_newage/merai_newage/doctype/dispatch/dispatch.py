@@ -7,6 +7,24 @@ from frappe.utils import nowdate
 
 
 class Dispatch(Document):
+
+
+    def validate(self):
+        self.set_print_format_from_item_group()
+   
+    def set_print_format_from_item_group(self):
+        if self.item_group:
+            dispatch_print_format = frappe.db.get_value(
+                "Item Group",
+                self.item_group,
+                "custom_dispatch_print_format"
+            )
+
+            if dispatch_print_format:
+                self.custom_print_format = dispatch_print_format
+            else:
+                self.custom_print_format = None
+
     def on_submit(self):
         robot_tracker_name = frappe.db.get_value(
             "Robot Tracker",

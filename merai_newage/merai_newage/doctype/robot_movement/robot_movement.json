@@ -12,12 +12,14 @@
   "robot_status",
   "from_location",
   "item_code",
+  "item_group",
   "column_break_eikr",
   "robot_name",
   "batch",
   "to_location",
   "naming_series",
-  "work_order"
+  "work_order",
+  "custom_print_format"
  ],
  "fields": [
   {
@@ -96,13 +98,29 @@
    "fieldtype": "Link",
    "label": "Work Order",
    "options": "Work Order"
+  },
+  {
+   "fetch_from": "item_code.item_group",
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "custom_print_format",
+   "fieldtype": "Link",
+   "label": "Print Format",
+   "options": "Print Format",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-09 16:05:02.082246",
+ "modified": "2025-12-17 14:47:01.597645",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Movement",

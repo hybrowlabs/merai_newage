@@ -13,6 +13,8 @@
   "city",
   "status",
   "work_order",
+  "item_group",
+  "custom_print_format",
   "column_break_vy08",
   "item_code",
   "warrenty_end_date",
@@ -117,6 +119,22 @@
    "fieldtype": "Link",
    "label": "Work Order",
    "options": "Work Order"
+  },
+  {
+   "fetch_from": "item_code.item_group",
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "custom_print_format",
+   "fieldtype": "Link",
+   "label": "Print Format",
+   "options": "Print Format",
+   "print_hide": 1,
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
@@ -128,7 +146,7 @@
    "link_fieldname": "assign_installation"
   }
  ],
- "modified": "2025-12-09 17:09:30.149516",
+ "modified": "2025-12-17 14:43:08.294153",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Assign Installation",
