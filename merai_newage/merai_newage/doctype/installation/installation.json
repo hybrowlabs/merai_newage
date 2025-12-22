@@ -32,9 +32,11 @@
   "system_packing_list_tab",
   "system_packaging_list",
   "instrument_tray_list_tab",
-  "instrument_tray",
   "instrument_tray_list",
-  "amended_from"
+  "amended_from",
+  "tab_5_tab",
+  "hardware_or_software_replacement_tracking_section",
+  "hardware_or_software_replacement_tracking_log"
  ],
  "fields": [
   {
@@ -179,12 +181,6 @@
    "options": "Installation Attachment Details"
   },
   {
-   "fieldname": "instrument_tray",
-   "fieldtype": "Select",
-   "label": "Instrument Tray",
-   "options": "Instrument Tray-A\nInstrument Tray-B\nInstrument Tray-C"
-  },
-  {
    "fetch_from": "item_code.item_group",
    "fieldname": "item_group",
    "fieldtype": "Link",
@@ -204,14 +200,29 @@
    "options": "Print Format",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "tab_5_tab",
+   "fieldtype": "Tab Break",
+   "label": "Hardware Or Software Replacement Tracking"
+  },
+  {
+   "fieldname": "hardware_or_software_replacement_tracking_section",
+   "fieldtype": "Section Break",
+   "label": "Hardware Or Software Replacement Tracking"
+  },
+  {
+   "fieldname": "hardware_or_software_replacement_tracking_log",
+   "fieldtype": "Table",
+   "label": "Hardware Or Software Replacement Tracking Log",
+   "options": "Hardware Or Software Replacement Tracking Log"
   }
-
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-17 14:46:08.882221",
+ "modified": "2025-12-22 10:48:23.129380",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Installation",

@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class DispatchPackingMaster(Document):
+class HardwareOrSoftwareReplacementTrackingLog(Document):
 	pass

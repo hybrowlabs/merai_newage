@@ -24,9 +24,10 @@ class AssignInstallation(Document):
                 self.custom_print_format = None     
 	    
     def on_submit(self):
+        item_doc=frappe.get_doc("Item",self.item_code)
         dispatch_doc=frappe.get_doc("Dispatch",self.dispatch_no)
         new_installation = frappe.new_doc("Installation")
-
+        
         new_installation.robot_classification = self.robot_classification
         new_installation.item_code = self.item_code
         new_installation.dispatch_no = self.name
@@ -68,19 +69,28 @@ class AssignInstallation(Document):
             new_installation.append("performance_check_details", {
                 "performance_check":row.performance_check
             })
-        
-        for row in dispatch_doc.dispatch_standard_checklist:
-            new_installation.append('system_packaging_list',{
-                "item":row.product_code,
-                "qty":row.std_qty
-            })
-            new_installation.append('instrument_tray_list',{
-                "product_code":row.product_code,
-                "product_description":frappe.db.get_value("Item",row.product_code,"description"),
-                "stdqty":row.std_qty,
-                "batch_no":row.batch_no
-            })
+        batch_map = {
+            d.product_code: d.batch_no
+            for d in dispatch_doc.dispatch_standard_checklist
+        }
 
+        for row in item_doc.custom_dispatch_checklist_details:
+            if row.type=="System Packaging List":
+                new_installation.append('system_packaging_list',{
+                    "item":row.product_name,
+                    "qty":row.qty,
+                    "item_description":row.product_description,
+                    "attach":row.attach
+                })
+            else:
+                new_installation.append('instrument_tray_list',{
+                    "product_code":row.product_name,
+                    "product_description":row.product_description,
+                    "stdqty":row.qty,
+                    "batch_no": batch_map.get(row.product_name) ,
+                    "attach":row.attach
+                })
+       
         
 
         new_installation.insert(ignore_permissions=True)

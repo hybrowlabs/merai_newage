@@ -9,7 +9,9 @@
   "section_break_do9n",
   "item",
   "qty",
-  "received"
+  "received",
+  "attach",
+  "item_description"
  ],
  "fields": [
   {
@@ -35,13 +37,24 @@
    "in_list_view": 1,
    "label": "Received",
    "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "attach",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "Attach"
+  },
+  {
+   "fieldname": "item_description",
+   "fieldtype": "Data",
+   "label": "Item Description"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-03 12:16:37.165451",
+ "modified": "2025-12-22 10:39:14.045529",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "System Packaging List",

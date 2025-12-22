@@ -15,10 +15,11 @@ frappe.ui.form.on("Dispatch", {
                 let new_row = frm.add_child("dispatch_standard_checklist");
 
                 new_row.product_code = row.product_name;
-
+                new_row.std_qty=row.qty
                 frappe.db.get_value("Item", row.product_name, "description")
                     .then(r => {
                         new_row.product_description = r.message.description;
+                        
                         frm.refresh_field("dispatch_standard_checklist");
                     });
             });

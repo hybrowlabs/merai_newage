@@ -66,6 +66,7 @@ def set_values_in_checklist(name):
     for row in item_doc.custom_dispatch_checklist_details:
         new_row = dispatch_doc.append("dispatch_standard_checklist", {})
         new_row.product_name = row.product_name
+        new_row.std_qty=row.qty
         print("=======================")
         new_row.product_description = frappe.db.get_value("Item",row.product_name,"description")
     
