@@ -15,7 +15,11 @@
   "material_request",
   "uom",
   "lead_timedays",
-  "additional_emails"
+  "additional_emails",
+  "item_description",
+  "external_vendor_mail_id",
+  "external_vendor_name",
+  "purpose_and_estimated_cost"
  ],
  "fields": [
   {
@@ -91,13 +95,34 @@
    "fieldname": "additional_emails",
    "fieldtype": "Data",
    "label": "Additional Emails"
+  },
+  {
+   "fetch_from": "item_code.description",
+   "fieldname": "item_description",
+   "fieldtype": "Data",
+   "label": "Item Description"
+  },
+  {
+   "fieldname": "external_vendor_mail_id",
+   "fieldtype": "Data",
+   "label": "External Vendor Mail ID"
+  },
+  {
+   "fieldname": "external_vendor_name",
+   "fieldtype": "Data",
+   "label": "External Vendor Name"
+  },
+  {
+   "fieldname": "purpose_and_estimated_cost",
+   "fieldtype": "Data",
+   "label": "Purpose and Estimated Cost"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-22 15:25:14.603028",
+ "modified": "2025-12-24 17:26:30.042111",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "RFQ Entry Details",

@@ -1761,29 +1761,7 @@
    "row_name": null,
    "value": "1"
   },
-  {
-   "_assign": null,
-   "_comments": null,
-   "_liked_by": null,
-   "_user_tags": null,
-   "creation": "2025-12-23 15:48:28.415542",
-   "default_value": null,
-   "doc_type": "Material Request",
-   "docstatus": 0,
-   "doctype_or_field": "DocField",
-   "field_name": "material_request_type",
-   "idx": 0,
-   "is_system_generated": 0,
-   "modified": "2025-12-23 15:48:28.415542",
-   "modified_by": "Administrator",
-   "module": "Merai Newage",
-   "name": "Material Request-material_request_type-options",
-   "owner": "Administrator",
-   "property": "options",
-   "property_type": "Text",
-   "row_name": "",
-   "value": "Purchase\nMaterial Transfer\nMaterial Issue\nManufacture\nCustomer Provided\nAsset"
-  },
+ 
   {
    "_assign": null,
    "_comments": null,
