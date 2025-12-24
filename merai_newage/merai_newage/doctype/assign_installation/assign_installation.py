@@ -80,7 +80,9 @@ class AssignInstallation(Document):
                     "item":row.product_name,
                     "qty":row.qty,
                     "item_description":row.product_description,
-                    "attach":row.attach
+                    "attach":row.attach,
+                    "type":row.type
+
                 })
             else:
                 new_installation.append('instrument_tray_list',{
@@ -88,7 +90,9 @@ class AssignInstallation(Document):
                     "product_description":row.product_description,
                     "stdqty":row.qty,
                     "batch_no": batch_map.get(row.product_name) ,
-                    "attach":row.attach
+                    "attach":row.attach,
+                    "type":row.type
+
                 })
        
         
