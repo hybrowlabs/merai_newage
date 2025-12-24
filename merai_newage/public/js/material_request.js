@@ -42,5 +42,37 @@ frappe.ui.form.on("Material Request", {
             );
             return false;
         }
+    },
+   refresh(frm) {
+    console.log("----------------frm----------",frm)
+        // run only if field empty
+        if (!frm.doc.custom_requisitioner) {
+
+            // get logged-in user id
+            let user = frappe.session.user;
+            console.log("user=====",user)
+            frappe.db.get_list("Employee", {
+                fields: ["name","custom_user_email_for_creation"],
+                filters: {
+                    user_id: user
+                },
+                limit: 1
+            }).then(res => {
+                if (res.length > 0) {
+                    frm.set_value("custom_requisitioner", res[0].name);
+                    frm.set_value("custom_requisitioner_email",res[0].custom_user_email_for_creation)
+                }
+            });
+        }
+
+         frm.add_custom_button("Create RFQ Entry", function() {
+            frappe.call({
+                method: "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.create_rfq_entry",
+                args: {source_name: frm.doc.name},
+                callback(r) {
+                    frappe.set_route("Form", "RFQ Entry", r.message);
+                }
+            });
+        });
     }
 });

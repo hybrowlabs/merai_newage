@@ -1,0 +1,258 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-12-23 14:24:29.830754",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_zyox",
+  "amended_from",
+  "employee",
+  "reports_to",
+  "employee_id",
+  "designation",
+  "department",
+  "full_name",
+  "date_of_joining",
+  "entinty",
+  "asset_description",
+  "asset_specification",
+  "completion_date",
+  "qty",
+  "uom",
+  "item",
+  "column_break_kgni",
+  "plant",
+  "location",
+  "budgeted",
+  "category_of_asset",
+  "remarksspecial_attention",
+  "project_description",
+  "project_name",
+  "approx_cost",
+  "cost_centre",
+  "saftey_dep_approval_required",
+  "tab_break_cyks",
+  "attachments",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_zyox",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Asset Creation Form",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "label": "Employee",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee.reports_to",
+   "fieldname": "reports_to",
+   "fieldtype": "Link",
+   "label": "Reports To",
+   "options": "Employee"
+  },
+  {
+   "fetch_from": "employee.employee_number",
+   "fieldname": "employee_id",
+   "fieldtype": "Data",
+   "label": "Employee ID"
+  },
+  {
+   "fetch_from": "employee.designation",
+   "fieldname": "designation",
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation"
+  },
+  {
+   "fetch_from": "employee.department",
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "column_break_kgni",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "plant",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Plant",
+   "options": "Plant",
+   "reqd": 1
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Location",
+   "reqd": 1
+  },
+  {
+   "fieldname": "budgeted",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Budgeted",
+   "options": "\nYes\nNo",
+   "reqd": 1
+  },
+  {
+   "fieldname": "category_of_asset",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Category Of Asset",
+   "reqd": 1
+  },
+  {
+   "fieldname": "remarksspecial_attention",
+   "fieldtype": "Small Text",
+   "label": "Remarks/Special Attention"
+  },
+  {
+   "fetch_from": "employee.employee_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name"
+  },
+  {
+   "fetch_from": "employee.date_of_joining",
+   "fieldname": "date_of_joining",
+   "fieldtype": "Data",
+   "label": "Date Of Joining"
+  },
+  {
+   "fieldname": "entinty",
+   "fieldtype": "Link",
+   "label": "Entinty",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "asset_description",
+   "fieldtype": "Small Text",
+   "label": "Asset Description"
+  },
+  {
+   "fieldname": "asset_specification",
+   "fieldtype": "Small Text",
+   "label": "Asset Specification"
+  },
+  {
+   "fieldname": "completion_date",
+   "fieldtype": "Date",
+   "label": "Completion Date"
+  },
+  {
+   "fieldname": "project_description",
+   "fieldtype": "Small Text",
+   "label": "Project Description"
+  },
+  {
+   "fieldname": "project_name",
+   "fieldtype": "Link",
+   "label": "Project Name",
+   "options": "Project"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "label": "Qty",
+   "reqd": 1
+  },
+  {
+   "fieldname": "uom",
+   "fieldtype": "Link",
+   "label": "UOM",
+   "options": "UOM",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tab_break_cyks",
+   "fieldtype": "Tab Break",
+   "label": "Attachment Section"
+  },
+  {
+   "fieldname": "attachments",
+   "fieldtype": "Table",
+   "label": "Attachments",
+   "options": "Job Card Attachments"
+  },
+  {
+   "fieldname": "approx_cost",
+   "fieldtype": "Currency",
+   "label": "Approx Cost"
+  },
+  {
+   "fieldname": "cost_centre",
+   "fieldtype": "Data",
+   "label": "Cost Centre"
+  },
+  {
+   "fieldname": "saftey_dep_approval_required",
+   "fieldtype": "Select",
+   "label": "Saftey Dep. Approval Required",
+   "options": "\nYes\nNo"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item",
+   "reqd": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "ASS-.YYYY.-.MM.-"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-12-23 15:06:07.643727",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Asset Creation Form",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

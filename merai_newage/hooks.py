@@ -248,7 +248,9 @@ doctype_js = {
     "Job Card":"public/js/job_card.js",
     "Quality Inspection":"public/js/quality_inspection.js",
     "Work Order":"public/js/work_order.js",
-    "Stock Entry":"public/js/stock_entry.js"
+    "Stock Entry":"public/js/stock_entry.js",
+    "Employee":"public/js/employee.js",
+    "Material Request":"public/js/material_request.js"
 }
 
 # doc_events = {
@@ -278,14 +280,19 @@ doc_events = {
     "Quality Inspection": {
         "before_save": "merai_newage.overrides.quality_inspection.before_save",
         "on_submit": "merai_newage.overrides.quality_inspection.on_submit",        
-    }    
+    },
+    "Request for Quotation": {
+        "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails"
+    }
 
 }
-
+# In your custom app's hooks.py
 
 fixtures = [
     {"dt": "Batch Number Template"},
 # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
+    {"dt": "Property Setter",  "filters": [ ["name", "=", "Material Request-material_request_type-options"]] }
+
 ]
 page_js = {"print": "public/js/print.js"}
 
