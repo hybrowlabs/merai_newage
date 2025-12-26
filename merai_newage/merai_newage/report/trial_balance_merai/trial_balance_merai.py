@@ -133,15 +133,15 @@ def get_data(filters):
 	# Store ALL accounts before filtering for correct total calculation
 	all_accounts_before_filter = list(accounts)
 
-	# ---- MODE FILTER: Group ONLY or Ledger ONLY ----
+	# ---- MODE FILTER: Show Group Accounts or Ledger ONLY ----
 	# Apply this filter AFTER accumulation so parent accounts have correct totals
 	show_groups = cint(filters.get("show_group_accounts"))
 
 	if show_groups:
-		# Checked → ONLY group accounts
-		accounts = [d for d in accounts if cint(d.is_group)]
+		# Checked → Show ALL accounts (both group and ledger)
+		pass  # No filtering needed, show everything
 	else:
-		# Unchecked → ONLY ledger accounts
+		# Unchecked → ONLY ledger accounts (filter out group accounts)
 		accounts = [d for d in accounts if not cint(d.is_group)]
 
 	data = prepare_data(accounts, filters, parent_children_map, company_currency, all_accounts_before_filter)

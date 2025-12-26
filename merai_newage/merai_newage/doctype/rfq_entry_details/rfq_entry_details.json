@@ -19,7 +19,8 @@
   "item_description",
   "external_vendor_mail_id",
   "external_vendor_name",
-  "purpose_and_estimated_cost"
+  "purpose_and_estimated_cost",
+  "material_request_item"
  ],
  "fields": [
   {
@@ -116,13 +117,18 @@
    "fieldname": "purpose_and_estimated_cost",
    "fieldtype": "Data",
    "label": "Purpose and Estimated Cost"
+  },
+  {
+   "fieldname": "material_request_item",
+   "fieldtype": "Data",
+   "label": "Material Request Item"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-12-24 17:26:30.042111",
+ "modified": "2025-12-25 17:27:46.989698",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "RFQ Entry Details",
