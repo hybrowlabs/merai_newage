@@ -535,6 +535,11 @@ def create_rfq_entry(source_name):
             "material_request": mr_doc.name,
             "material_request_item": mr_item.name
         })
+        rfq_entry.append("rfq_entry_details", {
+            "item_code": mr_item.item_code,
+            "material_request": mr_doc.name,
+            "material_request_item": mr_item.name
+        })
     
     # Note: rfq_entry_details will be populated manually by user
     # with supplier, email_id, additional_emails for each item
