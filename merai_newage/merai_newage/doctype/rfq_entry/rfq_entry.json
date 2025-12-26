@@ -8,12 +8,14 @@
  "field_order": [
   "section_break_s57c",
   "amended_from",
+  "naming_series",
   "created_by",
   "required_by",
   "type",
   "email_template",
+  "rfq_item_details",
   "rfq_entry_details",
-  "naming_series"
+  "material_request_reference"
  ],
  "fields": [
   {
@@ -37,6 +39,7 @@
    "options": "User"
   },
   {
+   "default": "Today",
    "fieldname": "required_by",
    "fieldtype": "Date",
    "label": "Required By"
@@ -64,13 +67,30 @@
    "fieldtype": "Link",
    "label": "Email Template",
    "options": "Email Template"
+  },
+  {
+   "fieldname": "rfq_item_details",
+   "fieldtype": "Table",
+   "label": "RFQ Item Details",
+   "options": "RFQ Item Details"
+  },
+  {
+   "fieldname": "material_request_reference",
+   "fieldtype": "Link",
+   "label": "Material Request Reference",
+   "options": "Material Request"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
- "links": [],
- "modified": "2025-12-22 14:26:27.645971",
+ "links": [
+  {
+   "link_doctype": "Material Request",
+   "link_fieldname": "name"
+  }
+ ],
+ "modified": "2025-12-26 12:17:44.808545",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "RFQ Entry",

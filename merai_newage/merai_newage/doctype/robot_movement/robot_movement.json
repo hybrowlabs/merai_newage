@@ -40,7 +40,7 @@
    "fieldname": "robot_classification",
    "fieldtype": "Select",
    "label": "Robot Classification",
-   "options": "\nDemo\nSales"
+   "options": "\nDemo\nCommercial\nConsignment"
   },
   {
    "fieldname": "item_code",
@@ -124,7 +124,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-17 14:47:01.597645",
+ "modified": "2025-12-26 14:21:49.984806",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Movement",

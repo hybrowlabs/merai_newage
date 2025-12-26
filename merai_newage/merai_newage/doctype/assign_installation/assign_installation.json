@@ -30,7 +30,7 @@
    "fieldname": "robot_classification",
    "fieldtype": "Select",
    "label": "Robot Classification",
-   "options": "\nDemo\nSales"
+   "options": "\nDemo\nCommercial\nConsignment"
   },
   {
    "fieldname": "item_code",
@@ -152,7 +152,7 @@
    "link_fieldname": "assign_installation"
   }
  ],
- "modified": "2025-12-17 14:43:08.294153",
+ "modified": "2025-12-26 14:18:46.871858",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Assign Installation",
