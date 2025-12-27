@@ -80,7 +80,7 @@
    "fieldname": "robot_classification",
    "fieldtype": "Select",
    "label": "Robot Classification",
-   "options": "\nDemo\nSales"
+   "options": "\nDemo\nCommercial\nConsignment"
   },
   {
    "fieldname": "robot_status",
@@ -92,7 +92,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-10 15:02:54.448636",
+ "modified": "2025-12-26 14:22:03.066689",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Tracker",

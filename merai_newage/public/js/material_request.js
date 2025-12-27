@@ -64,15 +64,17 @@ frappe.ui.form.on("Material Request", {
                 }
             });
         }
+        if(frm.doc.docstatus==1){
 
-         frm.add_custom_button("Create RFQ Entry", function() {
-            frappe.call({
-                method: "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.create_rfq_entry",
-                args: {source_name: frm.doc.name},
-                callback(r) {
-                    frappe.set_route("Form", "RFQ Entry", r.message);
-                }
+            frm.add_custom_button("Create RFQ Entry", function() {
+                frappe.call({
+                    method: "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.create_rfq_entry",
+                    args: {source_name: frm.doc.name},
+                    callback(r) {
+                        frappe.set_route("Form", "RFQ Entry", r.message);
+                    }
+                });
             });
-        });
+        }
     }
 });

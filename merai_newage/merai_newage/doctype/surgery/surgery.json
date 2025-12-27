@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "naming_series:",
  "creation": "2025-12-09 16:16:37.500858",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -15,6 +16,7 @@
   "final_result_of_surgery",
   "feedbackremarks",
   "custom_print_format",
+  "count",
   "column_break_hzx1",
   "date_of_surgery",
   "hospital_name",
@@ -24,7 +26,8 @@
   "robot_surgery_end_time",
   "overal_robotic_surgery_time_minutes",
   "any_robotic_issues_if_yeselaboarte",
-  "amended_from"
+  "amended_from",
+  "naming_series"
  ],
  "fields": [
   {
@@ -143,6 +146,18 @@
    "label": "Print Format",
    "options": "Print Format",
    "read_only": 1
+  },
+  {
+   "fieldname": "count",
+   "fieldtype": "Int",
+   "label": "Count",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "{installed_robot}.-.YYYY.-"
   }
  ],
  "grid_page_length": 50,
@@ -153,6 +168,7 @@
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Surgery",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
