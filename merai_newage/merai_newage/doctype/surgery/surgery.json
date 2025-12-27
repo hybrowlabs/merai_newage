@@ -14,6 +14,7 @@
   "type_of_implantrs",
   "final_result_of_surgery",
   "feedbackremarks",
+  "custom_print_format",
   "column_break_hzx1",
   "date_of_surgery",
   "hospital_name",
@@ -133,13 +134,22 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "default": "MISSO-Surgery Tracker",
+   "fieldname": "custom_print_format",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Print Format",
+   "options": "Print Format",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-10 12:12:40.121899",
+ "modified": "2025-12-27 11:47:06.376346",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Surgery",
