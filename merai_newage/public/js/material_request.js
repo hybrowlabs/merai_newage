@@ -1,4 +1,47 @@
 frappe.ui.form.on("Material Request", {
+       custom_asset_record_no(frm) {
+        let acr = frm.doc.custom_asset_record_no;
+        if (!acr) return;
+
+        frappe.call({
+            method: "frappe.client.get",
+            args: {
+                doctype: "Asset Creation Request",
+                name: acr
+            },
+            callback: function (r) {
+                if (!r.message) return;
+
+                let acr_doc = r.message;
+
+                // Fetch item details including lead time
+                frappe.db.get_value("Item", acr_doc.item, ["lead_time_days", "item_name"])
+                    .then(item_data => {
+                        // Clear existing items
+                        frm.clear_table("items");
+                        frm.refresh_field("items");
+
+                        // Add item row and trigger item_code change
+                        setTimeout(() => {
+                            let row = frm.add_child("items");
+                            frm.refresh_field("items");
+                            
+                            // Set item_code using model.set_value to trigger all events
+                            frappe.model.set_value(row.doctype, row.name, "item_code", acr_doc.item)
+                                .then(() => {
+                                    // Set qty
+                                    frappe.model.set_value(row.doctype, row.name, "qty", acr_doc.qty);
+                                    
+                                    // Set lead time if it exists
+                                    if (item_data && item_data.message && item_data.message.lead_time_days) {
+                                        frappe.model.set_value(row.doctype, row.name, "custom_lead_timein_days", item_data.message.lead_time_days);
+                                    }
+                                });
+                        }, 100);
+                    });
+            }
+        });
+    },
     before_workflow_action(frm) {
 
         const action = frm.selected_workflow_action;

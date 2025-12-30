@@ -1,7 +1,7 @@
 // Copyright (c) 2025, Siddhant Hybrowlabs and contributors
 // For license information, please see license.txt
 
-// frappe.ui.form.on("Asset Creation Form", {
+// frappe.ui.form.on("Meril Manufacturing Settings", {
 // 	refresh(frm) {
 
 // 	},

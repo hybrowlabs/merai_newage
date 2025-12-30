@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class AssetCreationForm(Document):
+class MerilManufacturingSettings(Document):
 	pass

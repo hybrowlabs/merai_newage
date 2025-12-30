@@ -8,6 +8,7 @@
  "field_order": [
   "section_break_zyox",
   "amended_from",
+  "naming_series",
   "employee",
   "reports_to",
   "employee_id",
@@ -22,6 +23,9 @@
   "qty",
   "uom",
   "item",
+  "item_group",
+  "company_code",
+  "asset_code",
   "column_break_kgni",
   "plant",
   "location",
@@ -33,9 +37,11 @@
   "approx_cost",
   "cost_centre",
   "saftey_dep_approval_required",
+  "asset_creation_type",
+  "generate_asset_codes",
+  "asset_code_details",
   "tab_break_cyks",
-  "attachments",
-  "naming_series"
+  "attachments"
  ],
  "fields": [
   {
@@ -47,7 +53,7 @@
    "fieldtype": "Link",
    "label": "Amended From",
    "no_copy": 1,
-   "options": "Asset Creation Form",
+   "options": "Asset Creation Request",
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
@@ -99,9 +105,10 @@
   },
   {
    "fieldname": "location",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Location",
+   "options": "Location",
    "reqd": 1
   },
   {
@@ -114,9 +121,10 @@
   },
   {
    "fieldname": "category_of_asset",
-   "fieldtype": "Data",
+   "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Category Of Asset",
+   "options": "Asset Category",
    "reqd": 1
   },
   {
@@ -217,20 +225,58 @@
    "reqd": 1
   },
   {
+   "default": "{company_code}.{asset_code}.####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming Series",
-   "options": "ASS-.YYYY.-.MM.-"
+   "options": "{company_code}.{asset_code}.####"
+  },
+  {
+   "fieldname": "asset_code_details",
+   "fieldtype": "Table",
+   "label": "Asset Code Details",
+   "options": "Asset Code Details"
+  },
+  {
+   "fieldname": "asset_creation_type",
+   "fieldtype": "Select",
+   "label": "Asset Creation Type",
+   "options": "\nManual\nAutomatic"
+  },
+  {
+   "depends_on": "eval:doc.asset_creation_type=='Automatic'",
+   "fieldname": "generate_asset_codes",
+   "fieldtype": "Button",
+   "label": "Generate Asset Codes"
+  },
+  {
+   "fetch_from": "item.item_group",
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fetch_from": "category_of_asset.custom_company_code",
+   "fieldname": "company_code",
+   "fieldtype": "Data",
+   "label": "Company Code"
+  },
+  {
+   "fetch_from": "category_of_asset.custom_asset_code",
+   "fieldname": "asset_code",
+   "fieldtype": "Data",
+   "label": "Asset Code"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-23 15:06:07.643727",
+ "modified": "2025-12-29 14:22:33.799327",
  "modified_by": "Administrator",
  "module": "Merai Newage",
- "name": "Asset Creation Form",
+ "name": "Asset Creation Request",
  "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
