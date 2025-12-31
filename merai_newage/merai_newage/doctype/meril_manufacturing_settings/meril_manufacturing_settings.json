@@ -14,7 +14,7 @@
    "fieldtype": "Section Break"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "auto_stock",
    "fieldtype": "Check",
    "label": "Auto Stock"
@@ -24,7 +24,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-30 12:57:36.351521",
+ "modified": "2025-12-31 16:29:09.944407",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Meril Manufacturing Settings",

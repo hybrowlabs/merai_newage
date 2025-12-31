@@ -843,6 +843,12 @@ def create_stock_entry_on_submit(doc_name):
 
 @frappe.whitelist()
 def complete_work_order(doc_name):
+    is_auto_stock = frappe.db.get_single_value(
+            "Meril Manufacturing Settings",
+            "auto_stock"
+        )
+    if is_auto_stock==0:
+        return
     doc = frappe.get_doc("Work Order", doc_name)
 
     stock_entry = frappe.new_doc("Stock Entry")
@@ -915,9 +921,16 @@ def complete_work_order(doc_name):
 def on_submit(doc, method=None):
     # create_manual_batch_number(doc)
     create_manual_batch(doc,_method=None)
-    create_stock_entry_for_received_material_on_submit(doc.name)
-    create_stock_entry_on_submit(doc.name)
-    frappe.msgprint(f"{doc.name} work order has been released")
+    # is_auto_stock=frappe.db.get_single("Meril Manufacturing Settings","auto_stock")
+    is_auto_stock = frappe.db.get_single_value(
+            "Meril Manufacturing Settings",
+            "auto_stock"
+        )
+
+    if is_auto_stock==1:
+        create_stock_entry_for_received_material_on_submit(doc.name)
+        create_stock_entry_on_submit(doc.name)
+        frappe.msgprint(f"{doc.name} work order has been released")
     # doc.reload()
 
 

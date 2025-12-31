@@ -1,0 +1,150 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2025-12-31 09:38:47.484813",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_lt8u",
+  "amended_from",
+  "brand_name",
+  "product_name",
+  "product_description",
+  "category_of_device",
+  "intended_use",
+  "importing_location",
+  "batch",
+  "gmdn_code",
+  "manufacturing_date",
+  "batch_qty",
+  "batch_release_certificate_details",
+  "batch_release_certificate_item_details",
+  "naming_series",
+  "work_order"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_lt8u",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Batch Release Certificate",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "label": "Brand Name"
+  },
+  {
+   "fieldname": "product_name",
+   "fieldtype": "Link",
+   "label": "Product Name",
+   "options": "Item"
+  },
+  {
+   "fieldname": "product_description",
+   "fieldtype": "Small Text",
+   "label": "Product Description"
+  },
+  {
+   "fieldname": "category_of_device",
+   "fieldtype": "Data",
+   "label": "Category of Device"
+  },
+  {
+   "fieldname": "intended_use",
+   "fieldtype": "Data",
+   "label": "Intended Use"
+  },
+  {
+   "fieldname": "importing_location",
+   "fieldtype": "Link",
+   "label": "Importing Location",
+   "options": "Location"
+  },
+  {
+   "fieldname": "batch",
+   "fieldtype": "Link",
+   "label": "Batch",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "gmdn_code",
+   "fieldtype": "Data",
+   "label": "GMDN Code"
+  },
+  {
+   "fieldname": "manufacturing_date",
+   "fieldtype": "Date",
+   "label": "Manufacturing Date"
+  },
+  {
+   "fieldname": "batch_qty",
+   "fieldtype": "Data",
+   "label": "Batch Qty"
+  },
+  {
+   "fieldname": "batch_release_certificate_item_details",
+   "fieldtype": "Table",
+   "label": "Batch Release Certificate Item Details",
+   "options": "Batch Release Certificate Item Details"
+  },
+  {
+   "fieldname": "batch_release_certificate_details",
+   "fieldtype": "Table",
+   "label": "Batch Release Certificate Details",
+   "options": "Batch Release Certificate Details"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming series",
+   "options": "BRC./.YY./.####"
+  },
+  {
+   "fieldname": "work_order",
+   "fieldtype": "Link",
+   "label": "Work Order",
+   "options": "Work Order"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-12-31 14:27:41.351667",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Batch Release Certificate",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
