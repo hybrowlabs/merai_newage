@@ -8,7 +8,9 @@
  "field_order": [
   "section_break_w4wg",
   "sales_owner",
+  "robot_serial_no",
   "installed_robot",
+  "cutting_tool",
   "citytown",
   "csrs",
   "surgery_type",
@@ -121,7 +123,7 @@
   {
    "fieldname": "feedbackremarks",
    "fieldtype": "Data",
-   "label": "Feedback/Remarks"
+   "label": "Remarks"
   },
   {
    "fieldname": "any_robotic_issues_if_yeselaboarte",
@@ -158,13 +160,25 @@
    "fieldtype": "Select",
    "label": "Naming Series",
    "options": "{installed_robot}.-.YYYY.-"
+  },
+  {
+   "fieldname": "robot_serial_no",
+   "fieldtype": "Link",
+   "label": "Robot Serial No",
+   "options": "Work Order"
+  },
+  {
+   "fieldname": "cutting_tool",
+   "fieldtype": "Select",
+   "label": "Cutting Tool",
+   "options": "\nBur\nSaw\nUniknee"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-27 11:47:06.376346",
+ "modified": "2026-01-01 23:04:57.232504",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Surgery",
