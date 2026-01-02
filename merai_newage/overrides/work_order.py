@@ -962,3 +962,50 @@ def create_fg_consumption_entry(doc_name, batch_no):
     stock_entry.insert()
     stock_entry.submit()
     frappe.db.commit()
+
+
+@frappe.whitelist(allow_guest=True)
+def create_material_request(data):
+    data = frappe.json.loads(data)
+
+    # Track whether any material is still required
+    has_pending_qty = False
+
+    material_request = frappe.new_doc("Material Request")
+    material_request.material_request_type = "Material Transfer"
+    material_request.schedule_date = frappe.utils.now()
+    material_request.work_order = data["name"]
+    # material_request.custom_plant = data['custom_plant']
+
+    for item in data["required_items"]:
+        required_qty = item["required_qty"]
+        transferred_qty = item.get("transferred_qty", 0)
+        remaining_qty = required_qty - transferred_qty
+
+        if remaining_qty > 0:
+            has_pending_qty = True
+            rounded_up_qty = math.ceil(remaining_qty)
+            material_request_item = material_request.append("items", {})
+            material_request_item.item_code = item.get("item_code", None)
+            material_request_item.item_name = item.get("item_name", None)
+            material_request_item.warehouse = item.get("source_warehouse", None)
+            material_request_item.qty = rounded_up_qty
+            material_request_item.description = item.get("description", None)
+            material_request_item.bom_no = data["bom_no"]
+            material_request_item.custom_operation = item.get("operation", None)
+
+    # If no items pending → return message instead of creating
+    if not has_pending_qty:
+        return {
+            "status": "fail",
+            "message": f"No material requirement for Work Order {data['name']}. All items are fully transferred."
+        }
+
+    material_request.save()
+    frappe.db.commit()
+
+    return {
+        "status": "success",
+        "material_request": material_request.name,
+        "message": f"Material Request {material_request.name} created successfully."
+    }

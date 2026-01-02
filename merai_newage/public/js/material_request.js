@@ -1,6 +1,6 @@
 frappe.ui.form.on("Material Request", {
-       custom_asset_record_no(frm) {
-        let acr = frm.doc.custom_asset_record_no;
+       custom_asset_creation_request(frm) {
+        let acr = frm.doc.custom_asset_creation_request;
         if (!acr) return;
 
         frappe.call({

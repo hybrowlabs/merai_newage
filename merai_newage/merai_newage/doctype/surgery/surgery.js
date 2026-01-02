@@ -31,6 +31,13 @@ frappe.ui.form.on("Surgery", {
                 ]
             };
         });
+        frm.set_query("robot_serial_no", () => {
+            return {
+                filters: {
+                    custom_is_full_dhr: 1
+                }
+            };
+        });
     },
     installed_robot:function(frm){
         frappe.call({
@@ -59,6 +66,26 @@ frappe.ui.form.on("Surgery", {
                 }
             });
         }
+,robot_serial_no: function (frm) {
+    if (!frm.doc.robot_serial_no) {
+        frm.set_value("installed_robot", "");
+        return;
+    }
+
+    frappe.db.get_value(
+        "Robot Tracker",
+        { work_order: frm.doc.robot_serial_no },
+        "name"
+    ).then(r => {
+        console.log("r---",r)
+        if (r && r.message && r.message.name) {
+            frm.set_value("installed_robot", r.message.name);
+        } else {
+            frm.set_value("installed_robot", "");
+            frappe.msgprint(__("No Robot Tracker found for this Work Order"));
+        }
+    });
+}
 
         
 });

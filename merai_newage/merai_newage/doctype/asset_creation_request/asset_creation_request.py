@@ -11,44 +11,50 @@ class AssetCreationRequest(Document):
 import frappe
 import random
 from frappe.model.document import Document
-
+import frappe
+from frappe import _
+import json
 @frappe.whitelist()
-def create_serial_nos(doc):
+def create_assets_from_request(doc):
     doc = frappe.parse_json(doc)
 
     item_code = doc.get("item")
     qty = int(doc.get("qty") or 0)
-    print("item_code-----",item_code,"qty========",qty)
-    if not item_code or qty <= 0:
-        frappe.throw("Item Code and Qty are mandatory")
+    is_composite = doc.get("composite_item")
 
-    created_serials = []
+    asset_count = 1 if is_composite else qty
 
-    for _ in range(qty):
-        serial_no = generate_unique_serial_no()
+    created_assets = []
 
-        serial_doc = frappe.get_doc({
-            "doctype": "Serial No",
-            "serial_no": serial_no,
-            "item_code": item_code,
-            "employee":doc.get("employee"),
-            "item_group":frappe.db.get_value("Item",item_code,"item_group"),
-            # "custom_asset_creation_request_reference":doc.get("name"),
-            "status":"Active"
+    for _ in range(asset_count):
+        asset = frappe.get_doc({
+            "doctype": "Asset Master",
+            "item": item_code,
+            "asset_category": doc.get("category_of_asset"),
+            "company": doc.get("entinty"),
+            "location": doc.get("location"),
+            "cost_center": doc.get("cost_centre"),
+            "purchase_amount_approx": doc.get("approx_cost"),
+            "status": "Draft",
+            "custom_asset_creation_request": doc.get("name"),
+            "asset_owner":"Company",
+            "custodian":doc.get('employee'),
+            "department":doc.get("department"),
+            "asset_count": 1 if is_composite else doc.get("qty"),
+            "qty":doc.get("qty"),
+            "plant":doc.get("plant"),
+            "item_name":frappe.db.get_value("Item",item_code,"item_name"),
+            "asset_creation_request":doc.get("name")
         })
-        serial_doc.insert(ignore_permissions=True)
 
-        created_serials.append({
-            "item_code": item_code,
-            "serial_no": serial_no
+        # asset.insert(ignore_permissions=True)
+        asset.flags.ignore_validate = True
+        asset.flags.ignore_mandatory = True
+        asset.insert(ignore_permissions=True)
+        asset.submit()
+        created_assets.append({
+            "asset_code": asset.name   
         })
 
     frappe.db.commit()
-    return created_serials
-
-
-def generate_unique_serial_no():
-    while True:
-        serial_no = str(random.randint(10**9, 10**10 - 1))
-        if not frappe.db.exists("Serial No", serial_no):
-            return serial_no
+    return created_assets

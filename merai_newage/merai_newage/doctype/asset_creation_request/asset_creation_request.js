@@ -1,52 +1,89 @@
 frappe.ui.form.on("Asset Creation Request", {
 
 
+    // qty(frm) {
+    //     let qty = cint(frm.doc.qty || 0);
+
+    //     frm.clear_table("asset_code_details");
+
+    //     if (qty <= 0) {
+    //         frm.refresh_field("asset_code_details");
+    //         return;
+    //     }
+
+    //     for (let i = 0; i < qty; i++) {
+    //         frm.add_child("asset_code_details", {
+    //             serial_no: ""   
+    //         });
+    //     }
+
+    //     frm.refresh_field("asset_code_details");
+    // },
     qty(frm) {
-        let qty = cint(frm.doc.qty || 0);
+    update_asset_code_rows(frm);
+},
 
-        frm.clear_table("asset_code_details");
+composite_item(frm) {
+    update_asset_code_rows(frm);
+},
+//     generate_asset_codes(frm) {
+//     frappe.call({
+//         method: "merai_newage.merai_newage.doctype.asset_creation_request.asset_creation_request.create_assets_from_request",
+//         args: {
+//             doc: frm.doc
+//         },
+//         freeze: true,
+//         callback: function (r) {
+//             if (!r.message || !r.message.length) return;
 
-        if (qty <= 0) {
-            frm.refresh_field("asset_code_details");
-            return;
-        }
+//             frm.clear_table("asset_code_details");
 
-        for (let i = 0; i < qty; i++) {
-            frm.add_child("asset_code_details", {
-                serial_no: ""   
-            });
-        }
+//             r.message.forEach(row => {
+//                 let child = frm.add_child("asset_code_details");
+//                 child.asset_code = row.asset_code;
+//             });
 
-        frm.refresh_field("asset_code_details");
-    },
-    generate_asset_codes(frm) {
-        frappe.call({
-            method: "merai_newage.merai_newage.doctype.asset_creation_request.asset_creation_request.create_serial_nos",
-            args: {
-                doc: frm.doc
-            },
-            freeze: true,
-            callback: function (r) {
-                if (!r.message) return;
+//             frm.refresh_field("asset_code_details");
 
-                // clear child table safely
-                frm.clear_table("asset_code_details");
+//             frappe.show_alert({
+//                 message: __("Asset Codes generated successfully"),
+//                 indicator: "green"
+//             });
+//         }
+//     });
+// }
 
-                r.message.forEach(row => {
-                    let child = frm.add_child("asset_code_details");
-                    child.serial_no = row.serial_no;
-                });
 
-                // refresh the child table field
-                frm.refresh_field("asset_code_details");
-
-                frappe.show_alert({
-                    message: __("Serial Numbers generated successfully"),
-                    indicator: "green"
-                });
-            }
+generate_asset_codes(frm) {
+    if (frm.is_dirty()) {
+        frm.save().then(() => {
+            frm.trigger("generate_asset_codes");
         });
-    },
+        return;
+    }
+
+    frappe.call({
+        method: "merai_newage.merai_newage.doctype.asset_creation_request.asset_creation_request.create_assets_from_request",
+        args: {
+            doc: frm.doc
+        },
+        freeze: true,
+        callback: function (r) {
+            if (!r.message || !r.message.length) return;
+
+            frm.clear_table("asset_code_details");
+
+            r.message.forEach(row => {
+                let child = frm.add_child("asset_code_details");
+                child.asset_code = row.asset_code;
+            });
+
+            frm.refresh_field("asset_code_details");
+        }
+    });
+}
+
+,
     
     refresh(frm){
         if (!frm.doc.employee) {
@@ -74,3 +111,26 @@ frappe.ui.form.on("Asset Creation Request", {
         });
     }
 });
+
+
+function update_asset_code_rows(frm) {
+    let qty = cint(frm.doc.qty || 0);
+    let is_composite = frm.doc.composite_item;
+
+    frm.clear_table("asset_code_details");
+
+    if (qty <= 0) {
+        frm.refresh_field("asset_code_details");
+        return;
+    }
+
+    let row_count = is_composite ? 1 : qty;
+
+    for (let i = 0; i < row_count; i++) {
+        frm.add_child("asset_code_details", {
+            asset_code: ""
+        });
+    }
+
+    frm.refresh_field("asset_code_details");
+}
