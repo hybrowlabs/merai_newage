@@ -222,15 +222,14 @@ def on_cancel_purchase_receipt(doc, method):
             SET custom_asset_created = 0,
                 custom_asset_number = NULL,
                 custom_purchase_receipt = NULL,
-                custom_pr_date = NULL,
-                status = 'Draft'
+                custom_pr_date = NULL
             WHERE custom_purchase_receipt = %s
         """, doc.name)
         
         # Reset ACR status
-        frappe.db.set_value("Asset Creation Request", doc.custom_asset_creation_request, {
-            "custom_assets_created": 0,
-            "custom_asset_creation_status": "Pending"
-        })
+        # frappe.db.set_value("Asset Creation Request", doc.custom_asset_creation_request, {
+        #     "custom_assets_created": 0,
+        #     "custom_asset_creation_status": "Pending"
+        # })
         
         frappe.db.commit()

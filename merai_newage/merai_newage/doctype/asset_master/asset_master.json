@@ -37,7 +37,10 @@
   "custom_supplier",
   "custom_po_status",
   "custom_purchase_order",
-  "custom_asset_created"
+  "custom_asset_created",
+  "custom_purchase_receipt",
+  "custom_asset_number",
+  "custom_pr_date"
  ],
  "fields": [
   {
@@ -218,13 +221,29 @@
    "fieldname": "custom_asset_created",
    "fieldtype": "Check",
    "label": "Asset Created"
+  },
+  {
+   "fieldname": "custom_purchase_receipt",
+   "fieldtype": "Link",
+   "label": "Purchase Receipt",
+   "options": "Purchase Receipt"
+  },
+  {
+   "fieldname": "custom_asset_number",
+   "fieldtype": "Data",
+   "label": "Asset No"
+  },
+  {
+   "fieldname": "custom_pr_date",
+   "fieldtype": "Date",
+   "label": "custom_pr_date"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-02 15:05:01.109712",
+ "modified": "2026-01-03 00:56:21.758471",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Master",
