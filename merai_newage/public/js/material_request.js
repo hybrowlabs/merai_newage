@@ -1,47 +1,45 @@
 frappe.ui.form.on("Material Request", {
-       custom_asset_creation_request(frm) {
-        let acr = frm.doc.custom_asset_creation_request;
-        if (!acr) return;
+      custom_asset_creation_request(frm) {
+    let acr = frm.doc.custom_asset_creation_request;
+    if (!acr) return;
 
-        frappe.call({
-            method: "frappe.client.get",
-            args: {
-                doctype: "Asset Creation Request",
-                name: acr
-            },
-            callback: function (r) {
-                if (!r.message) return;
+    frappe.call({
+        method: "frappe.client.get",
+        args: {
+            doctype: "Asset Creation Request",
+            name: acr
+        },
+        callback: function (r) {
+            if (!r.message) return;
 
-                let acr_doc = r.message;
+            let acr_doc = r.message;
 
-                // Fetch item details including lead time
-                frappe.db.get_value("Item", acr_doc.item, ["lead_time_days", "item_name"])
-                    .then(item_data => {
-                        // Clear existing items
-                        frm.clear_table("items");
-                        frm.refresh_field("items");
+            frappe.db.get_value("Item", acr_doc.item, ["lead_time_days", "item_name"])
+                .then(item_data => {
 
-                        // Add item row and trigger item_code change
-                        setTimeout(() => {
-                            let row = frm.add_child("items");
-                            frm.refresh_field("items");
-                            
-                            // Set item_code using model.set_value to trigger all events
-                            frappe.model.set_value(row.doctype, row.name, "item_code", acr_doc.item)
-                                .then(() => {
-                                    // Set qty
-                                    frappe.model.set_value(row.doctype, row.name, "qty", acr_doc.qty);
-                                    
-                                    // Set lead time if it exists
-                                    if (item_data && item_data.message && item_data.message.lead_time_days) {
-                                        frappe.model.set_value(row.doctype, row.name, "custom_lead_timein_days", item_data.message.lead_time_days);
-                                    }
-                                });
-                        }, 100);
-                    });
-            }
-        });
-    },
+                    frm.clear_table("items");
+                    frm.refresh_field("items");
+
+                    let qty = cint(acr_doc.qty || 0);
+                    let is_asset = acr_doc.composite_item;   // ✅ flag from ACR
+
+                    // 🔹 CASE 1: Asset → single row
+                    if (is_asset) {
+                        add_item_row(frm, acr_doc, item_data, qty);
+                    }
+                    // 🔹 CASE 2: Non-asset → multiple rows (qty = 1 each)
+                    else {
+                        for (let i = 0; i < qty; i++) {
+                            add_item_row(frm, acr_doc, item_data, 1);
+                        }
+                    }
+
+                    frm.refresh_field("items");
+                });
+        }
+    });
+},
+
     before_workflow_action(frm) {
 
         const action = frm.selected_workflow_action;
@@ -121,3 +119,23 @@ frappe.ui.form.on("Material Request", {
         }
     }
 });
+
+
+
+function add_item_row(frm, acr_doc, item_data, qty) {
+    let row = frm.add_child("items");
+
+    frappe.model.set_value(row.doctype, row.name, "item_code", acr_doc.item)
+        .then(() => {
+            frappe.model.set_value(row.doctype, row.name, "qty", qty);
+
+            if (item_data?.message?.lead_time_days) {
+                frappe.model.set_value(
+                    row.doctype,
+                    row.name,
+                    "custom_lead_timein_days",
+                    item_data.message.lead_time_days
+                );
+            }
+        });
+}
