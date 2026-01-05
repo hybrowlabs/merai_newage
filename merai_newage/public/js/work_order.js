@@ -64,6 +64,24 @@ frappe.ui.form.on("Work Order", {
                 });
             });
         }
+         frm.add_custom_button("Create BRC", function () {
+                            frappe.call({
+                                method: "merai_newage.merai_newage.doctype.batch_release_certificate.batch_release_certificate.create_brc",
+                                args: {
+                                    work_order: frm.doc.name   // send name clearly
+                                },
+                                freeze: true,
+                                callback: function (r) {
+                                    if (r.message) {
+                                        frappe.set_route(
+                                            "Form",
+                                            "Batch Release Certificate",
+                                            r.message
+                                        );
+                                    }
+                                }
+                            });
+                        });
 
 
         setTimeout(() => {
