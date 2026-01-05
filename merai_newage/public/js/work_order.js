@@ -116,7 +116,8 @@ frappe.ui.form.on("Work Order", {
                                 });
                                 await frm.reload_doc();
                             }
-                            let batch_no = first.message.batch_no;
+                                let batch_no = first.message?.batch_no;
+                                console.log("batch_no-----------------",batch_no)
 
                             // 2nd call (runs only after first is finished)
                             let second = await frappe.call({
@@ -140,7 +141,7 @@ frappe.ui.form.on("Work Order", {
                     // btn.removeClass('btn-default').addClass('btn-dark');
                 }
                 else {
-                    frappe.message("All Operations must be completed to complete the Work Order")
+                    console.log("All Operations must be completed to complete the Work Order")
 
                 }
                                     }, 500);

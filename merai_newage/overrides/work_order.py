@@ -847,8 +847,8 @@ def complete_work_order(doc_name):
             "Meril Manufacturing Settings",
             "auto_stock"
         )
-    if is_auto_stock==0:
-        return
+    # if is_auto_stock==0:
+    #     return
     doc = frappe.get_doc("Work Order", doc_name)
 
     stock_entry = frappe.new_doc("Stock Entry")
