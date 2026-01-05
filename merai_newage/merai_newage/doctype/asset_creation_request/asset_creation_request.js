@@ -101,6 +101,13 @@ generate_asset_codes(frm) {
                 }
             });
         }
+        frm.set_query("cost_centre", () => {
+            return {
+                filters: {
+                    company: frm.doc.entinty,
+                }
+            };
+        });
         frm.set_query("item", () => {
             return {
                 filters: {

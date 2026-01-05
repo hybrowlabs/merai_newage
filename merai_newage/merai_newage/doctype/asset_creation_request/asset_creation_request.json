@@ -41,6 +41,10 @@
   "asset_creation_type",
   "generate_asset_codes",
   "asset_code_details",
+  "consumed_qty",
+  "pending_qty",
+  "available_qty",
+  "asset_creation_status",
   "tab_break_cyks",
   "attachments"
  ],
@@ -276,13 +280,34 @@
    "fieldname": "composite_item",
    "fieldtype": "Check",
    "label": "Bulk Item"
+  },
+  {
+   "fieldname": "asset_creation_status",
+   "fieldtype": "Select",
+   "label": "Asset Creation Status",
+   "options": "\nPending\nPartially Completed\nCompleted"
+  },
+  {
+   "fieldname": "consumed_qty",
+   "fieldtype": "Int",
+   "label": "Assets Consumed Qty"
+  },
+  {
+   "fieldname": "pending_qty",
+   "fieldtype": "Int",
+   "label": "Assets Pending Qty"
+  },
+  {
+   "fieldname": "available_qty",
+   "fieldtype": "Int",
+   "label": "Available Qty"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-02 23:38:45.638783",
+ "modified": "2026-01-05 12:31:17.559901",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",

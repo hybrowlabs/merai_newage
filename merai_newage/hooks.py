@@ -339,6 +339,6 @@ override_doctype_class = {
     # "Request For Quotation": "merai_newage.overrides.supplier.supplier_quotation_has_website_permission"
 
 }
-app_include_css = [
-    "merai_newage.public.css.safety_check_custom.css"
-]
+# app_include_css = [
+#     "merai_newage.public.css.safety_check_custom.css"
+# ]
