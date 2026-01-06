@@ -176,7 +176,7 @@
    "fieldname": "cutting_tool",
    "fieldtype": "Select",
    "label": "Cutting Tool",
-   "options": "\nBur\nSaw\nUniknee"
+   "options": "\nMiller\nSaw\nUniknee"
   },
   {
    "depends_on": "eval:doc.surgery_type==\"Bilateral\"",
@@ -214,7 +214,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-02 10:12:42.939281",
+ "modified": "2026-01-06 09:42:01.058818",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Surgery",
