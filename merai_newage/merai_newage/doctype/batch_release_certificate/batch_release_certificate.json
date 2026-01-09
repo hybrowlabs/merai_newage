@@ -10,6 +10,7 @@
   "amended_from",
   "robot_serial_no",
   "batch",
+  "batch_number",
   "work_order",
   "brand_name",
   "product_name",
@@ -127,13 +128,19 @@
    "fieldtype": "Link",
    "label": "Robot Serial No",
    "options": "Robot Tracker"
+  },
+  {
+   "fieldname": "batch_number",
+   "fieldtype": "Link",
+   "label": "Batch Number",
+   "options": "Batch"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-09 11:40:49.655945",
+ "modified": "2026-01-09 14:54:39.627692",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Batch Release Certificate",

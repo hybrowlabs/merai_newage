@@ -21,7 +21,8 @@
   "standard_checklist_section",
   "dispatch_standard_checklist",
   "amended_from",
-  "custom_print_format"
+  "custom_print_format",
+  "refrence_brc"
  ],
  "fields": [
   {
@@ -126,6 +127,12 @@
    "options": "Print Format",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "refrence_brc",
+   "fieldtype": "Link",
+   "label": "Refrence BRC",
+   "options": "Batch Release Certificate"
   }
  ],
  "grid_page_length": 50,
@@ -137,7 +144,7 @@
    "link_fieldname": "dispatch_no"
   }
  ],
- "modified": "2025-12-26 14:29:15.350314",
+ "modified": "2026-01-09 15:13:44.261563",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Dispatch",
