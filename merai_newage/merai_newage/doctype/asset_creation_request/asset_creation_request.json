@@ -37,9 +37,14 @@
   "approx_cost",
   "cost_centre",
   "saftey_dep_approval_required",
+  "composite_item",
   "asset_creation_type",
   "generate_asset_codes",
   "asset_code_details",
+  "consumed_qty",
+  "pending_qty",
+  "available_qty",
+  "asset_creation_status",
   "tab_break_cyks",
   "attachments"
  ],
@@ -147,7 +152,7 @@
   {
    "fieldname": "entinty",
    "fieldtype": "Link",
-   "label": "Entinty",
+   "label": "Entity",
    "options": "Company",
    "reqd": 1
   },
@@ -208,8 +213,10 @@
   },
   {
    "fieldname": "cost_centre",
-   "fieldtype": "Data",
-   "label": "Cost Centre"
+   "fieldtype": "Link",
+   "label": "Cost Centre",
+   "options": "Cost Center",
+   "reqd": 1
   },
   {
    "fieldname": "saftey_dep_approval_required",
@@ -225,11 +232,11 @@
    "reqd": 1
   },
   {
-   "default": "{company_code}.{asset_code}.####",
+   "default": "ACR-ASS-.YYYY.-",
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming Series",
-   "options": "{company_code}.{asset_code}.####"
+   "options": "ACR-ASS-.YYYY.-"
   },
   {
    "fieldname": "asset_code_details",
@@ -267,13 +274,40 @@
    "fieldname": "asset_code",
    "fieldtype": "Data",
    "label": "Asset Code"
+  },
+  {
+   "default": "0",
+   "fieldname": "composite_item",
+   "fieldtype": "Check",
+   "label": "Bulk Item"
+  },
+  {
+   "fieldname": "asset_creation_status",
+   "fieldtype": "Select",
+   "label": "Asset Creation Status",
+   "options": "\nPending\nPartially Completed\nCompleted"
+  },
+  {
+   "fieldname": "consumed_qty",
+   "fieldtype": "Int",
+   "label": "Assets Consumed Qty"
+  },
+  {
+   "fieldname": "pending_qty",
+   "fieldtype": "Int",
+   "label": "Assets Pending Qty"
+  },
+  {
+   "fieldname": "available_qty",
+   "fieldtype": "Int",
+   "label": "Available Qty"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-29 14:22:33.799327",
+ "modified": "2026-01-05 12:31:17.559901",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",

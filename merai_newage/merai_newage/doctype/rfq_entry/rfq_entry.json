@@ -15,7 +15,8 @@
   "email_template",
   "rfq_item_details",
   "rfq_entry_details",
-  "material_request_reference"
+  "material_request_reference",
+  "custom_asset_creation_request"
  ],
  "fields": [
   {
@@ -79,6 +80,12 @@
    "fieldtype": "Link",
    "label": "Material Request Reference",
    "options": "Material Request"
+  },
+  {
+   "fieldname": "custom_asset_creation_request",
+   "fieldtype": "Link",
+   "label": "Asset Creation Request",
+   "options": "Asset Creation Request"
   }
  ],
  "grid_page_length": 50,
@@ -90,7 +97,7 @@
    "link_fieldname": "name"
   }
  ],
- "modified": "2025-12-26 12:17:44.808545",
+ "modified": "2026-01-02 12:33:47.445344",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "RFQ Entry",

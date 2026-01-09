@@ -8,22 +8,29 @@
  "field_order": [
   "section_break_w4wg",
   "sales_owner",
+  "robot_serial_no",
   "installed_robot",
+  "cutting_tool",
   "citytown",
   "csrs",
   "surgery_type",
   "type_of_implantrs",
+  "type_of_implant_2rs",
   "final_result_of_surgery",
+  "final_result_of_surgery_2",
   "feedbackremarks",
   "custom_print_format",
   "count",
+  "count_2",
   "column_break_hzx1",
   "date_of_surgery",
   "hospital_name",
   "contactdocotoroperatorsurgeon",
   "clinical_application_specialists",
   "robot_surgery_start_time",
+  "robot_surgery_start_time_2",
   "robot_surgery_end_time",
+  "robot_surgery_end_time_2",
   "overal_robotic_surgery_time_minutes",
   "any_robotic_issues_if_yeselaboarte",
   "amended_from",
@@ -82,7 +89,7 @@
   {
    "fieldname": "type_of_implantrs",
    "fieldtype": "Link",
-   "label": "Type Of Implant(RS)",
+   "label": "Type Of Implant 1(RS)",
    "options": "Type Of Implant Master"
   },
   {
@@ -100,12 +107,12 @@
   {
    "fieldname": "robot_surgery_start_time",
    "fieldtype": "Time",
-   "label": "Robot Surgery Start Time"
+   "label": "Robot Surgery Start Time 1"
   },
   {
    "fieldname": "robot_surgery_end_time",
    "fieldtype": "Time",
-   "label": "Robot Surgery End Time"
+   "label": "Robot Surgery End Time 1"
   },
   {
    "fieldname": "overal_robotic_surgery_time_minutes",
@@ -116,12 +123,12 @@
   {
    "fieldname": "final_result_of_surgery",
    "fieldtype": "Data",
-   "label": "Final Result Of Surgery"
+   "label": "Final Result Of Surgery 1"
   },
   {
    "fieldname": "feedbackremarks",
    "fieldtype": "Data",
-   "label": "Feedback/Remarks"
+   "label": "Remarks"
   },
   {
    "fieldname": "any_robotic_issues_if_yeselaboarte",
@@ -150,7 +157,7 @@
   {
    "fieldname": "count",
    "fieldtype": "Int",
-   "label": "Count",
+   "label": "Count 1",
    "non_negative": 1
   },
   {
@@ -158,13 +165,56 @@
    "fieldtype": "Select",
    "label": "Naming Series",
    "options": "{installed_robot}.-.YYYY.-"
+  },
+  {
+   "fieldname": "robot_serial_no",
+   "fieldtype": "Link",
+   "label": "Robot Serial No",
+   "options": "Work Order"
+  },
+  {
+   "fieldname": "cutting_tool",
+   "fieldtype": "Select",
+   "label": "Cutting Tool",
+   "options": "\nMiller\nSaw\nUniknee"
+  },
+  {
+   "depends_on": "eval:doc.surgery_type==\"Bilateral\"",
+   "fieldname": "type_of_implant_2rs",
+   "fieldtype": "Link",
+   "label": "Type Of Implant 2(RS)",
+   "options": "Type Of Implant Master"
+  },
+  {
+   "depends_on": "eval:doc.surgery_type==\"Bilateral\"",
+   "fieldname": "final_result_of_surgery_2",
+   "fieldtype": "Data",
+   "label": "Final Result Of Surgery 2"
+  },
+  {
+   "depends_on": "eval:doc.surgery_type==\"Bilateral\"",
+   "fieldname": "count_2",
+   "fieldtype": "Int",
+   "label": "Count 2"
+  },
+  {
+   "depends_on": "eval:doc.surgery_type==\"Bilateral\"",
+   "fieldname": "robot_surgery_start_time_2",
+   "fieldtype": "Time",
+   "label": "Robot Surgery Start Time 2"
+  },
+  {
+   "depends_on": "eval:doc.surgery_type==\"Bilateral\"",
+   "fieldname": "robot_surgery_end_time_2",
+   "fieldtype": "Data",
+   "label": "Robot Surgery End Time 2"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-27 11:47:06.376346",
+ "modified": "2026-01-06 09:42:01.058818",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Surgery",

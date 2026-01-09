@@ -242,6 +242,15 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+
+
+scheduler_events = {
+    "weekly": [
+        "merai_newage.merai_newage.utils.supplier_deletions.cleanup_temporary_suppliers"
+    ]
+}
+
+
 doctype_js = {
     "Batch":"public/js/batch_script.js",
     "Job Card":"public/js/line_clearance.js",
@@ -250,7 +259,8 @@ doctype_js = {
     "Work Order":"public/js/work_order.js",
     "Stock Entry":"public/js/stock_entry.js",
     "Employee":"public/js/employee.js",
-    "Material Request":"public/js/material_request.js"
+    "Material Request":"public/js/material_request.js",
+    "Asset":"public/js/asset.js"
 }
 
 # doc_events = {
@@ -282,7 +292,31 @@ doc_events = {
         "on_submit": "merai_newage.overrides.quality_inspection.on_submit",        
     },
     "Request for Quotation": {
-        "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails"
+        "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
+         "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
+        "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
+
+    },
+    "Material Request": {
+        "validate": "merai_newage.overrides.material_request.validate_material_request",
+        "on_submit": "merai_newage.overrides.material_request.on_submit_material_request",
+        "on_cancel": "merai_newage.overrides.material_request.on_cancel_material_request",
+    },
+    "Supplier Quotation": {
+        "before_save": "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
+        "validate": "merai_newage.overrides.supplier_quotation.validate_supplier_quotation",
+    },
+    "Purchase Order": {
+        "before_save": "merai_newage.overrides.purchase_order.before_save_purchase_order",
+        "validate": "merai_newage.overrides.purchase_order.validate_purchase_order",
+        "on_submit": "merai_newage.overrides.purchase_order.on_submit_purchase_order",
+        "on_cancel": "merai_newage.overrides.purchase_order.on_cancel_purchase_order",
+    },
+    "Purchase Receipt": {
+        "before_save": "merai_newage.overrides.purchase_receipt.before_save_purchase_receipt",
+        "validate": "merai_newage.overrides.purchase_receipt.validate_purchase_receipt",
+        "on_submit": "merai_newage.overrides.purchase_receipt.on_submit_purchase_receipt",
+        "on_cancel": "merai_newage.overrides.purchase_receipt.on_cancel_purchase_receipt",
     }
 
 }
@@ -293,6 +327,7 @@ fixtures = [
 # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
     # {"dt": "Property Setter",  "filters": [ ["name", "=", "Material Request-material_request_type-options"]] }
 
+
 ]
 page_js = {"print": "public/js/print.js"}
 
@@ -300,7 +335,10 @@ page_js = {"print": "public/js/print.js"}
 override_doctype_class = {
     # "Job Card": "merai_newage.overrides.job_card.CustomJobCard",
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
+    # "Supplier Quotation": "merai_newage.overrides.supplier.supplier_quotation_has_website_permission",
+    # "Request For Quotation": "merai_newage.overrides.supplier.supplier_quotation_has_website_permission"
+
 }
-app_include_css = [
-    "merai_newage.public.css.safety_check_custom.css"
-]
+# app_include_css = [
+#     "merai_newage.public.css.safety_check_custom.css"
+# ]
