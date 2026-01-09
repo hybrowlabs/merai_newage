@@ -6,6 +6,41 @@ frappe.ui.form.on("Batch Release Certificate", {
         add_verify_buttons_to_grid(frm, 'batch_release_certificate_details', 'Batch Release Certificate Details');
 
 	},
+   work_order: function(frm) {
+        if (frm.doc.work_order) {
+            frappe.call({
+                method: "merai_newage.merai_newage.doctype.batch_release_certificate.batch_release_certificate.fetch_brc_details",
+                args: {
+                    work_order: frm.doc.work_order
+                },
+                callback: function(r) {
+                    if (r.message) {
+                      
+                        // Clear existing child table rows
+                        frm.clear_table('batch_release_certificate_item_details');
+                        
+                        // Add child table rows from Item Master
+                        if (r.message.child_items && r.message.child_items.length > 0) {
+                            r.message.child_items.forEach(function(item) {
+                                let row = frm.add_child('batch_release_certificate_item_details');
+                                row.part_no = item.part_no;
+                                row.std_qty = item.std_qty;
+                                row.description = item.description;
+                            });
+                            frm.refresh_field('batch_release_certificate_item_details');
+                        }
+                        
+                        frappe.show_alert({
+                            message: __('Data fetched successfully'),
+                            indicator: 'green'
+                        });
+                    }
+                }
+            });
+        } 
+
+
+}
 });
 
 function add_verify_buttons_to_grid(frm, fieldname, doctype) {

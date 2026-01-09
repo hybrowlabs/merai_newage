@@ -44,6 +44,7 @@ def create_brc(work_order):
     new_brc.batch_qty = doc.qty
     new_brc.manufacturing_date = doc.planned_start_date
     new_brc.work_order = work_order
+    new_brc.robot_serial_no = frappe.db.get_value("Robot Tracker",{"work_order":work_order},"name")
 
     item_doc = frappe.get_doc("Item", item_code)
 
@@ -60,3 +61,33 @@ def create_brc(work_order):
     new_brc.insert(ignore_permissions=True)
 
     return new_brc.name
+
+
+
+@frappe.whitelist()
+def fetch_brc_details(work_order):
+    # Get Work Order document
+    wo_doc = frappe.get_doc("Work Order", work_order)
+    
+    # Get Item code from Work Order
+    item_code = wo_doc.production_item
+    
+    # Get Item document to fetch child table data
+    item_doc = frappe.get_doc("Item", item_code)
+    
+    # Prepare response data
+    response = {
+       
+        "child_items": []
+    }
+    
+    # Fetch child table data from Item Master
+    if hasattr(item_doc, 'custom_dispatch_checklist_details'):
+        for row in item_doc.custom_dispatch_checklist_details:
+            response["child_items"].append({
+                "part_no": row.product_name,
+                "std_qty": row.qty,
+                "description": row.product_description
+            })
+    
+    return response

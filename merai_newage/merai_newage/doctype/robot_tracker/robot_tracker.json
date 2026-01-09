@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "field:batch_number",
+ "autoname": "naming_series:",
  "creation": "2025-11-20 16:19:36.786332",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -17,7 +17,8 @@
   "item_code",
   "robot_classification",
   "robot_tracker_details_section",
-  "robot_tracker_details"
+  "robot_tracker_details",
+  "naming_series"
  ],
  "fields": [
   {
@@ -87,16 +88,22 @@
    "fieldtype": "Select",
    "label": "Robot Status",
    "options": "\nManufactured\nDispatched\nEngineer Assigned\nInstalled\nTransfered"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "{work_order}.-.{batch_no}"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-26 14:22:03.066689",
+ "modified": "2026-01-09 11:14:08.402780",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Tracker",
- "naming_rule": "By fieldname",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
