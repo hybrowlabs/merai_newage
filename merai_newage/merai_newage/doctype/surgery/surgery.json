@@ -8,11 +8,9 @@
  "field_order": [
   "section_break_w4wg",
   "sales_owner",
-  "robot_serial_no",
   "installed_robot",
   "cutting_tool",
   "citytown",
-  "csrs",
   "surgery_type",
   "type_of_implantrs",
   "type_of_implant_2rs",
@@ -21,15 +19,14 @@
   "feedbackremarks",
   "custom_print_format",
   "count",
-  "count_2",
   "column_break_hzx1",
   "date_of_surgery",
   "hospital_name",
   "contactdocotoroperatorsurgeon",
   "clinical_application_specialists",
   "robot_surgery_start_time",
-  "robot_surgery_start_time_2",
   "robot_surgery_end_time",
+  "robot_surgery_start_time_2",
   "robot_surgery_end_time_2",
   "overal_robotic_surgery_time_minutes",
   "any_robotic_issues_if_yeselaboarte",
@@ -52,12 +49,6 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "sales_owner",
-   "fieldtype": "Data",
-   "label": "Sales Owner",
-   "read_only": 1
-  },
-  {
    "fetch_from": "hospital_name.city",
    "fieldname": "citytown",
    "fieldtype": "Data",
@@ -75,16 +66,12 @@
    "options": "Account Master"
   },
   {
-   "fieldname": "csrs",
-   "fieldtype": "Link",
-   "label": "CSR(s)",
-   "options": "Contact"
-  },
-  {
    "fieldname": "surgery_type",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Surgery Type",
-   "options": "Surgery Type"
+   "options": "Surgery Type",
+   "reqd": 1
   },
   {
    "fieldname": "type_of_implantrs",
@@ -157,20 +144,16 @@
   {
    "fieldname": "count",
    "fieldtype": "Int",
-   "label": "Count 1",
-   "non_negative": 1
+   "label": "Count",
+   "non_negative": 1,
+   "read_only": 1
   },
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Naming Series",
    "options": "{installed_robot}.-.YYYY.-"
-  },
-  {
-   "fieldname": "robot_serial_no",
-   "fieldtype": "Link",
-   "label": "Robot Serial No",
-   "options": "Work Order"
   },
   {
    "fieldname": "cutting_tool",
@@ -193,12 +176,6 @@
   },
   {
    "depends_on": "eval:doc.surgery_type==\"Bilateral\"",
-   "fieldname": "count_2",
-   "fieldtype": "Int",
-   "label": "Count 2"
-  },
-  {
-   "depends_on": "eval:doc.surgery_type==\"Bilateral\"",
    "fieldname": "robot_surgery_start_time_2",
    "fieldtype": "Time",
    "label": "Robot Surgery Start Time 2"
@@ -208,13 +185,20 @@
    "fieldname": "robot_surgery_end_time_2",
    "fieldtype": "Data",
    "label": "Robot Surgery End Time 2"
+  },
+  {
+   "fieldname": "sales_owner",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Sales Owner",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-06 09:42:01.058818",
+ "modified": "2026-01-12 16:55:28.495258",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Surgery",
