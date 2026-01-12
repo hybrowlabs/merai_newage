@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "naming_series:",
+ "autoname": "format:{work_order}-{batch_no}",
  "creation": "2025-11-20 16:19:36.786332",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -99,11 +99,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-01-09 11:14:08.402780",
+ "modified": "2026-01-12 17:32:51.621057",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Robot Tracker",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "By script",
  "owner": "Administrator",
  "permissions": [
   {
