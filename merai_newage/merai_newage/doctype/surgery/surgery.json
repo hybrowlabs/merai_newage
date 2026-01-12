@@ -25,8 +25,8 @@
   "contactdocotoroperatorsurgeon",
   "clinical_application_specialists",
   "robot_surgery_start_time",
-  "robot_surgery_start_time_2",
   "robot_surgery_end_time",
+  "robot_surgery_start_time_2",
   "robot_surgery_end_time_2",
   "overal_robotic_surgery_time_minutes",
   "any_robotic_issues_if_yeselaboarte",
@@ -68,8 +68,10 @@
   {
    "fieldname": "surgery_type",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Surgery Type",
-   "options": "Surgery Type"
+   "options": "Surgery Type",
+   "reqd": 1
   },
   {
    "fieldname": "type_of_implantrs",
@@ -143,7 +145,8 @@
    "fieldname": "count",
    "fieldtype": "Int",
    "label": "Count",
-   "non_negative": 1
+   "non_negative": 1,
+   "read_only": 1
   },
   {
    "fieldname": "naming_series",
@@ -195,7 +198,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-12 15:02:29.272469",
+ "modified": "2026-01-12 16:55:28.495258",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Surgery",
