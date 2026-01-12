@@ -64,24 +64,33 @@ frappe.ui.form.on("Work Order", {
                 });
             });
         }
-         frm.add_custom_button("Create BRC", function () {
-                            frappe.call({
-                                method: "merai_newage.merai_newage.doctype.batch_release_certificate.batch_release_certificate.create_brc",
-                                args: {
-                                    work_order: frm.doc.name   // send name clearly
-                                },
-                                freeze: true,
-                                callback: function (r) {
-                                    if (r.message) {
-                                        frappe.set_route(
-                                            "Form",
-                                            "Batch Release Certificate",
-                                            r.message
-                                        );
-                                    }
+        frm.add_custom_button(
+                    __("BRC"),
+                    function () {
+                        frappe.call({
+                            method: "merai_newage.merai_newage.doctype.batch_release_certificate.batch_release_certificate.create_brc",
+                            args: {
+                                work_order: frm.doc.name
+                            },
+                            freeze: true,
+                            freeze_message: __("Creating BRC..."),
+                            callback: function (r) {
+                                if (r.message) {
+                                    frappe.set_route(
+                                        "Form",
+                                        "Batch Release Certificate",
+                                        r.message
+                                    );
+                                    frappe.show_alert({
+                                        message: __("BRC created successfully"),
+                                        indicator: "green"
+                                    });
                                 }
-                            });
+                            }
                         });
+                    },
+                    __("Create")  // This adds it to the "Create" dropdown
+                );
 
 
         setTimeout(() => {
@@ -147,8 +156,3 @@ frappe.ui.form.on("Work Order", {
                                     }, 500);
     }
 });
-
-
-
-
-

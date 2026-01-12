@@ -11,7 +11,8 @@
   "instllation_steps",
   "safety_check_and_precautions",
   "performance_checks",
-  "system_electrical_ratings"
+  "system_electrical_ratings",
+  "brc_check_deatils"
  ],
  "fields": [
   {
@@ -47,12 +48,18 @@
    "fieldtype": "Table",
    "label": "Performance Checks",
    "options": "Performance Checks"
+  },
+  {
+   "fieldname": "brc_check_deatils",
+   "fieldtype": "Table",
+   "label": "BRC Check Details",
+   "options": "Batch Release Certificate Checks Details"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-12-05 16:42:34.278502",
+ "modified": "2026-01-09 14:25:57.742189",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Installation Procedure And Verification Template",

@@ -8,20 +8,22 @@
  "field_order": [
   "section_break_lt8u",
   "amended_from",
+  "robot_serial_no",
+  "batch",
+  "batch_number",
+  "work_order",
   "brand_name",
   "product_name",
   "product_description",
   "category_of_device",
   "intended_use",
   "importing_location",
-  "batch",
   "gmdn_code",
   "manufacturing_date",
   "batch_qty",
   "batch_release_certificate_details",
   "batch_release_certificate_item_details",
-  "naming_series",
-  "work_order"
+  "naming_series"
  ],
  "fields": [
   {
@@ -39,17 +41,20 @@
    "search_index": 1
   },
   {
+   "fetch_from": "product_name.brand",
    "fieldname": "brand_name",
    "fieldtype": "Data",
    "label": "Brand Name"
   },
   {
+   "fetch_from": "robot_serial_no.item_code",
    "fieldname": "product_name",
    "fieldtype": "Link",
    "label": "Product Name",
    "options": "Item"
   },
   {
+   "fetch_from": "product_name.description",
    "fieldname": "product_description",
    "fieldtype": "Small Text",
    "label": "Product Description"
@@ -71,10 +76,10 @@
    "options": "Location"
   },
   {
+   "fetch_from": "robot_serial_no.batch_no",
    "fieldname": "batch",
-   "fieldtype": "Link",
-   "label": "Batch",
-   "options": "Batch"
+   "fieldtype": "Data",
+   "label": "Batch"
   },
   {
    "fieldname": "gmdn_code",
@@ -82,13 +87,15 @@
    "label": "GMDN Code"
   },
   {
+   "fetch_from": "work_order.planned_start_date",
    "fieldname": "manufacturing_date",
    "fieldtype": "Date",
    "label": "Manufacturing Date"
   },
   {
+   "fetch_from": "work_order.qty",
    "fieldname": "batch_qty",
-   "fieldtype": "Data",
+   "fieldtype": "Float",
    "label": "Batch Qty"
   },
   {
@@ -110,17 +117,30 @@
    "options": "BRC./.YY./.####"
   },
   {
+   "fetch_from": "robot_serial_no.work_order",
    "fieldname": "work_order",
    "fieldtype": "Link",
    "label": "Work Order",
    "options": "Work Order"
+  },
+  {
+   "fieldname": "robot_serial_no",
+   "fieldtype": "Link",
+   "label": "Robot Serial No",
+   "options": "Robot Tracker"
+  },
+  {
+   "fieldname": "batch_number",
+   "fieldtype": "Link",
+   "label": "Batch Number",
+   "options": "Batch"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-31 14:27:41.351667",
+ "modified": "2026-01-09 14:54:39.627692",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Batch Release Certificate",
