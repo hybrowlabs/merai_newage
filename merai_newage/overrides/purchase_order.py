@@ -73,7 +73,7 @@
 
 import frappe
 from frappe import _
-from frappe.utils import flt
+from frappe.utils import flt,cint
 
 def before_save_purchase_order(doc, method):
     """Populate ACR from Material Request or Supplier Quotation"""
@@ -109,33 +109,35 @@ def validate_purchase_order(doc, method):
         consumed_qty = flt(acr.consumed_qty)
         total_qty = flt(acr.qty)
         available_qty = total_qty - consumed_qty
-        
+        is_cwip = cint(acr.enable_cwip_accounting)
+        if not is_cwip:
+
         # For new PO or draft, validate against available quantity
-        if doc.is_new() or doc.docstatus == 0:
-            # Check if this PO quantity was already reserved via MR
-            mr_reserved_qty = 0
-            for item in doc.items:
-                if item.material_request:
-                    mr = frappe.get_doc("Material Request", item.material_request)
-                    if mr.custom_asset_creation_request == doc.custom_asset_creation_request:
-                        mr_reserved_qty += flt(item.qty)
+            if doc.is_new() or doc.docstatus == 0:
+                # Check if this PO quantity was already reserved via MR
+                mr_reserved_qty = 0
+                for item in doc.items:
+                    if item.material_request:
+                        mr = frappe.get_doc("Material Request", item.material_request)
+                        if mr.custom_asset_creation_request == doc.custom_asset_creation_request:
+                            mr_reserved_qty += flt(item.qty)
+                
+                # If not from MR, check available quantity
+                if mr_reserved_qty == 0 and total_po_qty > available_qty:
+                    frappe.throw(_("""Purchase Order quantity ({0}) exceeds available quantity ({1}) in Asset Creation Request {2}
+                        <br><br>Total Qty: {3}
+                        <br>Already Consumed: {4}
+                        <br>Available: {5}
+                        <br><br>Please create Material Request first to reserve the quantity.""").format(
+                        total_po_qty, available_qty, doc.custom_asset_creation_request,
+                        total_qty, consumed_qty, available_qty
+                    ))
             
-            # If not from MR, check available quantity
-            if mr_reserved_qty == 0 and total_po_qty > available_qty:
-                frappe.throw(_("""Purchase Order quantity ({0}) exceeds available quantity ({1}) in Asset Creation Request {2}
-                    <br><br>Total Qty: {3}
-                    <br>Already Consumed: {4}
-                    <br>Available: {5}
-                    <br><br>Please create Material Request first to reserve the quantity.""").format(
-                    total_po_qty, available_qty, doc.custom_asset_creation_request,
-                    total_qty, consumed_qty, available_qty
-                ))
-        
-        # Validate items match ACR
-        for item in doc.items:
-            if item.item_code != acr.item:
-                frappe.throw(_("Row {0}: Item {1} does not match Asset Creation Request Item {2}").format(
-                    item.idx, item.item_code, acr.item))
+            # Validate items match ACR
+            # for item in doc.items:
+            #     if item.item_code != acr.item:
+            #         frappe.throw(_("Row {0}: Item {1} does not match Asset Creation Request Item {2}").format(
+            #             item.idx, item.item_code, acr.item))
 
 
 def on_submit_purchase_order(doc, method):
@@ -146,8 +148,8 @@ def on_submit_purchase_order(doc, method):
         acr = frappe.get_doc("Asset Creation Request", doc.custom_asset_creation_request)
         
         # Calculate total ordered quantity for this ACR
-        total_ordered = sum(flt(item.qty) for item in doc.items if item.item_code == acr.item)
-        
+        total_ordered = sum(flt(item.qty) for item in doc.items)
+        print("total-ordered=======",total_ordered)
         # Update Asset Masters (limited to ordered quantity)
         frappe.db.sql("""
             UPDATE `tabAsset Master`

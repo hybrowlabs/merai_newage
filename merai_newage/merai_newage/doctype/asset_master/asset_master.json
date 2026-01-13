@@ -17,6 +17,10 @@
   "asset_owner",
   "asset_owner_company",
   "company",
+  "bulk_item",
+  "custom_cwip_asset",
+  "asset_status",
+  "asset_name",
   "column_break_t4gq",
   "location",
   "cost_center",
@@ -237,13 +241,37 @@
    "fieldname": "custom_pr_date",
    "fieldtype": "Date",
    "label": "custom_pr_date"
+  },
+  {
+   "default": "0",
+   "fetch_from": "asset_creation_request.composite_item",
+   "fieldname": "bulk_item",
+   "fieldtype": "Check",
+   "label": "Bulk Item"
+  },
+  {
+   "fieldname": "custom_cwip_asset",
+   "fieldtype": "Link",
+   "label": "CWIP Asset",
+   "options": "Asset"
+  },
+  {
+   "fieldname": "asset_status",
+   "fieldtype": "Data",
+   "label": "Asset Status"
+  },
+  {
+   "fetch_from": "asset_creation_request.asset_name",
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "Asset Name"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-03 00:56:21.758471",
+ "modified": "2026-01-10 12:56:11.829904",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Master",

@@ -22,8 +22,6 @@
   "completion_date",
   "qty",
   "uom",
-  "item",
-  "item_group",
   "company_code",
   "asset_code",
   "column_break_kgni",
@@ -31,6 +29,7 @@
   "location",
   "budgeted",
   "category_of_asset",
+  "asset_name",
   "remarksspecial_attention",
   "project_description",
   "project_name",
@@ -45,6 +44,11 @@
   "pending_qty",
   "available_qty",
   "asset_creation_status",
+  "cwip_details_section",
+  "custom_cwip_asset",
+  "custom_total_cwip_amount",
+  "custom_cwip_purchase_receipts",
+  "enable_cwip_accounting",
   "tab_break_cyks",
   "attachments"
  ],
@@ -183,17 +187,18 @@
    "options": "Project"
   },
   {
+   "default": "1.00",
    "fieldname": "qty",
    "fieldtype": "Float",
-   "label": "Qty",
-   "reqd": 1
+   "label": "Qty"
   },
   {
+   "depends_on": "eval:doc.enable_cwip_accounting==0",
    "fieldname": "uom",
    "fieldtype": "Link",
    "label": "UOM",
-   "options": "UOM",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.enable_cwip_accounting==0",
+   "options": "UOM"
   },
   {
    "fieldname": "tab_break_cyks",
@@ -225,13 +230,6 @@
    "options": "\nYes\nNo"
   },
   {
-   "fieldname": "item",
-   "fieldtype": "Link",
-   "label": "Item",
-   "options": "Item",
-   "reqd": 1
-  },
-  {
    "default": "ACR-ASS-.YYYY.-",
    "fieldname": "naming_series",
    "fieldtype": "Select",
@@ -255,13 +253,6 @@
    "fieldname": "generate_asset_codes",
    "fieldtype": "Button",
    "label": "Generate Asset Codes"
-  },
-  {
-   "fetch_from": "item.item_group",
-   "fieldname": "item_group",
-   "fieldtype": "Link",
-   "label": "Item Group",
-   "options": "Item Group"
   },
   {
    "fetch_from": "category_of_asset.custom_company_code",
@@ -301,13 +292,47 @@
    "fieldname": "available_qty",
    "fieldtype": "Int",
    "label": "Available Qty"
+  },
+  {
+   "fieldname": "cwip_details_section",
+   "fieldtype": "Section Break",
+   "label": "CWIP Details"
+  },
+  {
+   "fieldname": "custom_cwip_asset",
+   "fieldtype": "Link",
+   "label": "Cwip Asset",
+   "options": "Asset"
+  },
+  {
+   "fieldname": "custom_total_cwip_amount",
+   "fieldtype": "Currency",
+   "label": "Total CWIP Amount"
+  },
+  {
+   "fieldname": "custom_cwip_purchase_receipts",
+   "fieldtype": "Table",
+   "label": "CWIP Purchase Receipts",
+   "options": "ACR CWIP PR"
+  },
+  {
+   "default": "0",
+   "fetch_from": "category_of_asset.enable_cwip_accounting",
+   "fieldname": "enable_cwip_accounting",
+   "fieldtype": "Check",
+   "label": "Is CWIP Category"
+  },
+  {
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "Asset Name"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-05 12:31:17.559901",
+ "modified": "2026-01-10 16:39:59.685639",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",

@@ -1,0 +1,142 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-01-12 16:01:31.453201",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_jj4r",
+  "amended_from",
+  "robot_serial_no",
+  "ticket_master_reference",
+  "hospital_name",
+  "issue_type",
+  "docket_no",
+  "clinical_engineer",
+  "service_engineer",
+  "issue_reported",
+  "system_admin_remarks",
+  "robot_materials",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_jj4r",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Ticket Task Master",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "robot_serial_no",
+   "fieldtype": "Link",
+   "label": "Robot Serial No",
+   "options": "Robot Tracker",
+   "read_only": 1
+  },
+  {
+   "fieldname": "issue_type",
+   "fieldtype": "Link",
+   "label": "Issue Type",
+   "options": "Issue Type",
+   "read_only": 1
+  },
+  {
+   "fieldname": "issue_reported",
+   "fieldtype": "Text Editor",
+   "label": "Issue Reported",
+   "read_only": 1
+  },
+  {
+   "fieldname": "system_admin_remarks",
+   "fieldtype": "Text Editor",
+   "label": "System Admin Remarks",
+   "read_only": 1
+  },
+  {
+   "fieldname": "robot_materials",
+   "fieldtype": "Table",
+   "label": "Robot Materials",
+   "options": "Robot Materials"
+  },
+  {
+   "fieldname": "docket_no",
+   "fieldtype": "Data",
+   "label": "Docket No."
+  },
+  {
+   "depends_on": "eval:doc.issue_type==\"Hardware + Clinical\"",
+   "fieldname": "clinical_engineer",
+   "fieldtype": "Link",
+   "label": "Clinical Engineer",
+   "options": "Employee"
+  },
+  {
+   "depends_on": "eval:doc.issue_type==\"Hardware + Clinical\"",
+   "fieldname": "service_engineer",
+   "fieldtype": "Link",
+   "label": "Service Engineer",
+   "options": "Employee"
+  },
+  {
+   "default": "TTM-.YYYY.-.MM.-",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "TTM-.YYYY.-.MM.-"
+  },
+  {
+   "fieldname": "ticket_master_reference",
+   "fieldtype": "Link",
+   "label": "Ticket No.",
+   "options": "Ticket Master",
+   "read_only": 1
+  },
+  {
+   "fieldname": "hospital_name",
+   "fieldtype": "Link",
+   "label": "Hospital Name",
+   "options": "Account Master",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-01-13 10:20:35.977159",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Ticket Task Master",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}
