@@ -136,7 +136,7 @@ class TicketTaskMaster(Document):
 
             <b>Ticket:</b> {self.name}<br>
             <b>Robot:</b> {self.robot_serial_no}<br>
-            <b>Issue:</b> {self.ticket_subject}<br><br>
+            <b>Issue:</b> {self.issue_reported}<br><br>
 
             <a href="{doc_url}" 
             style="background:#007bff;color:#fff;
