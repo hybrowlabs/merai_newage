@@ -13,6 +13,9 @@
   "column_break_jkk6",
   "surgery_no",
   "ticket_subject",
+  "docket_number",
+  "date_of_receipt",
+  "date_of_issue_resolved",
   "section_break_elia",
   "issue_type",
   "column_break_jbhl",
@@ -20,11 +23,14 @@
   "column_break_u2q7",
   "task_id",
   "section_break_oehn",
+  "raised_by",
+  "column_break_ctjq",
+  "ticket_date_and_time",
+  "section_break_htzg",
+  "issue_reported",
   "system_admin_remarks",
   "section_break_zbbu",
-  "issue_reported",
-  "raised_by",
-  "ticket_date_and_time",
+  "received_materials",
   "naming_series",
   "status"
  ],
@@ -119,6 +125,7 @@
    "fieldname": "issue_type",
    "fieldtype": "Link",
    "label": "Issue Type",
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\"",
    "options": "Issue Type"
   },
   {
@@ -126,6 +133,7 @@
    "fieldname": "assign_engineer",
    "fieldtype": "Link",
    "label": "Assign Engineer",
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\"",
    "options": "Employee"
   },
   {
@@ -152,18 +160,52 @@
    "depends_on": "eval:doc.workflow_state!=\"Draft\"",
    "fieldname": "system_admin_remarks",
    "fieldtype": "Text Editor",
-   "label": "System Admin Remarks"
+   "label": "System Admin Remarks",
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\""
   },
   {
    "fieldname": "section_break_zbbu",
    "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\"",
+   "fieldname": "received_materials",
+   "fieldtype": "Table",
+   "label": "Received Materials",
+   "options": "Robot Materials"
+  },
+  {
+   "fieldname": "column_break_ctjq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_htzg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\"",
+   "fieldname": "docket_number",
+   "fieldtype": "Data",
+   "label": "Docket Number"
+  },
+  {
+   "depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\"",
+   "fieldname": "date_of_receipt",
+   "fieldtype": "Date",
+   "label": "Date of Receipt",
+   "mandatory_depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\""
+  },
+  {
+   "fieldname": "date_of_issue_resolved",
+   "fieldtype": "Date",
+   "label": "Date of Issue Resolved"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-13 10:10:42.447315",
+ "modified": "2026-01-16 16:59:27.445313",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",

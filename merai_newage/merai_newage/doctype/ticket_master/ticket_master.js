@@ -2,6 +2,7 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Ticket Master", {
+    
     onload(frm){
          frm.set_query("robot_serial_no", () => {
             return {
@@ -14,7 +15,8 @@ frappe.ui.form.on("Ticket Master", {
          frm.set_query("surgery_no", () => {
             return {
                 filters: {
-                    installed_robot: frm.doc.robot_serial_no
+                    installed_robot: frm.doc.robot_serial_no,
+                    hospital_name:frm.doc.hospital_name
                 }
             };
         });
@@ -66,27 +68,54 @@ frappe.ui.form.on("Ticket Master", {
             }
         });
     },
+    // after_workflow_action(frm){
+    //     if (frm.doc.workflow_state==="Pending From Backend Team"){
+    //         frappe.call({
+    //             method: "merai_newage.merai_newage.doctype.ticket_task_master.ticket_task_master.create_ticket_task",
+    //             args: {
+    //                 doc: frm.doc,
+    //             },
+    //             callback: function (r) {
+    //                 if (r.message) {
+
+    //                     frm.set_value("task_id", r.message);
+
+    //                         frm.save();
+    //                     } 
+    //             }
+    //         })
+    //     }
+    // }
     after_workflow_action(frm){
-        console.log("-70-----",frm.doc.workflow_state)
-        if (frm.doc.workflow_state==="Pending From Backend Team"){
-            frappe.call({
-                method: "merai_newage.merai_newage.doctype.ticket_task_master.ticket_task_master.create_ticket_task",
-                args: {
-                    doc: frm.doc,
-                },
-                callback: function (r) {
-                    if (r.message) {
-
-                        frm.set_value("task_id", r.message);
-
-                            // Save form
-                            frm.save();
-                        // Reload the document to show updated warehouse values
-                        } else if (r.message && r.message.status === "already_set") {
-                        console.log("Warehouses already set:", r.message);
-                    }
-                }
-            })
-        }
+    if (frm.doc.workflow_state === "Pending From Backend Team"){
+        frappe.call({
+            method: "merai_newage.merai_newage.doctype.ticket_task_master.ticket_task_master.create_ticket_task",
+            args: {
+                doc: frm.doc,
+            },
+            callback: function (r) {
+                if (r.message) {
+                    frm.set_value("task_id", r.message);
+                    
+                    // Save the document first
+                    frm.save().then(() => {
+                        // Then send notification after task_id is saved
+                        frappe.call({
+                            method: "send_backend_notification",
+                            doc: frm.doc,
+                            callback: function(res) {
+                                if (res.message && res.message.success) {
+                                    frappe.show_alert({
+                                        message: __('Engineer notified successfully'),
+                                        indicator: 'green'
+                                    });
+                                }
+                            }
+                        });
+                    });
+                } 
+            }
+        });
     }
+}
 });

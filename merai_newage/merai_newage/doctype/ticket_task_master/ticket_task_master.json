@@ -9,16 +9,22 @@
   "section_break_jj4r",
   "amended_from",
   "robot_serial_no",
+  "assign_engineer",
   "ticket_master_reference",
   "hospital_name",
   "issue_type",
+  "column_break_vkkl",
   "docket_no",
+  "courier_name",
+  "dispatch_date",
   "clinical_engineer",
   "service_engineer",
+  "section_break_w2b2",
   "issue_reported",
   "system_admin_remarks",
   "robot_materials",
-  "naming_series"
+  "naming_series",
+  "issue_raised_by"
  ],
  "fields": [
   {
@@ -68,9 +74,11 @@
    "options": "Robot Materials"
   },
   {
+   "depends_on": "eval:doc.workflow_state!=\"Draft\"",
    "fieldname": "docket_no",
    "fieldtype": "Data",
-   "label": "Docket No."
+   "label": "Docket No.",
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\""
   },
   {
    "depends_on": "eval:doc.issue_type==\"Hardware + Clinical\"",
@@ -106,14 +114,47 @@
    "label": "Hospital Name",
    "options": "Account Master",
    "read_only": 1
+  },
+  {
+   "fieldname": "assign_engineer",
+   "fieldtype": "Link",
+   "label": "Engineer",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "issue_raised_by",
+   "fieldtype": "Link",
+   "label": "Issue Raised By",
+   "options": "Employee",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "fieldname": "courier_name",
+   "fieldtype": "Data",
+   "label": "Courier Name"
+  },
+  {
+   "depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "fieldname": "dispatch_date",
+   "fieldtype": "Date",
+   "label": "Dispatch Date"
+  },
+  {
+   "fieldname": "column_break_vkkl",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_w2b2",
+   "fieldtype": "Section Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-13 10:20:35.977159",
- "modified_by": "Administrator",
+ "modified": "2026-01-16 15:33:43.583687",
+ "modified_by": "prajwalkrishnappa04@gmail.com",
  "module": "Merai Newage",
  "name": "Ticket Task Master",
  "naming_rule": "By \"Naming Series\" field",
