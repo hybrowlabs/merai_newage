@@ -74,11 +74,11 @@
    "options": "Robot Materials"
   },
   {
-   "depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type==\"Hardware\"",
    "fieldname": "docket_no",
    "fieldtype": "Data",
    "label": "Docket No.",
-   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\""
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type==\"Hardware\""
   },
   {
    "depends_on": "eval:doc.issue_type==\"Hardware + Clinical\"",
@@ -129,13 +129,13 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type==\"Hardware\"",
    "fieldname": "courier_name",
    "fieldtype": "Data",
    "label": "Courier Name"
   },
   {
-   "depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type==\"Hardware\"",
    "fieldname": "dispatch_date",
    "fieldtype": "Date",
    "label": "Dispatch Date"
@@ -153,8 +153,8 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-16 15:33:43.583687",
- "modified_by": "prajwalkrishnappa04@gmail.com",
+ "modified": "2026-01-19 14:36:50.077127",
+ "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Task Master",
  "naming_rule": "By \"Naming Series\" field",

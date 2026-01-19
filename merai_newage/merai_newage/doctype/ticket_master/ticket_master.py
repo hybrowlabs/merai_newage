@@ -34,12 +34,17 @@ class TicketMaster(Document):
                     self.notify_store_team_material()
                     self._notified_store_team = True
             if self.workflow_state=="Resolved":
-                if not self.get("_notified_admin_after_issue_resolved"):
-                    self.notify_master_admins_after_issue_resolved()
-                    self._notified_admin_after_issue_resolved=True
+                if not self.get("_notified_on_field_engineer_after_issue_resolved"):
+                    self._notified_on_field_engineer_after_issue_resolved=True
+                    self.notify_on_field_engineer_after_resolve()
         if self.workflow_state=="Issue Resolved":
             print("----date of issue re")
-            self.date_of_issue_resolved = nowdate()
+            if not self.get("_notified_admin_after_issue_resolved"):
+                self._notified_admin_after_issue_resolved = True
+                self.notify_master_admins_after_issue_resolved()
+
+            if not self.date_of_issue_resolved:
+                self.date_of_issue_resolved = nowdate()
 
 
     def after_save(self):
@@ -129,7 +134,7 @@ class TicketMaster(Document):
         <b>Issue:</b> {self.ticket_subject}<br>
         <b>Issue Reported:</b> {self.issue_reported}<br>
         <b>Raised By:</b> {self.raised_by}<br>
-        <b>Date & Time:</b> {self.ticket_date_and_time}<br>
+        <b>Date & Time:</b> {self.ticket_date_and_time}<br> <br>
         
         <a href="{doc_url}" 
         style="background:#007bff;color:#fff;
@@ -155,6 +160,7 @@ class TicketMaster(Document):
                 "document_type": self.doctype,
                 "document_name": self.name
             }).insert(ignore_permissions=True)
+
     def notify_assigned_engineer(self):
 
         if not self.assign_engineer:
@@ -293,5 +299,58 @@ class TicketMaster(Document):
             return {"success": True}
         
         return {"success": False, "message": "Task ID not set or wrong workflow state"}
+    
+    def notify_on_field_engineer_after_resolve(self):
+
+        if not self.raised_by:
+            return
+
+        user = frappe.db.get_value(
+            "Employee",
+            self.raised_by,
+            "user_id"
+        )
+
+        if not user:
+            return
+        ticket_task = "Ticket Master"
+        doc_url = frappe.utils.get_url_to_form(
+            ticket_task,
+            self.task_id
+        )
+
+        subject = f"Ticket - {self.name} has been  Resolved"
+        message = f"""
+        <p>Dear Team,</p>
+        <p>The following service ticket has been resolved and closed.</p>
+        <b>Ticket Details:</b> <br>
+        <b>Ticket ID:</b> {self.name}<br>
+        <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
+        <b>Hospital Name:</b> {self.hospital_name} <br>
+        <b>Issue Type:</b> {self.issue_type}<br>
+        <b>Remarks:</b> {self.system_admin_remarks}<br>
+        <a href="{doc_url}" 
+        style="background:#007bff;color:#fff;
+        padding:10px 15px;
+        text-decoration:none;
+        border-radius:5px;">
+        Open Ticket
+        </a>
+        """
+        
+        frappe.sendmail(
+            recipients=user,
+            subject=subject,
+            message=message
+        )
+
+        frappe.get_doc({
+            "doctype": "Notification Log",
+            "subject": subject,
+            "for_user": user,
+            "type": "Alert",
+            "document_type": self.doctype,
+            "document_name": self.name
+        }).insert(ignore_permissions=True)
 
 

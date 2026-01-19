@@ -182,6 +182,26 @@ class TicketTaskMaster(Document):
             self.name
         )
 
+        items_html = """
+        <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;">
+            <tr style="background:#f2f2f2;">
+                <th>Item Code</th>
+                <th>Item Name</th>
+                <th>Qty</th>
+            </tr>
+        """
+
+        for row in self.robot_materials:
+            items_html += f"""
+            <tr>
+                <td>{row.item}</td>
+                <td>{row.item_name}</td>
+                <td>{row.qty}</td>
+            </tr>
+            """
+
+        items_html += "</table>"
+
         subject = f"Material for the below service ticket {self.ticket_master_reference} has been dispatched from the store."
         message = f"""
         <p>Dear Team,</p>
@@ -189,10 +209,13 @@ class TicketTaskMaster(Document):
         <b>Ticket ID:</b> {self.ticket_master_reference}<br>
         <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
         <b>Hosiptal Name:</b> {self.hospital_name}<br>
-        <b>Dispatch Details:</b>
+        <b>Dispatch Details:</b> <br>
         <b>Docket Number:</b> {self.docket_no}<br>
         <b>Courier Name:</b>{self.courier_name} <br>
         <b>Dispatch Date:<b>{self.dispatch_date}<br> <br>
+        <b>Requested Items:</b><br><br>
+        {items_html}<br><br>
+
         <a href="{doc_url}" 
         style="background:#007bff;color:#fff;
         padding:10px 15px;

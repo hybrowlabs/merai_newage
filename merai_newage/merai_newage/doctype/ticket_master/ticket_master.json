@@ -31,8 +31,7 @@
   "system_admin_remarks",
   "section_break_zbbu",
   "received_materials",
-  "naming_series",
-  "status"
+  "naming_series"
  ],
  "fields": [
   {
@@ -69,26 +68,28 @@
    "fieldname": "issue_reported",
    "fieldtype": "Text Editor",
    "label": "Issue Reported (Description)",
-   "read_only_depends_on": "eval:doc.workflow_state!=\"Draft\""
+   "read_only_depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "reqd": 1
   },
   {
    "fieldname": "raised_by",
    "fieldtype": "Link",
    "label": "Raised By",
    "options": "Employee",
-   "read_only_depends_on": "eval:doc.workflow_state!=\"Draft\""
+   "read_only": 1
   },
   {
    "default": "Now",
    "fieldname": "ticket_date_and_time",
    "fieldtype": "Datetime",
    "label": "Ticket Date And Time",
-   "read_only_depends_on": "eval:doc.workflow_state!=\"Draft\""
+   "read_only": 1
   },
   {
    "default": "YYYY.MM.####",
    "fieldname": "naming_series",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Naming Series",
    "options": "YYYY.MM.####"
   },
@@ -106,12 +107,6 @@
   {
    "fieldname": "section_break_oehn",
    "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Open\nReplied\nOn Hold\nClosed\nResolved"
   },
   {
    "fieldname": "ticket_subject",
@@ -196,6 +191,7 @@
    "mandatory_depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\""
   },
   {
+   "depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\"",
    "fieldname": "date_of_issue_resolved",
    "fieldtype": "Date",
    "label": "Date of Issue Resolved"
@@ -205,7 +201,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-16 16:59:27.445313",
+ "modified": "2026-01-19 14:32:17.747104",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",
