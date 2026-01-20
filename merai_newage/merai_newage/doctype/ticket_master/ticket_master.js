@@ -27,6 +27,13 @@ frappe.ui.form.on("Ticket Master", {
                 }
             };
         });
+        frm.set_query("software_team_engineer", () => {
+            return {
+                filters: {
+                    employment_type: "Software Team"
+                }
+            };
+        });
     },
 	refresh(frm) {
     if (!frm.doc.raised_by) {

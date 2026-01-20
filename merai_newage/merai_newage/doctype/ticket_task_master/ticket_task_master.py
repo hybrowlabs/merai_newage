@@ -6,6 +6,7 @@ from frappe.model.document import Document
 
 
 class TicketTaskMaster(Document):
+    
     def on_update(self):
         if not self.workflow_state:
             return
@@ -14,8 +15,8 @@ class TicketTaskMaster(Document):
         old_state = old_doc.workflow_state if old_doc else None
 
         # Trigger only if state changed
-        # if old_state == self.workflow_state:
-        #     return
+        if old_state == self.workflow_state:
+            return
 
         if self.workflow_state == "Pending From Store Team" and self.issue_type == "Hardware + Clinical":
             self.notify_assigned_engineers()
@@ -23,7 +24,7 @@ class TicketTaskMaster(Document):
         if self.workflow_state == "Pending From Store Team":
             self.notify_store_team()
 
-        if self.workflow_state == "Approved":
+        if self.workflow_state == "Approved" and self.issue_type=="Hardware":
             self.notify_ticket_rasied_by_user()
 
     def notify_store_team(self):
@@ -66,7 +67,7 @@ class TicketTaskMaster(Document):
         <p>Dear Team,</p>
 
         <p>Please Provide the below materials.</p>
-        <b>Ticket:</b> {self.name}<br>
+        <b>Ticket:</b> {self.ticket_master_reference}<br>
         <b>Robot:</b> {self.robot_serial_no}<br>
         <b>Issue Description:</b> {self.issue_reported}<br><br>
 
@@ -134,7 +135,7 @@ class TicketTaskMaster(Document):
             <p>Dear,</p>
             <p>You have been assigned a new ticket.</p>
 
-            <b>Ticket:</b> {self.name}<br>
+            <b>Ticket:</b> {self.ticket_master_reference}<br>
             <b>Robot:</b> {self.robot_serial_no}<br>
             <b>Issue:</b> {self.issue_reported}<br><br>
 
@@ -177,9 +178,11 @@ class TicketTaskMaster(Document):
 
         if not user:
             return
+        
+        doctype = "Task Master"
         doc_url = frappe.utils.get_url_to_form(
-            self.doctype,
-            self.name
+            doctype,
+            self.ticket_master_reference
         )
 
         items_html = """
@@ -243,9 +246,34 @@ class TicketTaskMaster(Document):
 
 
 
+# @frappe.whitelist()
+# def create_ticket_task(doc):
+#     doc = frappe.parse_json(doc)
+#     new_task = frappe.new_doc("Ticket Task Master")
+#     new_task.robot_serial_no = doc.get("robot_serial_no")
+#     new_task.issue_type = doc.get("issue_type")
+#     new_task.hospital_name = doc.get("hospital_name")
+#     new_task.issue_reported = doc.get("issue_reported")
+#     new_task.system_admin_remarks = doc.get("system_admin_remarks")
+#     new_task.ticket_master_reference = doc.get("name")
+#     new_task.assign_engineer = doc.get("assign_engineer")
+#     new_task.issue_raised_by = doc.get("raised_by")
+#     if doc.get("issue_type")=="Hardware + Clinical":
+#         new_task.dispatch_type="By Hand"
+#     elif doc.get("issue_type")=="Hardware":
+#         new_task.dispatch_type="By Courier"
+
+#     if doc.get("issue_type")=="Software":
+#         new_task.software_team = doc.get('software_team_engineer')
+
+#     new_task.insert(ignore_permissions=True)  
+#     return new_task.name
+
 @frappe.whitelist()
 def create_ticket_task(doc):
+
     doc = frappe.parse_json(doc)
+
     new_task = frappe.new_doc("Ticket Task Master")
     new_task.robot_serial_no = doc.get("robot_serial_no")
     new_task.issue_type = doc.get("issue_type")
@@ -256,14 +284,22 @@ def create_ticket_task(doc):
     new_task.assign_engineer = doc.get("assign_engineer")
     new_task.issue_raised_by = doc.get("raised_by")
 
-    new_task.insert(ignore_permissions=True)  
-    # if new_task.assign_engineer:
-    #     create_todo_for_engineer(
-    #         new_task,
-    #         new_task.name
-    #     )
+    if doc.get("issue_type") == "Hardware + Clinical":
+        new_task.dispatch_type = "By Hand"
 
+    elif doc.get("issue_type") == "Hardware":
+        new_task.dispatch_type = "By Courier"
+
+    if doc.get("issue_type") == "Software":
+
+        for row in doc.get('software_team_engineer'):
+            new_task.append("software_team", {
+                "software_engineer": row.get("software_engineer")
+            })
+
+    new_task.insert(ignore_permissions=True)
     return new_task.name
+
 
 
 
@@ -280,8 +316,8 @@ def update_ticket_master(reference_name, task_doc):
         return
 
     doc = frappe.get_doc("Ticket Master", reference_name)
-
-    doc.workflow_state = "Pending To Receive Material"
+    if task_doc.get("issue_type")=="Hardware":
+        doc.workflow_state = "Pending To Receive Material"
     doc.docket_number = task_doc.get('docket_no')
 
     doc.set("received_materials", [])

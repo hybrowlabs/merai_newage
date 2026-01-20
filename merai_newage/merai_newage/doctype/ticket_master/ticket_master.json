@@ -20,6 +20,7 @@
   "issue_type",
   "column_break_jbhl",
   "assign_engineer",
+  "software_team_engineer",
   "column_break_u2q7",
   "task_id",
   "section_break_oehn",
@@ -124,11 +125,11 @@
    "options": "Issue Type"
   },
   {
-   "depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type!==\"Software\"",
    "fieldname": "assign_engineer",
    "fieldtype": "Link",
    "label": "Assign Engineer",
-   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type!==\"Software\"",
    "options": "Employee"
   },
   {
@@ -156,7 +157,8 @@
    "fieldname": "system_admin_remarks",
    "fieldtype": "Text Editor",
    "label": "System Admin Remarks",
-   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\""
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "read_only_depends_on": "eval:doc.workflow_state!=\"Pending From Master Admin\""
   },
   {
    "fieldname": "section_break_zbbu",
@@ -191,17 +193,25 @@
    "mandatory_depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\""
   },
   {
-   "depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\"",
+   "depends_on": "eval:doc.workflow_state==\"Received Material\" || doc.workflow_state==\"Issue Resolved\"",
    "fieldname": "date_of_issue_resolved",
    "fieldtype": "Date",
    "label": "Date of Issue Resolved"
+  },
+  {
+   "depends_on": "eval:doc.issue_type==\"Software\"",
+   "fieldname": "software_team_engineer",
+   "fieldtype": "Table MultiSelect",
+   "label": "Software Team Engineer",
+   "mandatory_depends_on": "eval:doc.issue_type==\"Software\"",
+   "options": "Software Team Members"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-19 14:32:17.747104",
+ "modified": "2026-01-20 11:49:01.087977",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",

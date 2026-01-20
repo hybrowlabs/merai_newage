@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "naming_series:",
+ "autoname": "format:TASK-{ticket_master_reference}",
  "creation": "2026-01-12 16:01:31.453201",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -12,8 +12,10 @@
   "assign_engineer",
   "ticket_master_reference",
   "hospital_name",
-  "issue_type",
+  "software_team",
   "column_break_vkkl",
+  "issue_type",
+  "dispatch_type",
   "docket_no",
   "courier_name",
   "dispatch_date",
@@ -24,7 +26,10 @@
   "system_admin_remarks",
   "robot_materials",
   "naming_series",
-  "issue_raised_by"
+  "issue_raised_by",
+  "backend_team_reamrks",
+  "store_team_remarks",
+  "software_remarks"
  ],
  "fields": [
   {
@@ -68,38 +73,41 @@
    "read_only": 1
   },
   {
+   "depends_on": "eval:doc.issue_type!=\"Software\"",
    "fieldname": "robot_materials",
    "fieldtype": "Table",
    "label": "Robot Materials",
    "options": "Robot Materials"
   },
   {
-   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type==\"Hardware\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.dispatch_type==\"By Courier\"",
    "fieldname": "docket_no",
    "fieldtype": "Data",
    "label": "Docket No.",
-   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type==\"Hardware\""
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.dispatch_type==\"By Courier\""
   },
   {
-   "depends_on": "eval:doc.issue_type==\"Hardware + Clinical\"",
+   "depends_on": "eval:doc.dispatch_type==\"By Hand\"",
    "fieldname": "clinical_engineer",
    "fieldtype": "Link",
    "label": "Clinical Engineer",
+   "mandatory_depends_on": "eval:doc.dispatch_type==\"By Hand\"",
    "options": "Employee"
   },
   {
-   "depends_on": "eval:doc.issue_type==\"Hardware + Clinical\"",
+   "depends_on": "eval:doc.dispatch_type==\"By Hand\"",
    "fieldname": "service_engineer",
    "fieldtype": "Link",
    "label": "Service Engineer",
+   "mandatory_depends_on": "eval:doc.dispatch_type==\"By Hand\"",
    "options": "Employee"
   },
   {
-   "default": "TTM-.YYYY.-.MM.-",
+   "default": "TASK.-.{ticket_master_reference}",
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming Series",
-   "options": "TTM-.YYYY.-.MM.-"
+   "options": "TASK.-.{ticket_master_reference}"
   },
   {
    "fieldname": "ticket_master_reference",
@@ -116,6 +124,7 @@
    "read_only": 1
   },
   {
+   "depends_on": "eval:doc.issue_type!=\"Software\"",
    "fieldname": "assign_engineer",
    "fieldtype": "Link",
    "label": "Engineer",
@@ -129,16 +138,18 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type==\"Hardware\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.dispatch_type==\"By Courier\"",
    "fieldname": "courier_name",
    "fieldtype": "Data",
-   "label": "Courier Name"
+   "label": "Courier Name",
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.dispatch_type==\"By Courier\""
   },
   {
-   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type==\"Hardware\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.dispatch_type==\"By Courier\"",
    "fieldname": "dispatch_date",
    "fieldtype": "Date",
-   "label": "Dispatch Date"
+   "label": "Dispatch Date",
+   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.dispatch_type==\"By Courier\""
   },
   {
    "fieldname": "column_break_vkkl",
@@ -147,17 +158,48 @@
   {
    "fieldname": "section_break_w2b2",
    "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.issue_type!=\"Software\"",
+   "fieldname": "backend_team_reamrks",
+   "fieldtype": "Small Text",
+   "label": "Backend Team Reamrks"
+  },
+  {
+   "depends_on": "eval:doc.issue_type!=\"Software\"",
+   "fieldname": "store_team_remarks",
+   "fieldtype": "Small Text",
+   "label": "Store Team Remarks"
+  },
+  {
+   "depends_on": "eval:doc.issue_type!=\"Software\"",
+   "fieldname": "dispatch_type",
+   "fieldtype": "Select",
+   "label": "Dispatch Type",
+   "options": "\nBy Hand\nBy Courier"
+  },
+  {
+   "depends_on": "eval:doc.issue_type==\"Software\"",
+   "fieldname": "software_remarks",
+   "fieldtype": "Small Text",
+   "label": "Software Remarks "
+  },
+  {
+   "fieldname": "software_team",
+   "fieldtype": "Table MultiSelect",
+   "label": "Software Team",
+   "options": "Software Team Members"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-19 14:36:50.077127",
+ "modified": "2026-01-20 15:25:51.586457",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Task Master",
- "naming_rule": "By \"Naming Series\" field",
+ "naming_rule": "By script",
  "owner": "Administrator",
  "permissions": [
   {
