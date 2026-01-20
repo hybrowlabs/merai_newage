@@ -26,6 +26,8 @@ class TicketTaskMaster(Document):
 
         if self.workflow_state == "Approved" and self.issue_type=="Hardware":
             self.notify_ticket_rasied_by_user()
+        if self.workflow_state == "Approved" and self.issue_type=="Software":
+            self.notify_ticket_rasied_by_user_software()
 
     def notify_store_team(self):
 
@@ -179,7 +181,7 @@ class TicketTaskMaster(Document):
         if not user:
             return
         
-        doctype = "Task Master"
+        doctype = "Ticket Master"
         doc_url = frappe.utils.get_url_to_form(
             doctype,
             self.ticket_master_reference
@@ -219,6 +221,79 @@ class TicketTaskMaster(Document):
         <b>Requested Items:</b><br><br>
         {items_html}<br><br>
 
+        <a href="{doc_url}" 
+        style="background:#007bff;color:#fff;
+        padding:10px 15px;
+        text-decoration:none;
+        border-radius:5px;">
+        Open Ticket
+        </a>
+        """
+        
+        frappe.sendmail(
+            recipients=user,
+            subject=subject,
+            message=message
+        )
+
+        frappe.get_doc({
+            "doctype": "Notification Log",
+            "subject": subject,
+            "for_user": user,
+            "type": "Alert",
+            "document_type": self.doctype,
+            "document_name": self.name
+        }).insert(ignore_permissions=True)
+
+
+    def notify_ticket_rasied_by_user_software(self):
+
+        if not self.issue_raised_by:
+            return
+
+        user = frappe.db.get_value(
+            "Employee",
+            self.issue_raised_by,
+            "user_id"
+        )
+
+        if not user:
+            return
+        
+        doctype = "Ticket Master"
+        doc_url = frappe.utils.get_url_to_form(
+            doctype,
+            self.ticket_master_reference
+        )
+
+        items_html = """
+        <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse;width:100%;">
+            <tr style="background:#f2f2f2;">
+                <th>Item Code</th>
+                <th>Item Name</th>
+                <th>Qty</th>
+            </tr>
+        """
+
+        for row in self.robot_materials:
+            items_html += f"""
+            <tr>
+                <td>{row.item}</td>
+                <td>{row.item_name}</td>
+                <td>{row.qty}</td>
+            </tr>
+            """
+
+        items_html += "</table>"
+
+        subject = f"Issue for the below service ticket {self.ticket_master_reference} is resolved"
+        message = f"""
+        <p>Dear Team,</p>
+        <b>Ticket Details:</b>
+        <b>Ticket ID:</b> {self.ticket_master_reference}<br>
+        <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
+        <b>Hosiptal Name:</b> {self.hospital_name}<br>
+       
         <a href="{doc_url}" 
         style="background:#007bff;color:#fff;
         padding:10px 15px;

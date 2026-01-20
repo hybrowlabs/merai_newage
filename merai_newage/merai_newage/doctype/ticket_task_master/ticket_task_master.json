@@ -163,10 +163,10 @@
    "depends_on": "eval:doc.issue_type!=\"Software\"",
    "fieldname": "backend_team_reamrks",
    "fieldtype": "Small Text",
-   "label": "Backend Team Reamrks"
+   "label": "Backend Team Remarks"
   },
   {
-   "depends_on": "eval:doc.issue_type!=\"Software\"",
+   "depends_on": "eval:doc.workflow_state==\"Pending From Store Team\"",
    "fieldname": "store_team_remarks",
    "fieldtype": "Small Text",
    "label": "Store Team Remarks"
@@ -185,6 +185,7 @@
    "label": "Software Remarks "
   },
   {
+   "depends_on": "eval:doc.issue_type==\"Software\"",
    "fieldname": "software_team",
    "fieldtype": "Table MultiSelect",
    "label": "Software Team",
@@ -195,7 +196,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-20 15:25:51.586457",
+ "modified": "2026-01-20 16:30:08.274118",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Task Master",
