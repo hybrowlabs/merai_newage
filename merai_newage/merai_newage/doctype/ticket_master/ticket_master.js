@@ -124,5 +124,80 @@ frappe.ui.form.on("Ticket Master", {
             }
         });
     }
+
+    if (frm.doc.workflow_state === "Raised New Ticket") {
+
+            frappe.call({
+                method: "merai_newage.merai_newage.doctype.ticket_master.ticket_master.create_ticket_again",
+                args: {
+                    old_doc: frm.doc.name
+                },
+                callback: function (r) {
+
+                    if (r.message) {
+
+                        frappe.model.with_doctype("Ticket Master", function () {
+
+                            let doc = frappe.model.get_new_doc("Ticket Master");
+
+                            doc.robot_serial_no = r.message.robot_serial_no;
+                            doc.issue_reported = r.message.issue_reported;
+                            doc.ticket_subject = r.message.ticket_subject;
+                            doc.old_ticket_reference = r.message.old_ticket_reference;
+                            doc.original_ticket_id = r.message.original_ticket_id;
+                            doc.naming_series = r.message.naming_series;
+                            doc.surgery_no=r.message.surgery_no
+
+                            frappe.set_route("Form", "Ticket Master", doc.name);
+
+                            frappe.show_alert({
+                                message: __('New Ticket Draft Opened'),
+                                indicator: 'green'
+                            });
+                        });
+                    }
+                }
+            });
+}
+
+// if (frm.doc.workflow_state === "Raised New Ticket") {
+
+//     frappe.call({
+//         method: "merai_newage.merai_newage.doctype.ticket_master.ticket_master.create_ticket_again",
+//         args: {
+//             old_doc: frm.doc.name
+//         },
+//         callback: function (r) {
+
+//             if (r.message) {
+
+//                 // create new local doc
+//                 let doc = frappe.model.get_new_doc("Ticket Master");
+
+//                 // set values
+//                 doc.robot_serial_no = r.message.robot_serial_no;
+//                 doc.issue_reported = r.message.issue_reported;
+//                 doc.ticket_subject = r.message.ticket_subject;
+//                 doc.old_ticket_reference = r.message.old_ticket_reference;
+//                 doc.surgery_no = r.message.surgery_no;
+
+//                 // DO NOT set name here (important)
+//                 doc.custom_retry_name = r.message.new_name; 
+//                 // create custom field to show preview
+
+//                 // open form
+//                 frappe.set_route("Form", "Ticket Master", doc.name);
+
+//                 frappe.show_alert({
+//                     message: __('New Ticket Draft Opened'),
+//                     indicator: 'green'
+//                 });
+//             }
+//         }
+//     });
+// }
+
+
+
 }
 });

@@ -32,7 +32,9 @@
   "system_admin_remarks",
   "section_break_zbbu",
   "received_materials",
-  "naming_series"
+  "naming_series",
+  "old_ticket_reference",
+  "original_ticket_id"
  ],
  "fields": [
   {
@@ -92,7 +94,7 @@
    "fieldtype": "Select",
    "hidden": 1,
    "label": "Naming Series",
-   "options": "YYYY.MM.####"
+   "options": "YYYY.MM.####\n{original_ticket_id}.-.##"
   },
   {
    "fieldname": "surgery_no",
@@ -205,13 +207,26 @@
    "label": "Software Team Engineer",
    "mandatory_depends_on": "eval:doc.issue_type==\"Software\"",
    "options": "Software Team Members"
+  },
+  {
+   "fieldname": "old_ticket_reference",
+   "fieldtype": "Link",
+   "label": "Old Ticket Reference",
+   "options": "Ticket Master",
+   "read_only": 1
+  },
+  {
+   "fieldname": "original_ticket_id",
+   "fieldtype": "Link",
+   "label": "Original Ticket Id",
+   "options": "Ticket Master"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-20 11:49:01.087977",
+ "modified": "2026-01-21 11:19:53.074729",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",

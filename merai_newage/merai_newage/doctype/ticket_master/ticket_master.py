@@ -415,3 +415,23 @@ class TicketMaster(Document):
         }).insert(ignore_permissions=True)
 
 
+@frappe.whitelist()
+def create_ticket_again(old_doc):
+
+    old_doc = frappe.get_doc("Ticket Master", old_doc)
+
+    # decide base ticket
+    base_ticket = old_doc.original_ticket_id if old_doc.original_ticket_id else old_doc.name
+
+    naming_series = f"{base_ticket}.-.##"
+
+    return {
+        "robot_serial_no": old_doc.robot_serial_no,
+        "issue_reported": old_doc.issue_reported,
+        "ticket_subject": old_doc.ticket_subject,
+        "old_ticket_reference": old_doc.name,
+        "surgery_no": old_doc.surgery_no,
+        "original_ticket_id": base_ticket,
+        "naming_series": naming_series
+    }
+
