@@ -321,28 +321,6 @@ class TicketTaskMaster(Document):
 
 
 
-# @frappe.whitelist()
-# def create_ticket_task(doc):
-#     doc = frappe.parse_json(doc)
-#     new_task = frappe.new_doc("Ticket Task Master")
-#     new_task.robot_serial_no = doc.get("robot_serial_no")
-#     new_task.issue_type = doc.get("issue_type")
-#     new_task.hospital_name = doc.get("hospital_name")
-#     new_task.issue_reported = doc.get("issue_reported")
-#     new_task.system_admin_remarks = doc.get("system_admin_remarks")
-#     new_task.ticket_master_reference = doc.get("name")
-#     new_task.assign_engineer = doc.get("assign_engineer")
-#     new_task.issue_raised_by = doc.get("raised_by")
-#     if doc.get("issue_type")=="Hardware + Clinical":
-#         new_task.dispatch_type="By Hand"
-#     elif doc.get("issue_type")=="Hardware":
-#         new_task.dispatch_type="By Courier"
-
-#     if doc.get("issue_type")=="Software":
-#         new_task.software_team = doc.get('software_team_engineer')
-
-#     new_task.insert(ignore_permissions=True)  
-#     return new_task.name
 
 @frappe.whitelist()
 def create_ticket_task(doc):
@@ -356,7 +334,7 @@ def create_ticket_task(doc):
     new_task.issue_reported = doc.get("issue_reported")
     new_task.system_admin_remarks = doc.get("system_admin_remarks")
     new_task.ticket_master_reference = doc.get("name")
-    new_task.assign_engineer = doc.get("assign_engineer")
+    # new_task.assign_engineer = doc.get("assign_engineer")
     new_task.issue_raised_by = doc.get("raised_by")
 
     if doc.get("issue_type") == "Hardware + Clinical":
@@ -371,6 +349,13 @@ def create_ticket_task(doc):
             new_task.append("software_team", {
                 "software_engineer": row.get("software_engineer")
             })
+    elif doc.get("issue_type") != "Software":
+
+        for row in doc.get('backend_team_engineer'):
+            new_task.append("assign_engineer", {
+                "software_engineer": row.get("software_engineer")
+            })
+    
 
     new_task.insert(ignore_permissions=True)
     return new_task.name

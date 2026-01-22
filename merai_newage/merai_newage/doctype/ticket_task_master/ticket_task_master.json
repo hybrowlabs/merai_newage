@@ -126,9 +126,9 @@
   {
    "depends_on": "eval:doc.issue_type!=\"Software\"",
    "fieldname": "assign_engineer",
-   "fieldtype": "Link",
-   "label": "Engineer",
-   "options": "Employee"
+   "fieldtype": "Table MultiSelect",
+   "label": "Backend Engineer",
+   "options": "Software Team Members"
   },
   {
    "fieldname": "issue_raised_by",
@@ -196,7 +196,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-20 16:30:08.274118",
+ "modified": "2026-01-22 15:55:39.523748",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Task Master",

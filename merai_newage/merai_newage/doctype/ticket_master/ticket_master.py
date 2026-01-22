@@ -40,12 +40,12 @@ class TicketMaster(Document):
                 self.notify_master_admins_after_issue_resolved()
 
     def after_save(self):
-
+    
         if self.workflow_state == "Pending From Backend Team":
 
             if not self.get("_notified_backend_engineer"):
                 
-                self.notify_assigned_engineer()
+                self.notify_backend_team()
                 self._notified_backend_engineer = True
             
 
@@ -135,6 +135,8 @@ class TicketMaster(Document):
         <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
         <b>Hospital Name:</b> {self.hospital_name} <br>
         <b>Issue:</b> {self.ticket_subject}<br>
+        <b>Priorty:</b> {self.priorty} <br>
+
         <b>Issue Reported:</b> {self.issue_reported}<br>
         <b>Issue Type:</b> {self.issue_type}<br>
         <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
@@ -276,6 +278,71 @@ class TicketMaster(Document):
             "document_name": self.name
         }).insert(ignore_permissions=True)
 
+    def notify_backend_team(self):
+        # employee_list = self.software_team_engineer
+        users = []
+
+        for row in self.backend_team_engineer:
+            user = frappe.db.get_value(
+                "Employee",
+                row.software_engineer,
+                "user_id"
+            )
+            if user:
+                users.append(user)
+
+        ticket_task = "Ticket Task Master"
+        doc_url = frappe.utils.get_url_to_form(
+            ticket_task,
+            self.task_id
+        )
+        raised_by = frappe.db.get_value("Employee",self.raised_by,"employee_name")
+        department = frappe.db.get_value("Employee",self.raised_by,"department")
+
+        subject = f"Service Ticket Assigned - {self.name}"
+        message = f"""
+        <p>Dear Team,</p>
+        <p>The following service ticket has been reviewed and assigned</p>
+        <b>Ticket Details:</b> <br>
+        <b>Ticket ID:</b> {self.name}<br>
+        <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
+        <b>Hospital Name:</b> {self.hospital_name} <br>
+        <b>Priorty:</b> {self.priorty} <br>
+
+        <b>Issue:</b> {self.ticket_subject}<br>
+        <b>Issue Reported:</b> {self.issue_reported}<br>
+        <b>Issue Type:</b> {self.issue_type}<br>
+        <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
+        <b>Department:</b> {department}<br>
+
+        <b>Date & Time:</b> {self.ticket_date_and_time}<br>
+        <p>Please initiate the required actions at the earliest and update the ticket status accordingly.</p>
+
+        <a href="{doc_url}" 
+        style="background:#007bff;color:#fff;
+        padding:10px 15px;
+        text-decoration:none;
+        border-radius:5px;">
+        Open Ticket
+        </a>
+        """
+
+        for user in users:
+            frappe.sendmail(
+                recipients=user,
+                subject=subject,
+                message=message
+            )
+
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "subject": subject,
+                "for_user": user,
+                "type": "Alert",
+                "document_type": self.doctype,
+                "document_name": self.name
+            }).insert(ignore_permissions=True)
+
     def notify_store_team_material(self):
 
         users = frappe.get_all(
@@ -356,7 +423,7 @@ class TicketMaster(Document):
         if self.workflow_state == "Pending From Backend Team" and self.task_id:
             if self.issue_type=="Software":
                     self.notify_software_team()
-            self.notify_assigned_engineer()
+            self.notify_backend_team()
             return {"success": True}
         
         return {"success": False, "message": "Task ID not set or wrong workflow state"}

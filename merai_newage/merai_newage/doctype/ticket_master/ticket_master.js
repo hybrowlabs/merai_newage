@@ -20,7 +20,7 @@ frappe.ui.form.on("Ticket Master", {
                 }
             };
         });
-        frm.set_query("assign_engineer", () => {
+        frm.set_query("backend_team_engineer", () => {
             return {
                 filters: {
                     employment_type: "Backend Team"
@@ -34,6 +34,7 @@ frappe.ui.form.on("Ticket Master", {
                 }
             };
         });
+        
     },
 	refresh(frm) {
     if (!frm.doc.raised_by) {
