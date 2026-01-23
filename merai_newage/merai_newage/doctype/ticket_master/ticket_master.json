@@ -10,6 +10,7 @@
   "amended_from",
   "robot_serial_no",
   "hospital_name",
+  "state",
   "column_break_jkk6",
   "type",
   "surgery_no",
@@ -254,13 +255,20 @@
    "label": "Backend Team Engineer",
    "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type!=\"Software\"",
    "options": "Software Team Members"
+  },
+  {
+   "fetch_from": "hospital_name.state",
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State",
+   "options": "State"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-22 16:10:37.131492",
+ "modified": "2026-01-23 12:14:42.098268",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",
