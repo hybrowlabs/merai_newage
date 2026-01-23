@@ -246,8 +246,7 @@
    "depends_on": "eval:(doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Pending From Backend Team\") && doc.issue_type==\"Hardware + Clinical\"",
    "fieldname": "service_engineer_remarks",
    "fieldtype": "Small Text",
-   "label": "Service Engineer Remarks",
-   "mandatory_depends_on": "eval:(doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Pending From Backend Team\") && doc.issue_type==\"Hardware + Clinical\""
+   "label": "Service Engineer Remarks"
   },
   {
    "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type!=\"Software\"",
@@ -269,7 +268,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-23 13:05:07.449330",
+ "modified": "2026-01-23 14:30:49.655294",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",
