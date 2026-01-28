@@ -847,8 +847,8 @@ def complete_work_order(doc_name):
             "Meril Manufacturing Settings",
             "auto_stock"
         )
-    # if is_auto_stock==0:
-    #     return
+    if is_auto_stock==0:
+        return
     doc = frappe.get_doc("Work Order", doc_name)
 
     stock_entry = frappe.new_doc("Stock Entry")
@@ -927,10 +927,10 @@ def on_submit(doc, method=None):
             "auto_stock"
         )
 
-    # if is_auto_stock==1:
-    create_stock_entry_for_received_material_on_submit(doc.name)
-    create_stock_entry_on_submit(doc.name)
-    frappe.msgprint(f"{doc.name} work order has been released")
+    if is_auto_stock==1:
+        create_stock_entry_for_received_material_on_submit(doc.name)
+        create_stock_entry_on_submit(doc.name)
+        frappe.msgprint(f"{doc.name} work order has been released")
     # doc.reload()
 
 
@@ -963,7 +963,7 @@ def create_fg_consumption_entry(doc_name, batch_no):
     stock_entry.submit()
     frappe.db.commit()
 
-
+#merai_newage.merai_newage.overrides.work_order.create_material_request
 @frappe.whitelist(allow_guest=True)
 def create_material_request(data):
     data = frappe.json.loads(data)
