@@ -249,6 +249,14 @@ scheduler_events = {
         "merai_newage.merai_newage.utils.supplier_deletions.cleanup_temporary_suppliers"
     ]
 }
+override_whitelisted_methods = {
+        "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides..material_request_override.make_stock_entry",
+            "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_asset": "merai_newage.overrides.purchase_receipt.custom_make_asset",
+
+    # "Stock Entry": "chatnext_manufacturing.config.py.stock_entry_override.StockEntry",
+        "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides.material_request_override.make_stock_entry",
+
+}
 
 
 doctype_js = {
@@ -324,6 +332,9 @@ doc_events = {
 
 fixtures = [
     {"dt": "Batch Number Template"},
+    # {
+    #     "dt": "Workflow",
+    # },
 # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
     # {"dt": "Property Setter",  "filters": [ ["name", "=", "Material Request-material_request_type-options"]] }
 

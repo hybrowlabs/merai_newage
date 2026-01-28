@@ -200,13 +200,15 @@
   },
   {
    "fieldname": "city",
-   "fieldtype": "Data",
-   "label": "City"
+   "fieldtype": "Link",
+   "label": "City",
+   "options": "City"
   },
   {
    "fieldname": "state",
-   "fieldtype": "Data",
-   "label": "State"
+   "fieldtype": "Link",
+   "label": "State",
+   "options": "State"
   },
   {
    "fieldname": "latitude",
@@ -381,7 +383,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-28 12:25:58.830821",
+ "modified": "2026-01-23 11:17:05.624916",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Account Master",

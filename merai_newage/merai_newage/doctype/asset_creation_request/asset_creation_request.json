@@ -270,7 +270,7 @@
    "default": "0",
    "fieldname": "composite_item",
    "fieldtype": "Check",
-   "label": "Bulk Item"
+   "label": "Group Asset"
   },
   {
    "fieldname": "asset_creation_status",
@@ -332,7 +332,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-10 16:39:59.685639",
+ "modified": "2026-01-21 15:54:02.166490",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",

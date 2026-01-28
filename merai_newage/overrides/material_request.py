@@ -453,32 +453,32 @@ def validate_material_request(doc, method):
 
 def on_submit_material_request(doc, method):
     """Update Asset Masters and ACR consumed quantity after MR submission"""
-    
-    acr = frappe.get_doc("Asset Creation Request", doc.custom_asset_creation_request)
-    if doc.custom_purchase_types == "Asset" and doc.custom_asset_creation_request and acr.enable_cwip_accounting==0:
-        # Update Asset Masters with MR reference
-        frappe.db.sql("""
-            UPDATE `tabAsset Master`
-            SET custom_material_request = %s,
-                custom_mr_date = %s,
-                custom_mr_status = 'Submitted'
-            WHERE asset_creation_request = %s
-            AND docstatus = 1
-        """, (doc.name, doc.transaction_date, doc.custom_asset_creation_request))
-        
-        # Update consumed quantity in ACR
-        update_acr_consumed_qty(doc.custom_asset_creation_request)
-        
-        frappe.db.commit()
-        
-        # Show updated quantity status
-        frappe.msgprint(_("""Material Request submitted successfully!
-            <br><br><b>ACR Quantity Status:</b>
-            <br>Total Qty: {0}
-            <br>Consumed Qty: {1}
-            <br>Available Qty: {2}""").format(
-            acr.qty, acr.consumed_qty, flt(acr.qty) - flt(acr.consumed_qty)
-        ), alert=True, indicator="green")
+    if doc.custom_asset_creation_request:
+        acr = frappe.get_doc("Asset Creation Request", doc.custom_asset_creation_request)
+        if doc.custom_purchase_types == "Asset" and doc.custom_asset_creation_request and acr.enable_cwip_accounting==0:
+            # Update Asset Masters with MR reference
+            frappe.db.sql("""
+                UPDATE `tabAsset Master`
+                SET custom_material_request = %s,
+                    custom_mr_date = %s,
+                    custom_mr_status = 'Submitted'
+                WHERE asset_creation_request = %s
+                AND docstatus = 1
+            """, (doc.name, doc.transaction_date, doc.custom_asset_creation_request))
+            
+            # Update consumed quantity in ACR
+            update_acr_consumed_qty(doc.custom_asset_creation_request)
+            acr.reload()
+            frappe.db.commit()
+            
+            # Show updated quantity status
+            frappe.msgprint(_("""Material Request submitted successfully!
+                <br><br><b>ACR Quantity Status:</b>
+                <br>Total Qty: {0}
+                <br>Consumed Qty: {1}
+                <br>Available Qty: {2}""").format(
+                acr.qty, acr.consumed_qty, flt(acr.qty) - flt(acr.consumed_qty)
+            ), alert=True, indicator="green")
 
 
 def on_cancel_material_request(doc, method):
@@ -510,9 +510,9 @@ def update_acr_consumed_qty(acr_name):
         WHERE mr.custom_asset_creation_request = %s
         AND mr.docstatus = 1
     """, acr_name, as_dict=1)
-    
+    print(" flt(mr_qty[0].total_qty)----", flt(mr_qty[0].total_qty))
     consumed_qty = flt(mr_qty[0].total_qty) if mr_qty and mr_qty[0].total_qty else 0
-    
+    print("consumed_qty----------",consumed_qty)
     # Update ACR
     frappe.db.set_value("Asset Creation Request", acr_name, "consumed_qty", consumed_qty, update_modified=False)
     
