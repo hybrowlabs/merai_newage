@@ -211,7 +211,7 @@ def create_new_cwip_asset(pr_doc, acr, asset_category, pr_amount, total_cwip_amo
     # Create Asset document
     asset_doc = frappe.get_doc({
         "doctype": "Asset",
-        "asset_name": acr.get("asset_name") or acr.item_name,
+        "asset_name": acr.get("asset_name"),
         "item_code": main_item.item_code,
         "asset_category": acr.category_of_asset,
         "company": pr_doc.company,

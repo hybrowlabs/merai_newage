@@ -42,6 +42,22 @@ generate_asset_codes(frm) {
     
     refresh(frm){
 
+        if (frm.doc.docstatus === 1) {
+        frm.add_custom_button(__('Material Request'), function () {
+
+            frappe.route_options = {
+                custom_asset_creation_request: frm.doc.name,
+                schedule_date: frappe.datetime.get_today(),
+                custom_purchase_types:"Asset",
+                company:frm.doc.entinty,
+                custom_requisitioner:frm.doc.employee
+            };
+
+            frappe.set_route('Form', 'Material Request', 'new-material-request');
+
+        }, __('Create'));
+    }
+
          if (frm.doc.enable_cwip_accounting && 
             frm.doc.custom_cwip_purchase_receipts && 
             frm.doc.custom_cwip_purchase_receipts.length > 0 &&
@@ -108,6 +124,7 @@ generate_asset_codes(frm) {
             return {
                 filters: {
                     company: frm.doc.entinty,
+                    is_group: 0
                 }
             };
         });
