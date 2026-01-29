@@ -10,7 +10,7 @@
  "idx": 0,
  "is_standard": "Yes",
  "letterhead": null,
- "modified": "2026-01-22 17:01:19.711340",
+ "modified": "2026-01-29 09:57:25.585927",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Management",
@@ -19,10 +19,6 @@
  "ref_doctype": "Ticket Master",
  "report_name": "Ticket Management",
  "report_type": "Script Report",
- "roles": [
-  {
-   "role": "System Manager"
-  }
- ],
+ "roles": [],
  "timeout": 0
 }
