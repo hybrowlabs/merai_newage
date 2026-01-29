@@ -188,6 +188,7 @@
   },
   {
    "default": "1.00",
+   "depends_on": "eval:doc.enable_cwip_accounting==0",
    "fieldname": "qty",
    "fieldtype": "Float",
    "label": "Qty"
@@ -212,16 +213,18 @@
    "options": "Job Card Attachments"
   },
   {
+   "depends_on": "eval:doc.workflow_state==\"Pending From Accountant\"",
    "fieldname": "approx_cost",
    "fieldtype": "Currency",
    "label": "Approx Cost"
   },
   {
+   "depends_on": "eval:doc.workflow_state==\"Pending From Accountant\"",
    "fieldname": "cost_centre",
    "fieldtype": "Link",
    "label": "Cost Centre",
-   "options": "Cost Center",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.workflow_state==\"Pending From Accountant\"",
+   "options": "Cost Center"
   },
   {
    "fieldname": "saftey_dep_approval_required",
@@ -237,12 +240,14 @@
    "options": "ACR-ASS-.YYYY.-"
   },
   {
+   "depends_on": "eval:doc.workflow_state==\"Pending From Accountant\" || doc.workflow_state==\"Approved\"",
    "fieldname": "asset_code_details",
    "fieldtype": "Table",
    "label": "Asset Code Details",
    "options": "Asset Code Details"
   },
   {
+   "depends_on": "eval:doc.workflow_state==\"Pending From Accountant\"",
    "fieldname": "asset_creation_type",
    "fieldtype": "Select",
    "label": "Asset Creation Type",
@@ -276,22 +281,26 @@
    "fieldname": "asset_creation_status",
    "fieldtype": "Select",
    "label": "Asset Creation Status",
-   "options": "\nPending\nPartially Completed\nCompleted"
+   "options": "\nPending\nPartially Completed\nCompleted",
+   "read_only": 1
   },
   {
    "fieldname": "consumed_qty",
    "fieldtype": "Int",
-   "label": "Assets Consumed Qty"
+   "label": "Assets Consumed Qty",
+   "read_only": 1
   },
   {
    "fieldname": "pending_qty",
    "fieldtype": "Int",
-   "label": "Assets Pending Qty"
+   "label": "Assets Pending Qty",
+   "read_only": 1
   },
   {
    "fieldname": "available_qty",
    "fieldtype": "Int",
-   "label": "Available Qty"
+   "label": "Available Qty",
+   "read_only": 1
   },
   {
    "fieldname": "cwip_details_section",
@@ -299,17 +308,20 @@
    "label": "CWIP Details"
   },
   {
+   "depends_on": "eval:doc.enable_cwip_accounting==1",
    "fieldname": "custom_cwip_asset",
    "fieldtype": "Link",
    "label": "Cwip Asset",
    "options": "Asset"
   },
   {
+   "depends_on": "eval:doc.enable_cwip_accounting==1",
    "fieldname": "custom_total_cwip_amount",
    "fieldtype": "Currency",
    "label": "Total CWIP Amount"
   },
   {
+   "depends_on": "eval:doc.enable_cwip_accounting==1",
    "fieldname": "custom_cwip_purchase_receipts",
    "fieldtype": "Table",
    "label": "CWIP Purchase Receipts",
@@ -332,7 +344,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-21 15:54:02.166490",
+ "modified": "2026-01-29 12:36:28.021386",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",

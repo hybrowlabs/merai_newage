@@ -683,3 +683,65 @@ def cancel_regular_assets(pr_doc):
     """, pr_doc.name)
     
     frappe.db.commit()
+
+
+@frappe.whitelist()
+def auto_make_assets(self, asset_items):
+        pass
+		# items_data = get_asset_item_details(asset_items)
+		# messages = []
+		# accounting_dimensions = get_dimensions(with_cost_center_and_project=True)
+
+		# for d in self.items:
+		# 	if d.is_fixed_asset:
+		# 		item_data = items_data.get(d.item_code)
+
+		# 		if item_data.get("auto_create_assets"):
+		# 			# If asset has to be auto created
+		# 			# Check for asset naming series
+		# 			if item_data.get("asset_naming_series"):
+		# 				created_assets = []
+		# 				if item_data.get("is_grouped_asset"):
+		# 					asset = self.make_asset(d, accounting_dimensions, is_grouped_asset=True)
+		# 					created_assets.append(asset)
+		# 				else:
+		# 					for _qty in range(cint(d.qty)):
+		# 						asset = self.make_asset(d, accounting_dimensions)
+		# 						created_assets.append(asset)
+
+		# 				if len(created_assets) > 5:
+		# 					# dont show asset form links if more than 5 assets are created
+		# 					messages.append(
+		# 						_("{} Assets created for {}").format(
+		# 							len(created_assets), frappe.bold(d.item_code)
+		# 						)
+		# 					)
+		# 				else:
+		# 					assets_link = list(
+		# 						map(lambda d: frappe.utils.get_link_to_form("Asset", d), created_assets)
+		# 					)
+		# 					assets_link = frappe.bold(",".join(assets_link))
+
+		# 					is_plural = "s" if len(created_assets) != 1 else ""
+		# 					messages.append(
+		# 						_("Asset{is_plural} {assets_link} created for {item_code}").format(
+		# 							is_plural=is_plural,
+		# 							assets_link=assets_link,
+		# 							item_code=frappe.bold(d.item_code),
+		# 						)
+		# 					)
+		# 			else:
+		# 				frappe.throw(
+		# 					_(
+		# 						"Row {}: Asset Naming Series is mandatory for the auto creation for item {}"
+		# 					).format(d.idx, frappe.bold(d.item_code))
+		# 				)
+		# 		else:
+		# 			messages.append(
+		# 				_("Assets not created for {0}. You will have to create asset manually.").format(
+		# 					frappe.bold(d.item_code)
+		# 				)
+		# 			)
+
+		# for message in messages:
+		# 	frappe.msgprint(message, title="Success", indicator="green")
