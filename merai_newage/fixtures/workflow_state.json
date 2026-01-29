@@ -1,0 +1,236 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-12-15 12:30:09.548600",
+  "name": "cancel",
+  "style": "",
+  "workflow_state_name": "cancel"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-06-27 14:55:16.695882",
+  "name": "Initiated",
+  "style": "",
+  "workflow_state_name": "Initiated"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-06-27 16:18:38.530934",
+  "name": "KYC Pending",
+  "style": "",
+  "workflow_state_name": "KYC Pending"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-06-27 16:27:34.607514",
+  "name": "KYC Complete",
+  "style": "",
+  "workflow_state_name": "KYC Complete"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-13 12:18:42.452328",
+  "name": "Pending Receive Material",
+  "style": "",
+  "workflow_state_name": "Pending Receive Material"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-13 10:25:20.522376",
+  "name": "Received From Store Team",
+  "style": "",
+  "workflow_state_name": "Received From Store Team"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-21 10:13:34.461745",
+  "name": "Raised New Ticket",
+  "style": "",
+  "workflow_state_name": "Raised New Ticket"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-12-15 14:01:25.629861",
+  "name": "Pending From Manager",
+  "style": "",
+  "workflow_state_name": "Pending From Manager"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-12-16 22:11:39.764694",
+  "name": "Pending From Head",
+  "style": "",
+  "workflow_state_name": "Pending From Head"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-12-15 12:29:20.459976",
+  "name": "Pending From Purchase Manager",
+  "style": "",
+  "workflow_state_name": "Pending From Purchase Manager"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-12 15:15:22.255002",
+  "name": "Received From Backend Team",
+  "style": "",
+  "workflow_state_name": "Received From Backend Team"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-12-15 12:29:43.891994",
+  "name": "Pending From Purchase Head",
+  "style": "",
+  "workflow_state_name": "Pending From Purchase Head"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-19 10:03:43.918515",
+  "name": "Resolved",
+  "style": "Success",
+  "workflow_state_name": "Resolved"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-12-15 12:34:46.237748",
+  "name": "Cancelled",
+  "style": "",
+  "workflow_state_name": "Cancelled"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-13 10:23:05.439618",
+  "name": "Pending From Store Team",
+  "style": "",
+  "workflow_state_name": "Pending From Store Team"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-19 10:04:47.566591",
+  "name": "Pending To Receive Material",
+  "style": "Warning",
+  "workflow_state_name": "Pending To Receive Material"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-13 12:52:57.844513",
+  "name": "Received Material",
+  "style": "",
+  "workflow_state_name": "Received Material"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2025-12-29 14:24:39.230970",
+  "name": "Pending From Accountant",
+  "style": "",
+  "workflow_state_name": "Pending From Accountant"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-16 10:11:23.002913",
+  "name": "Issue Resolved",
+  "style": "",
+  "workflow_state_name": "Issue Resolved"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-19 10:05:22.387657",
+  "name": "Pending From Backend Team",
+  "style": "Primary",
+  "workflow_state_name": "Pending From Backend Team"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-01-12 15:08:57.666963",
+  "name": "Pending From Master Admin",
+  "style": "",
+  "workflow_state_name": "Pending From Master Admin"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "question-sign",
+  "modified": "2024-05-22 15:16:24.148650",
+  "name": "Pending",
+  "style": "",
+  "workflow_state_name": "Pending"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "ok-sign",
+  "modified": "2024-05-22 15:16:24.150633",
+  "name": "Approved",
+  "style": "Success",
+  "workflow_state_name": "Approved"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "remove",
+  "modified": "2024-05-22 15:16:24.152716",
+  "name": "Rejected",
+  "style": "Danger",
+  "workflow_state_name": "Rejected"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2024-06-17 18:39:35.048664",
+  "name": "Draft",
+  "style": "",
+  "workflow_state_name": "Draft"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2024-06-18 16:06:00.630035",
+  "name": "Submit To HIring Manager",
+  "style": "",
+  "workflow_state_name": "Submit To HIring Manager"
+ }
+]
