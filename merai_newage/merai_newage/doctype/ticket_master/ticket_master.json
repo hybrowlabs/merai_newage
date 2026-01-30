@@ -39,7 +39,8 @@
   "service_engineer_remarks",
   "naming_series",
   "old_ticket_reference",
-  "original_ticket_id"
+  "original_ticket_id",
+  "status"
  ],
  "fields": [
   {
@@ -262,13 +263,18 @@
    "fieldtype": "Data",
    "label": "State",
    "options": "State"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-23 14:30:49.655294",
+ "modified": "2026-01-30 15:45:06.234452",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",
