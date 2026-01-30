@@ -1,3 +1,4 @@
+
 # # Copyright (c) 2026, Siddhant Hybrowlabs and contributors
 # # For license information, please see license.txt
 
@@ -23,11 +24,11 @@
 	
 # 	if filters.get("from_date"):
 # 		conditions.append("creation >= %(from_date)s")
-# 		values["from_date"] = filters["from_date"]
+# 		values["from_date"] = filters["from_date"] + " 00:00:00"
 	
 # 	if filters.get("to_date"):
 # 		conditions.append("creation <= %(to_date)s")
-# 		values["to_date"] = filters["to_date"]
+# 		values["to_date"] = filters["to_date"] + " 23:59:59"
 	
 # 	if filters.get("state"):
 # 		conditions.append("state = %(state)s")
@@ -68,6 +69,66 @@
 	
 # 	return data
 
+
+# @frappe.whitelist()
+# def get_year_overview():
+#     """
+#     Get year-wise overview of tickets grouped by status (Open, Pending, Resolved)
+#     This loads WITHOUT any filters - shows ALL tickets ever created
+#     Draft = Open (red bar)
+#     """
+#     try:
+#         # Get all tickets grouped by year and status
+#         tickets = frappe.db.sql("""
+#             SELECT 
+#                 YEAR(creation) as year,
+#                 workflow_state,
+#                 COUNT(*) as count
+#             FROM `tabTicket Master`
+#             GROUP BY YEAR(creation), workflow_state
+#             ORDER BY year ASC
+#         """, as_dict=True)
+        
+#         # Organize data by year
+#         year_data = defaultdict(lambda: {'open': 0, 'pending': 0, 'resolved': 0})
+        
+#         for ticket in tickets:
+#             year = str(ticket.year)
+#             status = (ticket.workflow_state or 'Draft').strip()
+#             count = ticket.count
+            
+#             # Map statuses to categories
+#             # Draft and Open = Open (red bar)
+#             if status in ['Draft', 'Open']:
+#                 year_data[year]['open'] += count
+#             # Resolved = Resolved (green bar)
+#             elif status == 'Resolved':
+#                 year_data[year]['resolved'] += count
+#             # Everything else = Pending (orange bar)
+#             else:
+#                 year_data[year]['pending'] += count
+        
+#         # Sort years and prepare data
+#         years = sorted(year_data.keys())
+#         open_counts = [year_data[y]['open'] for y in years]
+#         pending_counts = [year_data[y]['pending'] for y in years]
+#         resolved_counts = [year_data[y]['resolved'] for y in years]
+        
+#         return {
+#             'years': years,
+#             'open': open_counts,
+#             'pending': pending_counts,
+#             'resolved': resolved_counts
+#         }
+        
+#     except Exception as e:
+#         frappe.log_error(f"Error in get_year_overview: {str(e)}")
+#         return {
+#             'years': [],
+#             'open': [],
+#             'pending': [],
+#             'resolved': []
+#         }
 
 # def get_metrics(where_clause, values):
 # 	"""Get key metrics for dashboard cards"""
@@ -248,7 +309,6 @@
 # 			{where_clause}
 # 			GROUP BY state
 # 			ORDER BY count DESC
-# 			LIMIT 10
 # 		"""
 		
 # 		data = frappe.db.sql(query, values, as_dict=True)
@@ -262,7 +322,7 @@
 
 
 # def get_timeline_data(where_clause, values):
-# 	"""Get tickets created over time (last 4 weeks)"""
+# 	"""Get tickets created over time within the selected date range"""
 # 	try:
 # 		query = f"""
 # 			SELECT 
@@ -270,7 +330,6 @@
 # 				COUNT(*) as count
 # 			FROM `tabTicket Master`
 # 			{where_clause}
-# 			{'AND' if where_clause else 'WHERE'} creation >= DATE_SUB(NOW(), INTERVAL 28 DAY)
 # 			GROUP BY DATE(creation)
 # 			ORDER BY date
 # 		"""
@@ -295,7 +354,6 @@
 # 			{where_clause}
 # 			GROUP BY hospital_name
 # 			ORDER BY count DESC
-# 			LIMIT 10
 # 		"""
 		
 # 		data = frappe.db.sql(query, values, as_dict=True)
@@ -317,7 +375,6 @@
 # 			{where_clause}
 # 			GROUP BY robot_serial_no
 # 			ORDER BY count DESC
-# 			LIMIT 10
 # 		"""
 		
 # 		data = frappe.db.sql(query, values, as_dict=True)
@@ -330,9 +387,10 @@
 # 		return {"labels": [], "data": []}
 
 
-# def get_recent_tickets(where_clause, values, limit=20):
-# 	"""Get recent tickets for the table"""
+# def get_recent_tickets(where_clause, values, limit=100):
+# 	"""Get recent tickets for the table - filtered by date range"""
 # 	try:
+# 		# This will now properly filter by the date range since where_clause includes date filters
 # 		query = f"""
 # 			SELECT
 # 				name,
@@ -384,11 +442,11 @@
 		
 # 		if from_date:
 # 			conditions.append("creation >= %(from_date)s")
-# 			values["from_date"] = from_date
+# 			values["from_date"] = from_date + " 00:00:00"
 		
 # 		if to_date:
 # 			conditions.append("creation <= %(to_date)s")
-# 			values["to_date"] = to_date
+# 			values["to_date"] = to_date + " 23:59:59"
 		
 # 		where_clause = ""
 # 		if conditions:
@@ -460,8 +518,6 @@
 
 
 
-
-
 # Copyright (c) 2026, Siddhant Hybrowlabs and contributors
 # For license information, please see license.txt
 
@@ -469,6 +525,68 @@ import frappe
 from frappe import _
 from frappe.utils import now_datetime, add_days, getdate
 import json
+from collections import defaultdict
+
+
+@frappe.whitelist()
+def get_year_overview():
+	"""
+	Get year-wise overview of tickets grouped by status (Open, Pending, Resolved)
+	This loads WITHOUT any filters - shows ALL tickets ever created
+	Draft = Open (red bar)
+	"""
+	try:
+		# Get all tickets grouped by year and status
+		tickets = frappe.db.sql("""
+			SELECT 
+				YEAR(creation) as year,
+				workflow_state,
+				COUNT(*) as count
+			FROM `tabTicket Master`
+			GROUP BY YEAR(creation), workflow_state
+			ORDER BY year ASC
+		""", as_dict=True)
+		
+		# Organize data by year
+		year_data = defaultdict(lambda: {'open': 0, 'pending': 0, 'resolved': 0})
+		
+		for ticket in tickets:
+			year = str(ticket.year)
+			status = (ticket.workflow_state or 'Draft').strip()
+			count = ticket.count
+			
+			# Map statuses to categories
+			# Draft and Open = Open (red bar)
+			if status in ['Draft', 'Open']:
+				year_data[year]['open'] += count
+			# Resolved = Resolved (green bar)
+			elif status == 'Resolved':
+				year_data[year]['resolved'] += count
+			# Everything else = Pending (orange bar)
+			else:
+				year_data[year]['pending'] += count
+		
+		# Sort years and prepare data
+		years = sorted(year_data.keys())
+		open_counts = [year_data[y]['open'] for y in years]
+		pending_counts = [year_data[y]['pending'] for y in years]
+		resolved_counts = [year_data[y]['resolved'] for y in years]
+		
+		return {
+			'years': years,
+			'open': open_counts,
+			'pending': pending_counts,
+			'resolved': resolved_counts
+		}
+		
+	except Exception as e:
+		frappe.log_error(f"Error in get_year_overview: {str(e)}")
+		return {
+			'years': [],
+			'open': [],
+			'pending': [],
+			'resolved': []
+		}
 
 
 @frappe.whitelist()
