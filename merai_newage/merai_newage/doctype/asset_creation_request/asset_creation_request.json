@@ -49,6 +49,7 @@
   "custom_total_cwip_amount",
   "custom_cwip_purchase_receipts",
   "enable_cwip_accounting",
+  "asset_code_original",
   "tab_break_cyks",
   "attachments"
  ],
@@ -339,13 +340,20 @@
    "fieldtype": "Data",
    "label": "Asset Name",
    "reqd": 1
+  },
+  {
+   "fieldname": "asset_code_original",
+   "fieldtype": "Link",
+   "label": "Asset",
+   "options": "Asset",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-29 16:19:25.564060",
+ "modified": "2026-01-29 16:52:35.680271",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",

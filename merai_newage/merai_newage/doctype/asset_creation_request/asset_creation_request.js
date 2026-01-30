@@ -42,18 +42,34 @@ generate_asset_codes(frm) {
     
     refresh(frm){
 
-        if (frm.doc.docstatus === 1) {
+       if (frm.doc.docstatus === 1) {
+
+        // 🔹 Material Request Button
         frm.add_custom_button(__('Material Request'), function () {
 
             frappe.route_options = {
                 custom_asset_creation_request: frm.doc.name,
                 schedule_date: frappe.datetime.get_today(),
-                custom_purchase_types:"Asset",
-                company:frm.doc.entinty,
-                custom_requisitioner:frm.doc.employee
+                custom_purchase_types: "Asset",
+                company: frm.doc.entinty,
+                custom_requisitioner: frm.doc.employee
             };
 
             frappe.set_route('Form', 'Material Request', 'new-material-request');
+
+        }, __('Create'));
+
+        // 🔹 Asset Capitalization Button
+        frm.add_custom_button(__('Asset Capitalization'), function () {
+
+            frappe.route_options = {
+                custom_asset_creation_request: frm.doc.name,
+                posting_date: frappe.datetime.get_today(),
+                company: frm.doc.entinty,
+                employee: frm.doc.employee
+            };
+
+            frappe.set_route('Form', 'Asset Capitalization', 'new-asset-capitalization');
 
         }, __('Create'));
     }
