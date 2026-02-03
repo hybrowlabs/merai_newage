@@ -59,8 +59,8 @@ def get_acr_details(acr_name):
             acr_name, existing_mr), alert=True, indicator="orange")
     
     return {
-        "item": acr.item,
-        "item_name": acr.item_name,
+        # "item": acr.item,
+        # "item_name": acr.item_name,
         "qty": available_qty,  # Return available quantity instead of total
         "total_qty": total_qty,
         "consumed_qty": consumed_qty,
@@ -94,7 +94,7 @@ def validate_material_request(doc, method):
             frappe.throw(_("Please add items"))
         
         # Calculate total quantity in MR
-        total_mr_qty = sum(flt(item.qty) for item in doc.items if item.item_code == acr.item)
+        total_mr_qty = sum(flt(item.qty) for item in doc.items)
         
         # Check available quantity
         consumed_qty = flt(acr.consumed_qty)

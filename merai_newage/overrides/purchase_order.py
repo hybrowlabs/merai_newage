@@ -32,7 +32,7 @@ def validate_purchase_order(doc, method):
         acr = frappe.get_doc("Asset Creation Request", doc.custom_asset_creation_request)
         
         # Calculate total PO quantity for ACR item
-        total_po_qty = sum(flt(item.qty) for item in doc.items if item.item_code == acr.item)
+        total_po_qty = sum(flt(item.qty) for item in doc.items)
         
         # Get consumed quantity from ACR
         consumed_qty = flt(acr.consumed_qty)
