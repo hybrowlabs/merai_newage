@@ -338,14 +338,11 @@ page_js = {"print": "public/js/print.js"}
 override_doctype_class = {
     # "Job Card": "merai_newage.overrides.job_card.CustomJobCard",
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
-    # "Supplier Quotation": "merai_newage.overrides.supplier.supplier_quotation_has_website_permission",
-    # "Request For Quotation": "merai_newage.overrides.supplier.supplier_quotation_has_website_permission"
-    "Buying Controller": "merai_newage.overrides.purchase_receipt.BuyingControllerOverride",
-    # "erpnext.controllers.buying_controller.auto_make_assets": 
-    #     "merai_newage.overrides.purchase_receipt.auto_make_assets",
-
-
 }
-# app_include_css = [
-#     "merai_newage.public.css.safety_check_custom.css"
-# ]
+app_include_css = [
+    "merai_newage.public.css.safety_check_custom.css"
+]
+
+app_include_js = [
+    "/assets/merai_newage/js/dimension_calculation.js"
+]
