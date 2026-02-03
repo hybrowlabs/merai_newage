@@ -308,3 +308,7 @@ override_doctype_class = {
 app_include_css = [
     "merai_newage.public.css.safety_check_custom.css"
 ]
+
+app_include_js = [
+    "/assets/merai_newage/js/dimension_calculation.js"
+]
