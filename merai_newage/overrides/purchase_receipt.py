@@ -3,7 +3,119 @@
 import frappe
 from frappe import _
 from frappe.utils import nowdate, flt, cint, get_link_to_form
+from erpnext.controllers.buying_controller import BuyingController ,get_asset_item_details, get_dimensions
 
+# class BuyingControllerOverride(BuyingController):
+#     print("BuyingControllerOverride=============================================================")
+#     def auto_make_assets(self, asset_items):
+#         print("Auto make assets override called=============================================================")
+#         # super().auto_make_assets(asset_items)
+#         items_data = get_asset_item_details(asset_items)
+#         messages = []
+#         accounting_dimensions = get_dimensions(with_cost_center_and_project=True)
+#         for d in self.items:
+#             if d.is_fixed_asset:
+#                 item_data = items_data.get(d.item_code)
+
+#                 if item_data.get("auto_create_assets"):
+#                     # If asset has to be auto created
+#                     # Check for asset naming series
+#                     if item_data.get("asset_naming_series"):
+#                         created_assets = []
+#                         if item_data.get("is_grouped_asset"):
+#                             asset = self.make_asset(d, accounting_dimensions, is_grouped_asset=True)
+#                             created_assets.append(asset)
+#                         else:
+#                             for _qty in range(cint(d.qty)):
+#                                 asset = self.make_asset(d, accounting_dimensions)
+#                                 created_assets.append(asset)
+
+#                         if len(created_assets) > 5:
+#                             # dont show asset form links if more than 5 assets are created
+#                             messages.append(
+#                                 _("{} Assets created for {}").format(
+#                                     len(created_assets), frappe.bold(d.item_code)
+#                                 )
+#                             )
+#                         else:
+#                             assets_link = list(
+#                                 map(lambda d: frappe.utils.get_link_to_form("Asset", d), created_assets)
+#                             )
+#                             assets_link = frappe.bold(",".join(assets_link))
+
+#                             is_plural = "s" if len(created_assets) != 1 else ""
+#                             messages.append(
+#                                 _("Asset{is_plural} {assets_link} created for {item_code}").format(
+#                                     is_plural=is_plural,
+#                                     assets_link=assets_link,
+#                                     item_code=frappe.bold(d.item_code),
+#                                 )
+#                             )
+#                     else:
+#                         frappe.throw(
+#                             _(
+#                                 "Row {}: Asset Naming Series is mandatory for the auto creation for item {}"
+#                             ).format(d.idx, frappe.bold(d.item_code))
+#                         )
+#                 else:
+#                     pass
+#                     # messages.append(
+#                     #     _("Assets not created for {0}. You will have to create asset manually.").format(
+#                     #         frappe.bold(d.item_code)
+#                     #     )
+#                     # )
+
+#         for message in messages:
+#             frappe.msgprint(message, title="Success", indicator="green")
+
+frappe.whitelist()
+def auto_make_assets(asset_items):
+    print("Custom auto_make_assets override called=============================================================")
+    """
+    ✅ CORRECT OVERRIDE: This replaces ERPNext's auto_make_assets
+    
+    Registered in hooks.py as:
+    override_whitelisted_methods = {
+        "erpnext.controllers.buying_controller.auto_make_assets": 
+            "merai_newage.overrides.purchase_receipt.auto_make_assets"
+    }
+    
+    This function is called BEFORE on_submit hook
+    """
+    
+    print("=" * 80)
+    print("Custom auto_make_assets called!")
+    print(f"Asset items: {asset_items}")
+    print("=" * 80)
+    
+    # Return None to suppress the popup completely
+    # ERPNext checks if return value is truthy to show popup
+    return None
+
+@frappe.whitelist()
+def custom_make_asset(asset_items):
+    """
+    ✅ OVERRIDE: Custom make_asset to suppress popup
+    
+    This function overrides: erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_asset
+    """
+    
+    if not asset_items:
+        return
+    
+    # Get PR name
+    pr_name = None
+    if isinstance(asset_items, list) and len(asset_items) > 0:
+        pr_name = asset_items[0].get("purchase_receipt")
+    
+    if pr_name:
+        pr = frappe.get_doc("Purchase Receipt", pr_name)
+        if pr.custom_asset_creation_request:
+            # Suppress for ACR
+            return None
+    
+    # Default behavior for non-ACR
+    return asset_items
 def before_save_purchase_receipt(doc, method):
     """Populate ACR from Purchase Order"""
     
@@ -66,7 +178,6 @@ def on_submit_purchase_receipt(doc, method):
     if doc.custom_asset_creation_request:
         acr = frappe.get_doc("Asset Creation Request", doc.custom_asset_creation_request)
         
-        # Get asset category
         asset_category = frappe.get_doc("Asset Category", acr.category_of_asset)
         
         # Check if CWIP is enabled (core field)
@@ -122,20 +233,18 @@ def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
             "item_code": pr_item_data["item_code"],
             "item_name": pr_item_data["item_name"],
             "qty": pr_item_data["qty"],
-            "rate": pr_item_data["rate"],
-            "amount": pr_item_data["amount"],
+            "rate": pr_item_data["amount"],  # Store total amount here
             "is_service_item": pr_item_data["is_service_item"],
             "description": f"{pr_item_data['item_name']} - {'Service/Stock' if pr_item_data['is_service_item'] else 'Asset'}"
         })
     
     # Calculate total accumulated amount from all PRs
     total_cwip_amount = sum(
-        flt(row.rate) * flt(row.qty)
+        flt(row.rate)
         for row in acr.custom_cwip_purchase_receipts
     )
 
     acr.custom_total_cwip_amount = total_cwip_amount
-
     
     acr.flags.ignore_validate_update_after_submit = True
     acr.flags.ignore_permissions = True
@@ -151,8 +260,26 @@ def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
     })
     
     if existing_cwip_asset:
-        # Asset exists - update it with new amount
-        update_existing_cwip_asset(pr_doc, existing_cwip_asset, acr, total_pr_amount, total_cwip_amount)
+        # ✅ For composite assets, DON'T update gross_purchase_amount
+        # It stays at 0 - all tracking is in ACR
+        frappe.msgprint(_("""✅ CWIP Tracking Updated!<br><br>
+            <b>Asset:</b> {0}<br>
+            <b>This PR Amount:</b> ₹{1:,.2f}<br>
+            <b>Total Accumulated:</b> ₹{2:,.2f}<br>
+            <b>Total PRs:</b> {3}<br><br>
+            
+            <b>Status:</b> Costs tracked in ACR<br>
+            <b>Accounting:</b> Costs posted to CWIP account<br><br>
+            
+            <b>Next Steps:</b><br>
+            - Continue adding PRs, OR<br>
+            - Click "Asset Capitalization" to capitalize
+        """).format(
+            get_link_to_form("Asset", existing_cwip_asset),
+            total_pr_amount,
+            total_cwip_amount,
+            len(set([row.purchase_receipt for row in acr.custom_cwip_purchase_receipts]))
+        ), alert=True, indicator="blue")
     else:
         # No asset yet - create new CWIP asset
         create_new_cwip_asset(pr_doc, acr, asset_category, total_pr_amount, total_cwip_amount)
@@ -160,41 +287,11 @@ def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
     frappe.db.commit()
 
 
-def update_existing_cwip_asset(pr_doc, asset_name, acr, pr_amount, total_cwip_amount):
-    """Update existing CWIP asset with new PR amount"""
-    
-    asset_doc = frappe.get_doc("Asset", asset_name)
-    
-    # Update asset gross purchase amount
-    asset_doc.gross_purchase_amount = total_cwip_amount
-    asset_doc.flags.ignore_validate_update_after_submit = True
-    asset_doc.flags.ignore_permissions = True
-    asset_doc.save()
-    
-    frappe.msgprint(_("""✅ CWIP Asset Updated!<br><br>
-        <b>Asset:</b> {0}<br>
-        <b>This PR Amount:</b> ₹{1:,.2f}<br>
-        <b>New Asset Total:</b> ₹{2:,.2f}<br>
-        <b>Total PRs:</b> {3}<br><br>
-        
-        <b>Status:</b> Asset remains in Draft<br>
-        <b>Accounting:</b> Costs posted to CWIP account<br><br>
-        
-        <b>Next Steps:</b><br>
-        - Continue adding PRs, OR<br>
-        - Set "Available for Use Date" when ready<br>
-        - Submit Asset to finalize capitalization
-    """).format(
-        get_link_to_form("Asset", asset_name),
-        pr_amount,
-        total_cwip_amount,
-        len(set([row.purchase_receipt for row in acr.custom_cwip_purchase_receipts]))
-    ), alert=True, indicator="blue")
-    
-    frappe.db.commit()
-
 def create_new_cwip_asset(pr_doc, acr, asset_category, pr_amount, total_cwip_amount):
-    """Create new CWIP Asset on first Purchase Receipt"""
+    """
+    Create new CWIP Asset on first Purchase Receipt
+    ✅ FIXED: For composite assets, gross_purchase_amount = 0
+    """
     
     # Get main asset item from PR
     main_item = None
@@ -207,7 +304,13 @@ def create_new_cwip_asset(pr_doc, acr, asset_category, pr_amount, total_cwip_amo
     if not main_item:
         # If no fixed asset item, use first item
         main_item = pr_doc.items[0]
-    print("main item---------",main_item)
+    
+    print("main item---------", main_item)
+    
+    # ✅ KEY FIX: For composite assets, set gross_purchase_amount = 0
+    # All costs are tracked in ACR child table, not in asset itself
+    is_composite = cint(acr.get("composite_item")) or cint(acr.get("composite_asset"))
+    
     # Create Asset document
     asset_doc = frappe.get_doc({
         "doctype": "Asset",
@@ -224,43 +327,40 @@ def create_new_cwip_asset(pr_doc, acr, asset_category, pr_amount, total_cwip_amo
         
         # Purchase details
         "purchase_date": pr_doc.posting_date,
-        "gross_purchase_amount": total_cwip_amount,
+        "gross_purchase_amount": 0 if is_composite else total_cwip_amount,  # ✅ FIX: 0 for composite
         "supplier": pr_doc.supplier,
         "purchase_receipt": pr_doc.name,
-
-        
-        # IMPORTANT: Do NOT set available_for_use_date - user sets when ready
-        # Do NOT set purchase_receipt_amount - CWIP doesn't use this
         
         # Reference fields
         "custom_asset_creation_request": acr.name,
+        "is_composite_asset": 1 if is_composite else 0,  # ✅ Mark as composite
         
         # Asset stays in DRAFT
         "is_existing_asset": 0,
-        # "calculate_depreciation": 1,  
         "docstatus": 0
     })
     
-    asset_doc.flags.ignore_validate = False
+    asset_doc.flags.ignore_validate = True  # ✅ Skip validation since gross_purchase_amount = 0
     asset_doc.insert(ignore_permissions=True)
     
     frappe.msgprint(_("""✅ CWIP Asset Created!<br><br>
         <b>Asset:</b> {0}<br>
-        <b>This PR Amount:</b> ₹{1:,.2f}<br>
-        <b>Asset Total:</b> ₹{2:,.2f}<br>
-        <b>Total PRs:</b> {3}<br><br>
+        <b>Type:</b> {1}<br>
+        <b>This PR Amount:</b> ₹{2:,.2f}<br>
+        <b>Total Accumulated:</b> ₹{3:,.2f}<br>
+        <b>Total PRs:</b> {4}<br><br>
         
         <b>Accounting:</b><br>
-        - Asset items → CWIP account<br>
-        - Service items → Expense account<br><br>
+        - Costs tracked in ACR (not asset)<br>
+        - Posted to CWIP account<br><br>
         
         <b>Next Steps:</b><br>
         1. Continue creating PRs for all project costs<br>
-        2. Asset amount will auto-update with each PR<br>
-        3. When complete, set "Available for Use Date" in Asset<br>
-        4. Submit Asset to capitalize CWIP → Fixed Asset
+        2. All amounts tracked in ACR child table<br>
+        3. Click "Asset Capitalization" to capitalize when ready
     """).format(
         get_link_to_form("Asset", asset_doc.name),
+        "Composite Asset" if is_composite else "Single Asset",
         pr_amount,
         total_cwip_amount,
         len(set([row.purchase_receipt for row in acr.custom_cwip_purchase_receipts]))
@@ -567,36 +667,8 @@ def on_cancel_purchase_receipt(doc, method):
             cancel_regular_assets(doc)
 
 
-def remove_pr_from_acr(pr_doc, acr):
-    """Remove PR entry from ACR child table and recalculate"""
-    
-    # Remove all entries for this PR from child table
-    acr.custom_cwip_purchase_receipts = [
-        row for row in acr.custom_cwip_purchase_receipts 
-        if row.purchase_receipt != pr_doc.name
-    ]
-    
-    # Recalculate total
-    total_cwip_amount = sum(
-        flt(row.rate) * flt(row.qty)
-        for row in acr.custom_cwip_purchase_receipts
-    )
-
-    acr.custom_total_cwip_amount = total_cwip_amount
-
-    
-    acr.flags.ignore_validate_update_after_submit = True
-    acr.flags.ignore_permissions = True
-    acr.save()
-    
-    frappe.msgprint(_("Removed PR {0} from ACR. New total: ₹{1:,.2f}<br>GL entries reversed automatically.").format(
-        pr_doc.name, acr.custom_total_cwip_amount),
-        alert=True, indicator="orange")
-    
-    frappe.db.commit()
-
 def cancel_cwip_purchase_receipt(pr_doc, acr):
-    """Handle CWIP PR cancellation - update asset and remove from tracking"""
+    """Handle CWIP PR cancellation - just remove from tracking"""
     
     # Remove PR from ACR child table
     acr.custom_cwip_purchase_receipts = [
@@ -606,49 +678,25 @@ def cancel_cwip_purchase_receipt(pr_doc, acr):
     
     # Recalculate total
     total_cwip_amount = sum(
-        flt(row.rate) * flt(row.qty)
+        flt(row.rate)
         for row in acr.custom_cwip_purchase_receipts
     )
 
     acr.custom_total_cwip_amount = total_cwip_amount
-
     
     acr.flags.ignore_validate_update_after_submit = True
     acr.flags.ignore_permissions = True
     acr.save()
     
-    # Update CWIP Asset if exists
-    existing_cwip_asset = frappe.db.get_value("Asset", {
-        "custom_asset_creation_request": acr.name,
-        "docstatus": 0  # Only Draft assets can be updated
-    })
-    
-    if existing_cwip_asset:
-        asset_doc = frappe.get_doc("Asset", existing_cwip_asset)
-        asset_doc.gross_purchase_amount = new_total
-        asset_doc.flags.ignore_validate_update_after_submit = True
-        asset_doc.flags.ignore_permissions = True
-        asset_doc.save()
-        
-        frappe.msgprint(_("""✅ PR Cancelled - CWIP Updated<br><br>
-            <b>Removed PR:</b> {0}<br>
-            <b>Asset:</b> {1}<br>
-            <b>New Asset Total:</b> ₹{2:,.2f}<br><br>
-            <b>Note:</b> GL entries reversed automatically
-        """).format(
-            pr_doc.name,
-            get_link_to_form("Asset", existing_cwip_asset),
-            new_total
-        ), alert=True, indicator="orange")
-    else:
-        frappe.msgprint(_("""✅ PR Removed from Tracking<br><br>
-            <b>Removed PR:</b> {0}<br>
-            <b>New ACR Total:</b> ₹{1:,.2f}<br><br>
-            <b>Note:</b> GL entries reversed automatically
-        """).format(
-            pr_doc.name,
-            new_total
-        ), alert=True, indicator="orange")
+    frappe.msgprint(_("""✅ PR Removed from Tracking<br><br>
+        <b>Removed PR:</b> {0}<br>
+        <b>New Total:</b> ₹{1:,.2f}<br><br>
+        <b>Note:</b> For composite assets, amount tracked in ACR only<br>
+        GL entries reversed automatically
+    """).format(
+        pr_doc.name,
+        total_cwip_amount
+    ), alert=True, indicator="orange")
     
     frappe.db.commit()
 
@@ -683,3 +731,5 @@ def cancel_regular_assets(pr_doc):
     """, pr_doc.name)
     
     frappe.db.commit()
+
+

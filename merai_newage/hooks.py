@@ -249,9 +249,16 @@ scheduler_events = {
         "merai_newage.merai_newage.utils.supplier_deletions.cleanup_temporary_suppliers"
     ]
 }
+
 override_whitelisted_methods = {
         "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides..material_request_override.make_stock_entry",
-            "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_asset": "merai_newage.overrides.purchase_receipt.custom_make_asset",
+        #     "erpnext.controllers.buying_controller.auto_make_assets": 
+        # "merai_newage.overrides.purchase_receipt.auto_make_assets",
+        "erpnext.controllers.buying_controller.auto_make_assets": 
+        "merai_newage.overrides.purchase_receipt.auto_make_assets",
+    
+    # "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_asset": 
+    #     "merai_newage.overrides.purchase_receipt.custom_make_asset",
 
     # "Stock Entry": "chatnext_manufacturing.config.py.stock_entry_override.StockEntry",
         "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides.material_request_override.make_stock_entry",
@@ -335,6 +342,12 @@ fixtures = [
     # {
     #     "dt": "Workflow",
     # },
+    {
+        "dt": "Web Page",
+    },
+    #  {
+    #     "dt": "Workflow State",
+    # },
 # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
     # {"dt": "Property Setter",  "filters": [ ["name", "=", "Material Request-material_request_type-options"]] }
 
@@ -348,6 +361,10 @@ override_doctype_class = {
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
     # "Supplier Quotation": "merai_newage.overrides.supplier.supplier_quotation_has_website_permission",
     # "Request For Quotation": "merai_newage.overrides.supplier.supplier_quotation_has_website_permission"
+    "Buying Controller": "merai_newage.overrides.purchase_receipt.BuyingControllerOverride",
+    # "erpnext.controllers.buying_controller.auto_make_assets": 
+    #     "merai_newage.overrides.purchase_receipt.auto_make_assets",
+
 
 }
 # app_include_css = [
