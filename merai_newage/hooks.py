@@ -250,7 +250,8 @@ doctype_js = {
     "Work Order":"public/js/work_order.js",
     "Stock Entry":"public/js/stock_entry.js",
     "Employee":"public/js/employee.js",
-    "Material Request":"public/js/material_request.js"
+    "Material Request":"public/js/material_request.js",
+    "Pre Alert": "public/js/pre_alert.js"
 }
 
 # doc_events = {
@@ -283,6 +284,9 @@ doc_events = {
     },
     "Request for Quotation": {
         "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails"
+    },
+    "Pre Alert": {
+        "validate": "merai_newage.overrides.pre_alert.validate_igcr_category"
     }
 
 }
