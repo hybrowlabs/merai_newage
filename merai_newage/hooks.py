@@ -275,7 +275,7 @@ doctype_js = {
     "Stock Entry":"public/js/stock_entry.js",
     "Employee":"public/js/employee.js",
     "Material Request":"public/js/material_request.js",
-    "Asset":"public/js/asset.js"
+    "Pre Alert": "public/js/pre_alert.js"
 }
 
 # doc_events = {
@@ -307,31 +307,10 @@ doc_events = {
         "on_submit": "merai_newage.overrides.quality_inspection.on_submit",        
     },
     "Request for Quotation": {
-        "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
-         "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
-        "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
-
+        "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails"
     },
-    "Material Request": {
-        "validate": "merai_newage.overrides.material_request.validate_material_request",
-        "on_submit": "merai_newage.overrides.material_request.on_submit_material_request",
-        "on_cancel": "merai_newage.overrides.material_request.on_cancel_material_request",
-    },
-    "Supplier Quotation": {
-        "before_save": "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
-        "validate": "merai_newage.overrides.supplier_quotation.validate_supplier_quotation",
-    },
-    "Purchase Order": {
-        "before_save": "merai_newage.overrides.purchase_order.before_save_purchase_order",
-        "validate": "merai_newage.overrides.purchase_order.validate_purchase_order",
-        "on_submit": "merai_newage.overrides.purchase_order.on_submit_purchase_order",
-        "on_cancel": "merai_newage.overrides.purchase_order.on_cancel_purchase_order",
-    },
-    "Purchase Receipt": {
-        "before_save": "merai_newage.overrides.purchase_receipt.before_save_purchase_receipt",
-        "validate": "merai_newage.overrides.purchase_receipt.validate_purchase_receipt",
-        "on_submit": "merai_newage.overrides.purchase_receipt.on_submit_purchase_receipt",
-        "on_cancel": "merai_newage.overrides.purchase_receipt.on_cancel_purchase_receipt",
+    "Pre Alert": {
+        "validate": "merai_newage.overrides.pre_alert.validate_igcr_category"
     }
 
 }
