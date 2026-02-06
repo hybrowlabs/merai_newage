@@ -1,20 +1,16 @@
-console.log("🔥 Custom pickup_request.js loaded");
+console.log("🔥 Custom request_for_quotation.js loaded");
 
-frappe.ui.form.on("Pickup Request", {
-  onload: function (frm) {
-    frappe.require("/assets/merai_newage/js/dimension_calculation.js");
-  },
-
+frappe.ui.form.on("Request for Quotation", {
   refresh: function (frm) {
-    sync_workflow_table(frm);
+    sync_rfq_workflow_table(frm);
   },
 
   after_save: function (frm) {
-    sync_workflow_table(frm);
+    sync_rfq_workflow_table(frm);
   }
 });
 
-function sync_workflow_table(frm) {
+function sync_rfq_workflow_table(frm) {
   if (frm.is_new()) return;
   if (frm.__sync_in_progress) return;
 
