@@ -984,7 +984,7 @@ def create_assets_from_cwip_prs(acr_name):
                 existing_asset_doc.available_for_use_date = pr_row.pr_date or nowdate()
                 existing_asset_doc.flags.ignore_validate_update_after_submit = True
                 existing_asset_doc.save(ignore_permissions=True)
-
+            print("Updated available_for_use_date for existing asset if it was missing.======",pr_row.amount,"rate=",pr_row.rate)
             created_assets.append({
                 "asset_name": existing_asset,
                 "item_code": pr_row.item_code,
@@ -1048,7 +1048,7 @@ def create_assets_from_cwip_prs(acr_name):
                 "custodian": acr.employee,
                 "purchase_receipt": pr_row.purchase_receipt,
                 "purchase_receipt_item": purchase_receipt_item,  # ✅ CRITICAL: Add this field
-                "gross_purchase_amount": flt(pr_row.rate),
+                "gross_purchase_amount": flt(pr_row.amount),
                 "purchase_date": pr_row.pr_date or nowdate(),
                 "available_for_use_date": pr_row.pr_date or nowdate(),
                 "custom_asset_creation_request": acr_name,
@@ -1063,7 +1063,8 @@ def create_assets_from_cwip_prs(acr_name):
             created_assets.append({
                 "asset_name": asset_doc.name,
                 "item_code": pr_row.item_code,
-                "amount": flt(pr_row.rate),
+                "amount": flt(pr_row.amount),
+                "rate": flt(pr_row.rate),
                 "purchase_receipt": pr_row.purchase_receipt,
                 "already_exists": False
             })
@@ -1217,7 +1218,7 @@ def create_asset_capitalization_from_acr(acr_name):
             continue
 
         item_flags = get_item_flags(row.item_code)
-        amount = flt(row.rate)
+        amount = flt(row.amount)
         
         print(f"\nRow {idx}: {row.item_code}")
         print(f"  - Is Fixed Asset: {item_flags.get('is_fixed_asset')}")

@@ -241,3 +241,40 @@ def get_warehouse_and_set_in_material_request(work_order_name, name):
         "set_warehouse": wip_warehouse
     }
 
+import frappe
+
+@frappe.whitelist()
+def get_segments_from_plant(doctype, txt, searchfield, start, page_len, filters):
+    plant = filters.get("custom_plant")
+    print("plant=====249==================",plant)
+    if not plant:
+        return []
+
+    segments = frappe.get_all(
+        "Segment Details",        
+        filters={
+            "parent": plant,
+            "parenttype": "Plant"
+        },
+        fields=["segment"]
+    )
+    print("segments========",segments)
+    segment_names = [d.segment for d in segments if d.segment]
+
+    if not segment_names:
+        return []
+
+    # 2️⃣ Filter Segment Master link field
+    return frappe.db.sql("""
+        SELECT name
+        FROM `tabSegment Master`
+        WHERE name IN %(segments)s
+        AND name LIKE %(txt)s
+        ORDER BY name
+        LIMIT %(page_len)s OFFSET %(start)s
+    """, {
+        "segments": tuple(segment_names),
+        "txt": f"%{txt}%",
+        "page_len": page_len,
+        "start": start
+    })
