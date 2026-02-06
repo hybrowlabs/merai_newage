@@ -5,69 +5,6 @@ from frappe import _
 from frappe.utils import nowdate, flt, cint, get_link_to_form
 from erpnext.controllers.buying_controller import BuyingController ,get_asset_item_details, get_dimensions
 
-# class BuyingControllerOverride(BuyingController):
-#     print("BuyingControllerOverride=============================================================")
-#     def auto_make_assets(self, asset_items):
-#         print("Auto make assets override called=============================================================")
-#         # super().auto_make_assets(asset_items)
-#         items_data = get_asset_item_details(asset_items)
-#         messages = []
-#         accounting_dimensions = get_dimensions(with_cost_center_and_project=True)
-#         for d in self.items:
-#             if d.is_fixed_asset:
-#                 item_data = items_data.get(d.item_code)
-
-#                 if item_data.get("auto_create_assets"):
-#                     # If asset has to be auto created
-#                     # Check for asset naming series
-#                     if item_data.get("asset_naming_series"):
-#                         created_assets = []
-#                         if item_data.get("is_grouped_asset"):
-#                             asset = self.make_asset(d, accounting_dimensions, is_grouped_asset=True)
-#                             created_assets.append(asset)
-#                         else:
-#                             for _qty in range(cint(d.qty)):
-#                                 asset = self.make_asset(d, accounting_dimensions)
-#                                 created_assets.append(asset)
-
-#                         if len(created_assets) > 5:
-#                             # dont show asset form links if more than 5 assets are created
-#                             messages.append(
-#                                 _("{} Assets created for {}").format(
-#                                     len(created_assets), frappe.bold(d.item_code)
-#                                 )
-#                             )
-#                         else:
-#                             assets_link = list(
-#                                 map(lambda d: frappe.utils.get_link_to_form("Asset", d), created_assets)
-#                             )
-#                             assets_link = frappe.bold(",".join(assets_link))
-
-#                             is_plural = "s" if len(created_assets) != 1 else ""
-#                             messages.append(
-#                                 _("Asset{is_plural} {assets_link} created for {item_code}").format(
-#                                     is_plural=is_plural,
-#                                     assets_link=assets_link,
-#                                     item_code=frappe.bold(d.item_code),
-#                                 )
-#                             )
-#                     else:
-#                         frappe.throw(
-#                             _(
-#                                 "Row {}: Asset Naming Series is mandatory for the auto creation for item {}"
-#                             ).format(d.idx, frappe.bold(d.item_code))
-#                         )
-#                 else:
-#                     pass
-#                     # messages.append(
-#                     #     _("Assets not created for {0}. You will have to create asset manually.").format(
-#                     #         frappe.bold(d.item_code)
-#                     #     )
-#                     # )
-
-#         for message in messages:
-#             frappe.msgprint(message, title="Success", indicator="green")
-
 frappe.whitelist()
 def auto_make_assets(asset_items):
     print("Custom auto_make_assets override called=============================================================")
@@ -118,6 +55,14 @@ def custom_make_asset(asset_items):
     return asset_items
 def before_save_purchase_receipt(doc, method):
     """Populate ACR from Purchase Order"""
+    if hasattr(doc, 'custom_gate_entry_no') and doc.custom_gate_entry_no:
+        ge = frappe.get_doc("Gate Entry", doc.custom_gate_entry_no)
+        if ge.custom_asset_creation_request:
+            doc.custom_asset_creation_request = ge.custom_asset_creation_request
+            frappe.msgprint(_("Asset Creation Request {0} linked from Gate Entry {1}").format(
+                ge.custom_asset_creation_request, doc.custom_gate_entry_no
+            ), alert=True, indicator="blue")
+            return
     
     for item in doc.items:
         if item.purchase_order:
@@ -167,7 +112,7 @@ def validate_purchase_receipt(doc, method):
             
             # Validate PR qty doesn't exceed PO qty
             if total_pr_qty > total_po_qty:
-                frappe.throw(_("""Purchase Receipt quantity ({0}) exceeds Purchase Order quantity ({1}) for Asset Creation Request {2}""").format(
+                frappe.msgprint(_("""Purchase Receipt quantity ({0}) exceeds Purchase Order quantity ({1}) for Asset Creation Request {2}""").format(
                     total_pr_qty, total_po_qty, doc.custom_asset_creation_request
                 ))
 
@@ -218,7 +163,8 @@ def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
             "rate": item.rate,
             "amount": item.amount,
             "po_name": po_name,
-            "is_service_item": 0 if is_asset_item else 1
+            "is_service_item": 0 if is_asset_item else 1,
+            "purchase_receipt_item": item.name  # ✅ Store PR item reference
         })
         
         total_pr_amount += flt(item.amount)
@@ -233,14 +179,17 @@ def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
             "item_code": pr_item_data["item_code"],
             "item_name": pr_item_data["item_name"],
             "qty": pr_item_data["qty"],
-            "rate": pr_item_data["amount"],  # Store total amount here
+            "rate": pr_item_data["rate"],
+            "amount": pr_item_data["amount"], 
             "is_service_item": pr_item_data["is_service_item"],
+            "purchase_receipt_item": pr_item_data["purchase_receipt_item"],  # ✅ Add this field
+
             "description": f"{pr_item_data['item_name']} - {'Service/Stock' if pr_item_data['is_service_item'] else 'Asset'}"
         })
     
     # Calculate total accumulated amount from all PRs
     total_cwip_amount = sum(
-        flt(row.rate)
+        flt(row.amount)
         for row in acr.custom_cwip_purchase_receipts
     )
 
@@ -282,7 +231,8 @@ def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
         ), alert=True, indicator="blue")
     else:
         # No asset yet - create new CWIP asset
-        create_new_cwip_asset(pr_doc, acr, asset_category, total_pr_amount, total_cwip_amount)
+        if acr.composite_asset==0:
+            create_new_cwip_asset(pr_doc, acr, asset_category, total_pr_amount, total_cwip_amount)
     
     frappe.db.commit()
 
@@ -419,21 +369,25 @@ def get_asset_cost(am, pr_item, asset_qty):
 
 def create_assets_from_asset_masters(pr_doc):
     """
-    Create Asset documents from Asset Master based on Purchase Receipt
-    Handles multiple different items in single PR - creates separate assets for each item type
+    ✅ FIXED: Create assets based on ACTUAL PR quantity
+    Update Asset Masters with MR/PO references during asset creation
     """
     
     acr_name = pr_doc.custom_asset_creation_request
     acr = frappe.get_doc("Asset Creation Request", acr_name)
     
-    # Get PO from PR items
+    # Get PO and MR from PR items
     po_name = None
+    mr_name = None
     for item in pr_doc.items:
-        if item.purchase_order:
+        if item.purchase_order and not po_name:
             po_name = item.purchase_order
+        if item.material_request and not mr_name:
+            mr_name = item.material_request
+        if po_name and mr_name:
             break
     
-    # Group PR items by item_code to handle different items separately
+    # Group PR items by item_code
     pr_items_by_code = {}
     for item in pr_doc.items:
         if item.item_code not in pr_items_by_code:
@@ -442,27 +396,20 @@ def create_assets_from_asset_masters(pr_doc):
     
     created_assets = []
     errors = []
-    total_assets_to_create = sum(int(flt(item.qty)) for item in pr_doc.items)
     
     # Process each item type separately
     for item_code, pr_items_list in pr_items_by_code.items():
-        # Calculate quantity for this item type
-        item_qty = sum(flt(item.qty) for item in pr_items_list)
-        
-        # Get the PR item for cost calculation
+        # ✅ Use ACTUAL PR received quantity
+        actual_received_qty = sum(flt(item.qty) for item in pr_items_list)
         pr_item = pr_items_list[0]
         
-        # Get Asset Masters for this specific item that need conversion
+        # ✅ Get ONLY unused Asset Masters
         filters = {
             "asset_creation_request": acr_name,
             "docstatus": 1,
-            "custom_asset_created": 0
+            "custom_asset_created": 0  # Only unused
         }
         
-        if po_name:
-            filters["custom_purchase_order"] = po_name
-        
-        # Get all pending asset masters (we'll filter by item match)
         all_asset_masters = frappe.get_all("Asset Master",
             filters=filters,
             fields=["name", "item", "item_name", "asset_category", "company", 
@@ -471,29 +418,25 @@ def create_assets_from_asset_masters(pr_doc):
             order_by="creation asc"
         )
         
-        # Filter asset masters: either matching item or no item set (will be mapped)
+        # Filter: matching item or unassigned
         asset_masters = []
         unassigned_masters = []
         
         for am in all_asset_masters:
             if am.get("item") == item_code:
-                # Exact match
                 asset_masters.append(am)
             elif not am.get("item"):
-                # No item assigned yet
                 unassigned_masters.append(am)
         
-        # Calculate how many assets we need for this item
-        assets_needed = int(item_qty)
+        # ✅ Limit to ACTUAL received quantity
+        assets_needed = int(actual_received_qty)
         
-        # First use exact matches
+        # Assign unassigned masters if needed
         if len(asset_masters) < assets_needed and unassigned_masters:
-            # Assign unassigned masters to this item
             remaining_needed = assets_needed - len(asset_masters)
             masters_to_assign = unassigned_masters[:remaining_needed]
             
             for am in masters_to_assign:
-                # Update the asset master with this item
                 frappe.db.set_value("Asset Master", am["name"], {
                     "item": item_code,
                     "item_name": pr_item.item_name
@@ -501,39 +444,28 @@ def create_assets_from_asset_masters(pr_doc):
                 am["item"] = item_code
                 am["item_name"] = pr_item.item_name
                 asset_masters.append(am)
-                
-                frappe.msgprint(_("Assigned item {0} to Asset Master {1}").format(
-                    item_code, am["name"]), alert=True, indicator="blue")
         
-        # Limit to required quantity
+        # Limit to received quantity
         asset_masters = asset_masters[:assets_needed]
         
         if not asset_masters:
-            frappe.msgprint(_("No Asset Masters available for item {0} (Qty: {1})").format(
-                item_code, item_qty), alert=True, indicator="orange")
+            frappe.msgprint(_("⚠️ No Asset Masters available for item {0} (Received: {1})").format(
+                item_code, actual_received_qty), alert=True, indicator="orange")
             continue
         
-        if len(asset_masters) < assets_needed:
-            frappe.msgprint(_("""Warning: Item {0} - Received {1} but only {2} Asset Masters available.
-                <br>Creating {3} assets.""").format(
-                item_code, assets_needed, len(asset_masters), len(asset_masters)
-            ), alert=True, indicator="orange")
-        
-        # Create assets for this item type
+        # Create assets for ACTUAL received quantity only
         for idx, am in enumerate(asset_masters, 1):
             try:
                 item_code_to_use = am.get("item") or item_code
                 item_name_to_use = am.get("item_name") or pr_item.item_name
                 
-                # Determine asset quantity
                 asset_qty = 1
                 if cint(am.get("bulk_item")):
                     asset_qty = cint(am.get("qty")) or 1
                 
-                # Calculate cost per asset
                 cost_per_asset = get_asset_cost(am, pr_item, asset_qty)
                 
-                # Create Asset document
+                # Create Asset
                 asset_doc = frappe.get_doc({
                     "doctype": "Asset",
                     "asset_name": f"{item_name_to_use}-{am['name']}",
@@ -541,13 +473,11 @@ def create_assets_from_asset_masters(pr_doc):
                     "asset_category": am.get("asset_category") or acr.category_of_asset,
                     "company": am.get("company") or pr_doc.company,
                     
-                    # Location & Department
                     "location": am.get("location"),
                     "cost_center": am.get("cost_center") or pr_doc.cost_center,
                     "custodian": am.get("custodian"),
                     "department": am.get("department"),
                     
-                    # Purchase details from PR
                     "purchase_date": pr_doc.posting_date,
                     "available_for_use_date": pr_doc.posting_date,
                     "gross_purchase_amount": cost_per_asset,
@@ -556,19 +486,15 @@ def create_assets_from_asset_masters(pr_doc):
                     "supplier": pr_doc.supplier,
                     "asset_quantity": asset_qty,
                     
-                    # Reference fields
                     "custom_asset_creation_request": acr_name,
                     "custom_asset_master": am["name"],
-                    "custom_material_request": pr_item.material_request,
-                    "custom_purchase_order": pr_item.purchase_order,
+                    "custom_material_request": mr_name,
+                    "custom_purchase_order": po_name,
                     
-                    # Status
                     "is_existing_asset": 0,
                     "calculate_depreciation": 0,
                 })
                 
-                # Insert asset (keep in draft)
-                asset_doc.flags.ignore_validate = False
                 asset_doc.insert(ignore_permissions=True)
                 
                 created_assets.append({
@@ -577,25 +503,28 @@ def create_assets_from_asset_masters(pr_doc):
                     "item_name": item_name_to_use
                 })
                 
-                # Update Asset Master
+                # ✅ Update Asset Master with MR/PO/PR references
                 frappe.db.set_value("Asset Master", am["name"], {
                     "custom_asset_created": 1,
                     "custom_asset_number": asset_doc.name,
+                    "custom_material_request": mr_name,
+                    "custom_mr_date": frappe.db.get_value("Material Request", mr_name, "transaction_date") if mr_name else None,
+                    "custom_mr_status": "Submitted" if mr_name else None,
+                    "custom_purchase_order": po_name,
+                    "custom_po_date": frappe.db.get_value("Purchase Order", po_name, "transaction_date") if po_name else None,
+                    "custom_po_status": "Submitted" if po_name else None,
                     "custom_purchase_receipt": pr_doc.name,
                     "custom_pr_date": pr_doc.posting_date,
                 }, update_modified=False)
                 
-                frappe.msgprint(_("✅ Created Asset: {0} ({1}) from Asset Master: {2}").format(
-                    asset_doc.name, item_name_to_use, am["name"]), alert=True, indicator="green")
-                
             except Exception as e:
-                error_msg = _("❌ Error creating asset from Asset Master {0} for item {1}: {2}").format(
-                    am["name"], item_code, str(e))
+                error_msg = _("❌ Error creating asset from Asset Master {0}: {1}").format(
+                    am["name"], str(e))
                 errors.append(error_msg)
                 frappe.log_error(message=str(e), title=f"Asset Creation Error - {am['name']}")
                 frappe.msgprint(error_msg, alert=True, indicator="red")
     
-    # Update Asset Creation Request status
+    # Update ACR status
     if created_assets:
         pending_count = frappe.db.count("Asset Master", {
             "asset_creation_request": acr_name,
@@ -604,54 +533,27 @@ def create_assets_from_asset_masters(pr_doc):
         })
         
         status = "Completed" if pending_count == 0 else "Partially Completed"
-        
-        frappe.db.set_value("Asset Creation Request", acr_name, {
-            "asset_creation_status": status,
-        }, update_modified=False)
+        frappe.db.set_value("Asset Creation Request", acr_name, "asset_creation_status", status, update_modified=False)
     
     frappe.db.commit()
     
-    # Final summary message - grouped by item
+    # Summary message
     if created_assets:
-        # Group by item for display
-        items_summary = {}
-        for asset_info in created_assets:
-            item = asset_info["item"]
-            if item not in items_summary:
-                items_summary[item] = {
-                    "item_name": asset_info["item_name"],
-                    "assets": []
-                }
-            items_summary[item]["assets"].append(asset_info["asset"])
+        remaining = frappe.db.count("Asset Master", {
+            "asset_creation_request": acr_name,
+            "docstatus": 1,
+            "custom_asset_created": 0
+        })
         
-        summary_html = ""
-        for item_code, item_data in items_summary.items():
-            summary_html += f"<br><b>{item_data['item_name']} ({item_code}):</b><br>"
-            summary_html += "<br>".join([f"  • {asset}" for asset in item_data["assets"]])
-        
-        frappe.msgprint(
-            _("""<div style='font-size: 14px;'>
-                <b>🎉 Asset Creation Successful!</b><br><br>
-                <b>Created {0} Asset(s) from {1} items received:</b>
-                {2}
-                </div>""").format(
-                len(created_assets),
-                total_assets_to_create,
-                summary_html
-            ),
-            title=_("Assets Created"),
+        frappe.msgprint(_("""<b>🎉 Assets Created Successfully!</b><br><br>
+            <b>This PR:</b> {0} assets created<br>
+            <b>Remaining:</b> {1} Asset Masters pending for future PRs
+        """).format(len(created_assets), remaining),
+            title=_("Success"),
             indicator="green"
         )
     
-    if errors:
-        frappe.msgprint(
-            _("<b>⚠️ Some errors occurred:</b><br>{0}").format("<br>".join(errors)),
-            title=_("Errors"),
-            indicator="orange"
-        )
-    
     return [asset_info["asset"] for asset_info in created_assets]
-
 def on_cancel_purchase_receipt(doc, method):
     """Handle PR cancellation for both CWIP and regular assets"""
     
@@ -678,7 +580,7 @@ def cancel_cwip_purchase_receipt(pr_doc, acr):
     
     # Recalculate total
     total_cwip_amount = sum(
-        flt(row.rate)
+        flt(row.amount)
         for row in acr.custom_cwip_purchase_receipts
     )
 

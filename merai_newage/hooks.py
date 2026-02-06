@@ -275,7 +275,8 @@ doctype_js = {
     "Stock Entry":"public/js/stock_entry.js",
     "Employee":"public/js/employee.js",
     "Material Request":"public/js/material_request.js",
-    "Pre Alert": "public/js/pre_alert.js"
+    "Pre Alert": "public/js/pre_alert.js",
+    "Purchase Order":"public/js/purchase_order.js",
 }
 
 # doc_events = {
@@ -334,7 +335,13 @@ doc_events = {
         "validate": "merai_newage.overrides.purchase_receipt.validate_purchase_receipt",
         "on_submit": "merai_newage.overrides.purchase_receipt.on_submit_purchase_receipt",
         "on_cancel": "merai_newage.overrides.purchase_receipt.on_cancel_purchase_receipt",
-    }
+    },
+     "Gate Entry": {
+        "before_save": "merai_newage.overrides.gate_entry_override.before_save_gate_entry",
+        "validate": "merai_newage.overrides.gate_entry_override.validate_gate_entry",
+        "on_submit": "merai_newage.overrides.gate_entry_override.on_submit_gate_entry",
+        "on_cancel": "merai_newage.overrides.gate_entry_override.on_cancel_gate_entry",
+    },
 
 }
 # In your custom app's hooks.py

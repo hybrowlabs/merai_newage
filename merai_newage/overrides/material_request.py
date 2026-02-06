@@ -240,3 +240,4 @@ def get_warehouse_and_set_in_material_request(work_order_name, name):
         "set_from_warehouse": source_warehouse,
         "set_warehouse": wip_warehouse
     }
+
