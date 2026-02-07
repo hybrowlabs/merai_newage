@@ -18,7 +18,9 @@
   "purchase_order",
   "item_name",
   "description",
-  "purchase_receipt_item"
+  "purchase_receipt_item",
+  "is_stock_item",
+  "is_asset_item"
  ],
  "fields": [
   {
@@ -105,13 +107,25 @@
    "fieldname": "amount",
    "fieldtype": "Currency",
    "label": "Amount"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_stock_item",
+   "fieldtype": "Check",
+   "label": "Is Stock Item"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_asset_item",
+   "fieldtype": "Check",
+   "label": "Is Asset Item"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-02-05 17:28:11.051612",
+ "modified": "2026-02-06 20:27:03.988001",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "ACR CWIP PR",

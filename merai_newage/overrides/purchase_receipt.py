@@ -153,7 +153,11 @@ def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
         
         # Check if item is a fixed asset item
         item_doc = frappe.get_doc("Item", item.item_code)
-        is_asset_item = 1 if item_doc.is_fixed_asset else 0
+        is_asset_item = cint(item_doc.is_fixed_asset)
+        is_stock_item = cint(item_doc.is_stock_item)
+
+        # Service item = neither asset nor stock
+        is_service_item = 1 if not is_asset_item and not is_stock_item else 0
         
         # Add to tracking list
         pr_items_data.append({
@@ -163,8 +167,10 @@ def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
             "rate": item.rate,
             "amount": item.amount,
             "po_name": po_name,
-            "is_service_item": 0 if is_asset_item else 1,
-            "purchase_receipt_item": item.name  # ✅ Store PR item reference
+            "is_asset_item": is_asset_item,
+            "is_stock_item": is_stock_item,
+            "is_service_item": is_service_item,
+            "purchase_receipt_item": item.name  
         })
         
         total_pr_amount += flt(item.amount)
@@ -182,7 +188,10 @@ def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
             "rate": pr_item_data["rate"],
             "amount": pr_item_data["amount"], 
             "is_service_item": pr_item_data["is_service_item"],
-            "purchase_receipt_item": pr_item_data["purchase_receipt_item"],  # ✅ Add this field
+            "is_stock_item": pr_item_data["is_stock_item"],
+            "is_asset_item": pr_item_data["is_asset_item"],
+            
+            "purchase_receipt_item": pr_item_data["purchase_receipt_item"], 
 
             "description": f"{pr_item_data['item_name']} - {'Service/Stock' if pr_item_data['is_service_item'] else 'Asset'}"
         })
