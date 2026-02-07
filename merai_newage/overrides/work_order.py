@@ -843,6 +843,8 @@ def create_stock_entry_on_submit(doc_name):
 
 @frappe.whitelist()
 def complete_work_order(doc_name):
+    if doc.custom_is_full_dhr==1:
+        create_robot_tracker(doc,method=None)
     is_auto_stock = frappe.db.get_single_value(
             "Meril Manufacturing Settings",
             "auto_stock"
@@ -904,8 +906,8 @@ def complete_work_order(doc_name):
     stock_entry.insert()
     stock_entry.submit()
     frappe.db.commit()
-    if doc.custom_is_full_dhr==1:
-        create_robot_tracker(doc,method=None)
+    # if doc.custom_is_full_dhr==1:
+    #     create_robot_tracker(doc,method=None)
     return {
         "status": "success",
         "stock_entry": stock_entry.name,
@@ -963,7 +965,7 @@ def create_fg_consumption_entry(doc_name, batch_no):
     stock_entry.submit()
     frappe.db.commit()
 
-#merai_newage.merai_newage.overrides.work_order.create_material_request
+
 @frappe.whitelist(allow_guest=True)
 def create_material_request(data):
     data = frappe.json.loads(data)

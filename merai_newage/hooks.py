@@ -242,6 +242,30 @@ app_license = "mit"
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
 
+
+
+scheduler_events = {
+    "weekly": [
+        "merai_newage.merai_newage.utils.supplier_deletions.cleanup_temporary_suppliers"
+    ]
+}
+
+override_whitelisted_methods = {
+        "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides..material_request_override.make_stock_entry",
+        #     "erpnext.controllers.buying_controller.auto_make_assets": 
+        # "merai_newage.overrides.purchase_receipt.auto_make_assets",
+        "erpnext.controllers.buying_controller.auto_make_assets": 
+        "merai_newage.overrides.purchase_receipt.auto_make_assets",
+    
+    # "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_asset": 
+    #     "merai_newage.overrides.purchase_receipt.custom_make_asset",
+
+    # "Stock Entry": "chatnext_manufacturing.config.py.stock_entry_override.StockEntry",
+        "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides.material_request_override.make_stock_entry",
+
+}
+
+
 doctype_js = {
     "Batch":"public/js/batch_script.js",
     "Job Card":"public/js/line_clearance.js",
@@ -251,7 +275,8 @@ doctype_js = {
     "Stock Entry":"public/js/stock_entry.js",
     "Employee":"public/js/employee.js",
     "Material Request":"public/js/material_request.js",
-    "Pre Alert": "public/js/pre_alert.js"
+    "Pre Alert": "public/js/pre_alert.js",
+    "Purchase Order":"public/js/purchase_order.js",
 }
 
 # doc_events = {
@@ -284,19 +309,58 @@ doc_events = {
     },
     "Request for Quotation": {
         "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
-        "validate": "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request"
+        "validate": "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
+        "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
+        "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
     },
     "Pre Alert": {
         "validate": "merai_newage.overrides.pre_alert.validate_igcr_category"
-    }
+    },
+     "Material Request": {
+        "validate": "merai_newage.overrides.material_request.validate_material_request",
+        "on_submit": "merai_newage.overrides.material_request.on_submit_material_request",
+        "on_cancel": "merai_newage.overrides.material_request.on_cancel_material_request",
+    },
+    "Supplier Quotation": {
+        "before_save": "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
+        "validate": "merai_newage.overrides.supplier_quotation.validate_supplier_quotation",
+    },
+    "Purchase Order": {
+        "before_save": "merai_newage.overrides.purchase_order.before_save_purchase_order",
+        "validate": "merai_newage.overrides.purchase_order.validate_purchase_order",
+        "on_submit": "merai_newage.overrides.purchase_order.on_submit_purchase_order",
+        "on_cancel": "merai_newage.overrides.purchase_order.on_cancel_purchase_order",
+    },
+    "Purchase Receipt": {
+        "before_save": "merai_newage.overrides.purchase_receipt.before_save_purchase_receipt",
+        "validate": "merai_newage.overrides.purchase_receipt.validate_purchase_receipt",
+        "on_submit": "merai_newage.overrides.purchase_receipt.on_submit_purchase_receipt",
+        "on_cancel": "merai_newage.overrides.purchase_receipt.on_cancel_purchase_receipt",
+    },
+     "Gate Entry": {
+        "before_save": "merai_newage.overrides.gate_entry_override.before_save_gate_entry",
+        "validate": "merai_newage.overrides.gate_entry_override.validate_gate_entry",
+        "on_submit": "merai_newage.overrides.gate_entry_override.on_submit_gate_entry",
+        "on_cancel": "merai_newage.overrides.gate_entry_override.on_cancel_gate_entry",
+    },
 
 }
 # In your custom app's hooks.py
 
 fixtures = [
     {"dt": "Batch Number Template"},
+    # {
+    #     "dt": "Workflow",
+    # },
+    {
+        "dt": "Web Page",
+    },
+    #  {
+    #     "dt": "Workflow State",
+    # },
 # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
     # {"dt": "Property Setter",  "filters": [ ["name", "=", "Material Request-material_request_type-options"]] }
+
 
 ]
 page_js = {"print": "public/js/print.js"}

@@ -4,8 +4,93 @@
 frappe.ui.form.on("Batch Release Certificate", {
 	refresh(frm) {
         add_verify_buttons_to_grid(frm, 'batch_release_certificate_details', 'Batch Release Certificate Details');
+        if (frm.doc.docstatus === 1) {
+
+            frm.add_custom_button(
+                __("Dispatch"),
+                function () {
+                    frappe.new_doc("Dispatch", {
+                        item_code: frm.doc.product_name,   
+                        batch_number: frm.doc.batch,
+                        batch_no:frm.doc.batch_number,    
+                        refrence_brc: frm.doc.name        
+                    });
+
+                },
+                __("Create")
+            );
+        }
 
 	},
+   batch(frm) {
+
+    if (!frm.doc.batch) return;
+
+    frappe.db.get_value(
+        "Batch",
+        { custom_batch_number: frm.doc.batch },
+        "name"
+    ).then(r => {
+
+        if (r && r.message) {
+            frm.set_value("batch_number", r.message.name);
+        }
+
+    });
+}
+,
+   work_order: function(frm) {
+    if (!frm.doc.work_order) return;
+
+    frappe.call({
+        method: "merai_newage.merai_newage.doctype.batch_release_certificate.batch_release_certificate.fetch_brc_details",
+        args: {
+            work_order: frm.doc.work_order
+        },
+        callback: function(r) {
+
+            if (!r.message) return;
+
+          
+            frm.clear_table('batch_release_certificate_item_details');
+
+            if (r.message.child_items && r.message.child_items.length) {
+                r.message.child_items.forEach(function(item) {
+                    let row = frm.add_child(
+                        'batch_release_certificate_item_details'
+                    );
+                    row.part_no = item.part_no;
+                    row.std_qty = item.std_qty;
+                    row.description = item.description;
+                });
+            }
+
+            frm.refresh_field('batch_release_certificate_item_details');
+
+
+            frm.clear_table('batch_release_certificate_details');
+
+            if (r.message.verification_items && r.message.verification_items.length) {
+                r.message.verification_items.forEach(function(item) {
+                    let row = frm.add_child(
+                        'batch_release_certificate_details'
+                    );
+                    row.test_description = item.test_description;
+                });
+            }
+
+            frm.refresh_field('batch_release_certificate_details');
+
+            frappe.show_alert({
+                message: __('Data fetched successfully'),
+                indicator: 'green'
+            });
+        }
+    });
+
+
+
+}
 });
 
 function add_verify_buttons_to_grid(frm, fieldname, doctype) {

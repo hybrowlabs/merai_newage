@@ -1,0 +1,339 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-01-02 11:05:55.822323",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_d9tn",
+  "amended_from",
+  "item",
+  "item_name",
+  "asset_category",
+  "asset_id",
+  "asset_count",
+  "qty",
+  "asset_owner",
+  "asset_owner_company",
+  "company",
+  "bulk_item",
+  "custom_cwip_asset",
+  "asset_status",
+  "asset_name",
+  "column_break_t4gq",
+  "location",
+  "cost_center",
+  "purchase_amount_approx",
+  "purchase_amount_actual",
+  "custodian",
+  "department",
+  "plant",
+  "employee_id",
+  "naming_series",
+  "asset_code",
+  "company_code",
+  "asset_creation_request",
+  "buying_refrence_section",
+  "custom_material_request",
+  "custom_mr_date",
+  "custom_mr_status",
+  "custom_po_date",
+  "custom_supplier",
+  "custom_po_status",
+  "custom_purchase_order",
+  "custom_asset_created",
+  "custom_purchase_receipt",
+  "custom_asset_number",
+  "custom_pr_date",
+  "gate_entry",
+  "gate_entry_date",
+  "gate_entry_status",
+  "ordered_qty",
+  "received_qty"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_d9tn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Asset Master",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "Item",
+   "options": "Item"
+  },
+  {
+   "fieldname": "asset_category",
+   "fieldtype": "Link",
+   "label": "Asset Category",
+   "options": "Asset Category"
+  },
+  {
+   "fetch_from": "asset_category.custom_asset_code",
+   "fieldname": "asset_code",
+   "fieldtype": "Int",
+   "label": "Asset Code"
+  },
+  {
+   "fieldname": "asset_count",
+   "fieldtype": "Data",
+   "label": "Asset Count"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Int",
+   "label": "Qty"
+  },
+  {
+   "fieldname": "asset_owner",
+   "fieldtype": "Select",
+   "label": "Asset Owner",
+   "options": "\nCompany\nSupplier\nCustomer"
+  },
+  {
+   "fieldname": "asset_owner_company",
+   "fieldtype": "Data",
+   "label": "Asset Owner Company"
+  },
+  {
+   "fetch_from": "item.item_name",
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name"
+  },
+  {
+   "fieldname": "column_break_t4gq",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Link",
+   "label": "Location",
+   "options": "Location"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Data",
+   "label": "Cost Center"
+  },
+  {
+   "fieldname": "purchase_amount_approx",
+   "fieldtype": "Data",
+   "label": "Purchase Amount (Approx)"
+  },
+  {
+   "fieldname": "purchase_amount_actual",
+   "fieldtype": "Data",
+   "label": "Purchase Amount (Actual)"
+  },
+  {
+   "fieldname": "custodian",
+   "fieldtype": "Link",
+   "label": "Custodian",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
+  },
+  {
+   "fieldname": "plant",
+   "fieldtype": "Link",
+   "label": "Plant",
+   "options": "Plant"
+  },
+  {
+   "fieldname": "employee_id",
+   "fieldtype": "Data",
+   "label": "Employee ID"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "{company_code}.{asset_code}.#####"
+  },
+  {
+   "fieldname": "asset_id",
+   "fieldtype": "Data",
+   "label": "Asset ID"
+  },
+  {
+   "fetch_from": "asset_category.custom_company_code",
+   "fieldname": "company_code",
+   "fieldtype": "Data",
+   "label": "Company Code"
+  },
+  {
+   "fieldname": "asset_creation_request",
+   "fieldtype": "Link",
+   "label": "Asset Creation Request",
+   "options": "Asset Creation Request"
+  },
+  {
+   "fieldname": "custom_material_request",
+   "fieldtype": "Link",
+   "label": "Material Request",
+   "options": "Material Request"
+  },
+  {
+   "fieldname": "custom_mr_date",
+   "fieldtype": "Date",
+   "label": "Mr Date"
+  },
+  {
+   "fieldname": "custom_mr_status",
+   "fieldtype": "Data",
+   "label": "MR Status"
+  },
+  {
+   "fieldname": "custom_po_date",
+   "fieldtype": "Data",
+   "label": "PO Date"
+  },
+  {
+   "fieldname": "custom_supplier",
+   "fieldtype": "Data",
+   "label": "Supplier"
+  },
+  {
+   "fieldname": "custom_po_status",
+   "fieldtype": "Data",
+   "label": "PO Status"
+  },
+  {
+   "fieldname": "custom_purchase_order",
+   "fieldtype": "Link",
+   "label": "Purchase Order",
+   "options": "Purchase Order"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "default": "0",
+   "fieldname": "custom_asset_created",
+   "fieldtype": "Check",
+   "label": "Asset Created"
+  },
+  {
+   "fieldname": "custom_purchase_receipt",
+   "fieldtype": "Link",
+   "label": "Purchase Receipt",
+   "options": "Purchase Receipt"
+  },
+  {
+   "fieldname": "custom_asset_number",
+   "fieldtype": "Data",
+   "label": "Asset No"
+  },
+  {
+   "fieldname": "custom_pr_date",
+   "fieldtype": "Date",
+   "label": "PR Date"
+  },
+  {
+   "default": "0",
+   "fetch_from": "asset_creation_request.composite_item",
+   "fieldname": "bulk_item",
+   "fieldtype": "Check",
+   "label": "Bulk Item"
+  },
+  {
+   "fieldname": "custom_cwip_asset",
+   "fieldtype": "Link",
+   "label": "CWIP Asset",
+   "options": "Asset"
+  },
+  {
+   "fieldname": "asset_status",
+   "fieldtype": "Data",
+   "label": "Asset Status"
+  },
+  {
+   "fetch_from": "asset_creation_request.asset_name",
+   "fieldname": "asset_name",
+   "fieldtype": "Data",
+   "label": "Asset Name"
+  },
+  {
+   "fieldname": "buying_refrence_section",
+   "fieldtype": "Section Break",
+   "label": "Buying Refrence"
+  },
+  {
+   "fieldname": "gate_entry",
+   "fieldtype": "Link",
+   "label": "Gate Entry",
+   "options": "Gate Entry"
+  },
+  {
+   "fieldname": "gate_entry_date",
+   "fieldtype": "Date",
+   "label": "Gate Entry Date"
+  },
+  {
+   "fieldname": "gate_entry_status",
+   "fieldtype": "Data",
+   "label": "Gate Entry Status"
+  },
+  {
+   "fieldname": "ordered_qty",
+   "fieldtype": "Data",
+   "label": "Ordered Qty"
+  },
+  {
+   "fieldname": "received_qty",
+   "fieldtype": "Data",
+   "label": "Received Qty"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-02-05 14:53:09.414731",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Asset Master",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

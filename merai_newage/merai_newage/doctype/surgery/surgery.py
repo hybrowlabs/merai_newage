@@ -6,7 +6,26 @@ from frappe.model.document import Document
 
 
 class Surgery(Document):
-	pass
+    def on_submit(self):
+        # Get last max count for this Installed Robot
+        last_count = frappe.db.get_value(
+            self.doctype,
+            {
+                "installed_robot": self.installed_robot,
+                "docstatus": 1  # only submitted docs
+            },
+            "MAX(count)"
+        ) or 0
+
+        # Increment logic based on surgery type
+        if self.surgery_type == "Bilateral":
+            self.count = last_count + 2
+        else:  # Unilateral
+            self.count = last_count + 1
+
+        # Save updated count in DB
+        self.db_set("count", self.count)
+
 
 
 
