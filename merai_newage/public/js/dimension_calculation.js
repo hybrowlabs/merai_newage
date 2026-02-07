@@ -1,12 +1,9 @@
-
-console.log("Dimension Calculation JS Loaded");
-
 function calculation_box_and_gross_weight(frm, cdt, cdn) {
   const row = locals[cdt][cdn];
   if (!row) return;
 
   const box = flt(row.box || 0);
-  const weight = flt(row.weight || 0); // manual input
+  const weight = flt(row.weight || 0);
 
   const gross = flt(box * weight, 3);
   frappe.model.set_value(cdt, cdn, "gross_weight", gross);
@@ -25,12 +22,7 @@ function dimension_calculation(frm, cdt, cdn) {
   const volume =
     (length * width * height * gross_weight) / type_wise_value;
 
-  frappe.model.set_value(
-    cdt,
-    cdn,
-    "custom_volume_metric_weight_cm",
-    flt(volume, 3)
-  );
+  frappe.model.set_value(cdt,cdn,"custom_volume_metric_weight_cm",flt(volume, 3));
 
   // Parent total
   let total = 0;
