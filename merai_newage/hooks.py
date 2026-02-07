@@ -309,6 +309,7 @@ doc_events = {
     },
     "Request for Quotation": {
         "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
+        "validate": "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
         "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
         "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
     },
@@ -374,5 +375,7 @@ app_include_css = [
 ]
 
 app_include_js = [
-    "/assets/merai_newage/js/dimension_calculation.js"
+    "/assets/merai_newage/js/dimension_calculation.js",
+    "/assets/merai_newage/js/pickup_request.js",
+    "/assets/merai_newage/js/workflow_attachment.js"
 ]
