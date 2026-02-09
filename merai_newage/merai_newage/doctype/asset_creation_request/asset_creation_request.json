@@ -50,9 +50,11 @@
   "cwip_asset",
   "target_asset_item_code",
   "custom_total_cwip_amount",
+  "enable_cwip_accounting",
   "custom_cwip_purchase_receipts",
   "custom_created_assets",
-  "enable_cwip_accounting",
+  "acr_stock_items",
+  "acr_service_items",
   "tab_break_cyks",
   "attachments"
  ],
@@ -375,13 +377,27 @@
    "fieldtype": "Link",
    "label": "Cwip Asset",
    "options": "Asset"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "acr_stock_items",
+   "fieldtype": "Table",
+   "label": "ACR Stock Items",
+   "options": "ACR Stock Items"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "acr_service_items",
+   "fieldtype": "Table",
+   "label": "ACR Service Items",
+   "options": "ACR Service Items"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-05 16:33:46.174652",
+ "modified": "2026-02-07 17:12:47.175824",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",
