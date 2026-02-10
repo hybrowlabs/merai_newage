@@ -1,7 +1,9 @@
 frappe.ui.form.on("Quality Inspection", {
     refresh: function(frm) {
         handle_software_fields(frm);
-       
+        handle_qc_items_visibility(frm);
+        fetch_purchase_order_reference(frm); 
+        fetch_material_received_qty(frm);
     },
 // before_save: function(frm) {
 //   frappe.call({
@@ -16,11 +18,23 @@ frappe.ui.form.on("Quality Inspection", {
 //     }
 //   });
 // },
+    reference_type: function(frm) {
+        handle_qc_items_visibility(frm);
+        fetch_purchase_order_reference(frm); 
+    },
    
+    reference_name: function(frm) {
+        fetch_material_received_qty(frm);
+    },   
 
     after_save: function(frm) {
         handle_software_fields(frm);
-    }
+    },
+
+    item_code: function(frm) {
+        fetch_material_received_qty(frm);
+    },
+    
 });
 
 function handle_software_fields(frm) {
@@ -61,5 +75,89 @@ function handle_software_fields(frm) {
         }
 
         frm.refresh_fields();
+    });
+}
+
+// Show or hide QC Items child table based on reference type
+function handle_qc_items_visibility(frm) {
+    const show_fields_for = ["Stock Entry", "Job Card"];
+
+    const should_show = show_fields_for.includes(frm.doc.reference_type);
+
+    // Toggle fields based on condition
+    frm.set_df_property("custom_qc_items", "hidden", !should_show);
+    frm.set_df_property("custom_software", "hidden", !should_show);
+    frm.set_df_property("custom_verified", "hidden", !should_show);
+    frm.set_df_property("custom_remarks", "hidden", !should_show);
+
+    frm.refresh_fields(["custom_qc_items", "custom_software", "custom_verified", "custom_remarks"]);
+}
+
+// Fetch and set the purchase order reference based on reference type and name
+function fetch_purchase_order_reference(frm) {
+    const ref_type = frm.doc.reference_type;
+    const ref_name = frm.doc.reference_name;
+
+    if (!ref_type || !ref_name) return;
+
+    const child_doctypes = ["Purchase Receipt", "Purchase Invoice", "Subcontracting Receipt"];
+
+    if (!child_doctypes.includes(ref_type)) {
+        frm.set_value("custom_purchase_order_reference", null);
+        return;
+    }
+
+    frappe.call({
+        method: "frappe.client.get",
+        args: {
+            doctype: ref_type,
+            name: ref_name
+        },
+        callback: function(r) {
+            if (r.message) {
+                const doc = r.message;
+                const items = doc.items || [];
+                let purchase_order = null;
+
+                for (let item of items) {
+                    if (item.purchase_order) {
+                        purchase_order = item.purchase_order;
+                        break;
+                    }
+                }
+
+                frm.set_value("custom_purchase_order_reference", purchase_order || null);
+            }
+        }
+    });
+}
+
+// Fetch and set the material received quantity based on reference type and name
+function fetch_material_received_qty(frm) {
+    if (frm.doc.reference_type !== "Purchase Receipt" || !frm.doc.reference_name || !frm.doc.item_code) {
+        frm.set_value("custom_material_received_quantity", null);
+        return;
+    }
+
+    frappe.call({
+        method: "frappe.client.get",
+        args: {
+            doctype: "Purchase Receipt",
+            name: frm.doc.reference_name
+        },
+        callback: function(r) {
+            if (r.message) {
+                const receipt = r.message;
+                const item_row = (receipt.items || []).find(
+                    row => row.item_code === frm.doc.item_code
+                );
+
+                if (item_row) {
+                    frm.set_value("custom_material_received_quantity", item_row.qty || 0);
+                } else {
+                    frm.set_value("custom_material_received_quantity", 0);
+                }
+            }
+        }
     });
 }

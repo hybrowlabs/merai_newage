@@ -1,7 +1,23 @@
 
 
 frappe.ui.form.on("Material Request", {
+       custom_plant: function (frm) {
+               set_segment_filter(frm);
+
+    },
+    
     onload: function (frm) {
+        set_segment_filter(frm);
+
+        // frm.set_query("custom_segment_master", () => {
+        //     return {
+        //         filters: [
+        //             ["Contact", "custom_contact_type", "=", "Clinical Specialist"]
+        //         ]
+        //     };
+        // });
+
+
         // Set warehouse from work order - only on first load
         if (!frm.doc.set_from_warehouse && frm.doc.work_order) {
             frappe.call({
@@ -267,4 +283,29 @@ function show_acr_quantity_status(frm) {
             }
         }
     });
+}
+
+function set_segment_filter(frm) {
+    frm.set_query("custom_segment_master", function() {
+        console.log("Setting query for custom_segment_master with plant:", frm.doc.custom_plant);
+        
+        if (!frm.doc.custom_plant) {
+            // If no plant selected, return empty result
+            return {
+                filters: {
+                    "name": ["=", ""]  // This ensures nothing shows up
+                }
+            };
+        }
+
+        return {
+            query: "merai_newage.overrides.material_request.get_segments_from_plant",
+            filters: {
+                custom_plant: frm.doc.custom_plant
+            }
+        };
+    });
+    
+    // Refresh the field to apply the filter
+    frm.refresh_field("custom_segment_master");
 }

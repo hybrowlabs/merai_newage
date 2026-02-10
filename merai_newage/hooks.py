@@ -275,7 +275,8 @@ doctype_js = {
     "Stock Entry":"public/js/stock_entry.js",
     "Employee":"public/js/employee.js",
     "Material Request":"public/js/material_request.js",
-    "Asset":"public/js/asset.js"
+    "Pre Alert": "public/js/pre_alert.js",
+    "Purchase Order":"public/js/purchase_order.js",
 }
 
 # doc_events = {
@@ -308,11 +309,14 @@ doc_events = {
     },
     "Request for Quotation": {
         "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
-         "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
+        "validate": "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
+        "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
         "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
-
     },
-    "Material Request": {
+    "Pre Alert": {
+        "validate": "merai_newage.overrides.pre_alert.validate_igcr_category"
+    },
+     "Material Request": {
         "validate": "merai_newage.overrides.material_request.validate_material_request",
         "on_submit": "merai_newage.overrides.material_request.on_submit_material_request",
         "on_cancel": "merai_newage.overrides.material_request.on_cancel_material_request",
@@ -332,7 +336,13 @@ doc_events = {
         "validate": "merai_newage.overrides.purchase_receipt.validate_purchase_receipt",
         "on_submit": "merai_newage.overrides.purchase_receipt.on_submit_purchase_receipt",
         "on_cancel": "merai_newage.overrides.purchase_receipt.on_cancel_purchase_receipt",
-    }
+    },
+     "Gate Entry": {
+        "before_save": "merai_newage.overrides.gate_entry_override.before_save_gate_entry",
+        "validate": "merai_newage.overrides.gate_entry_override.validate_gate_entry",
+        "on_submit": "merai_newage.overrides.gate_entry_override.on_submit_gate_entry",
+        "on_cancel": "merai_newage.overrides.gate_entry_override.on_cancel_gate_entry",
+    },
 
 }
 # In your custom app's hooks.py
@@ -359,14 +369,13 @@ page_js = {"print": "public/js/print.js"}
 override_doctype_class = {
     # "Job Card": "merai_newage.overrides.job_card.CustomJobCard",
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
-    # "Supplier Quotation": "merai_newage.overrides.supplier.supplier_quotation_has_website_permission",
-    # "Request For Quotation": "merai_newage.overrides.supplier.supplier_quotation_has_website_permission"
-    "Buying Controller": "merai_newage.overrides.purchase_receipt.BuyingControllerOverride",
-    # "erpnext.controllers.buying_controller.auto_make_assets": 
-    #     "merai_newage.overrides.purchase_receipt.auto_make_assets",
-
-
 }
-# app_include_css = [
-#     "merai_newage.public.css.safety_check_custom.css"
-# ]
+app_include_css = [
+    "merai_newage.public.css.safety_check_custom.css"
+]
+
+app_include_js = [
+    "/assets/merai_newage/js/dimension_calculation.js",
+    "/assets/merai_newage/js/pickup_request.js",
+    "/assets/merai_newage/js/workflow_attachment.js"
+]

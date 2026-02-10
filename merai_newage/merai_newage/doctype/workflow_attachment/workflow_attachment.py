@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class ACRCreatedAssets(Document):
+class WorkflowAttachment(Document):
 	pass

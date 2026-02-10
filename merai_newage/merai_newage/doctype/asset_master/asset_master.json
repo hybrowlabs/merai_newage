@@ -34,6 +34,7 @@
   "asset_code",
   "company_code",
   "asset_creation_request",
+  "buying_refrence_section",
   "custom_material_request",
   "custom_mr_date",
   "custom_mr_status",
@@ -44,7 +45,12 @@
   "custom_asset_created",
   "custom_purchase_receipt",
   "custom_asset_number",
-  "custom_pr_date"
+  "custom_pr_date",
+  "gate_entry",
+  "gate_entry_date",
+  "gate_entry_status",
+  "ordered_qty",
+  "received_qty"
  ],
  "fields": [
   {
@@ -265,13 +271,44 @@
    "fieldname": "asset_name",
    "fieldtype": "Data",
    "label": "Asset Name"
+  },
+  {
+   "fieldname": "buying_refrence_section",
+   "fieldtype": "Section Break",
+   "label": "Buying Refrence"
+  },
+  {
+   "fieldname": "gate_entry",
+   "fieldtype": "Link",
+   "label": "Gate Entry",
+   "options": "Gate Entry"
+  },
+  {
+   "fieldname": "gate_entry_date",
+   "fieldtype": "Date",
+   "label": "Gate Entry Date"
+  },
+  {
+   "fieldname": "gate_entry_status",
+   "fieldtype": "Data",
+   "label": "Gate Entry Status"
+  },
+  {
+   "fieldname": "ordered_qty",
+   "fieldtype": "Data",
+   "label": "Ordered Qty"
+  },
+  {
+   "fieldname": "received_qty",
+   "fieldtype": "Data",
+   "label": "Received Qty"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-21 16:16:16.704166",
+ "modified": "2026-02-05 14:53:09.414731",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Master",
