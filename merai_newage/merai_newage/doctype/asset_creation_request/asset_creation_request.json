@@ -225,18 +225,18 @@
    "label": "Approx Cost"
   },
   {
-   "depends_on": "eval:doc.workflow_state==\"Pending From Accountant\"",
    "fieldname": "cost_centre",
    "fieldtype": "Link",
    "label": "Cost Centre",
-   "mandatory_depends_on": "eval:doc.workflow_state==\"Pending From Accountant\"",
-   "options": "Cost Center"
+   "options": "Cost Center",
+   "reqd": 1
   },
   {
    "fieldname": "saftey_dep_approval_required",
    "fieldtype": "Select",
    "label": "Saftey Dep. Approval Required",
-   "options": "\nYes\nNo"
+   "options": "\nYes\nNo",
+   "reqd": 1
   },
   {
    "default": "ACR-ASS-.YYYY.-",
@@ -397,7 +397,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-07 17:12:47.175824",
+ "modified": "2026-02-11 13:57:02.097547",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",

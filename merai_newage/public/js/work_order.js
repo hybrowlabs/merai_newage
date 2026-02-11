@@ -28,6 +28,8 @@ frappe.ui.form.on("Work Order", {
                     frm.remove_custom_button("Create Pick List");
                     // frm.remove_custom_button("Finish");
                     frm.remove_custom_button("Start");
+                    frm.remove_custom_button("Print Work Order");
+
 
 
                 }

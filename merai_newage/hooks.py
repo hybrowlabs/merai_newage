@@ -251,7 +251,7 @@ scheduler_events = {
 }
 
 override_whitelisted_methods = {
-        "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides..material_request_override.make_stock_entry",
+        # "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides..material_request_override.make_stock_entry",
         #     "erpnext.controllers.buying_controller.auto_make_assets": 
         # "merai_newage.overrides.purchase_receipt.auto_make_assets",
         "erpnext.controllers.buying_controller.auto_make_assets": 
@@ -261,7 +261,7 @@ override_whitelisted_methods = {
     #     "merai_newage.overrides.purchase_receipt.custom_make_asset",
 
     # "Stock Entry": "chatnext_manufacturing.config.py.stock_entry_override.StockEntry",
-        "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides.material_request_override.make_stock_entry",
+        # "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides.material_request_override.make_stock_entry",
 
 }
 

@@ -85,7 +85,7 @@ frappe.ui.form.on("Asset Creation Request", {
                     );
                 }, __('Create'));
             }
-            
+            console.log("CWIP Accounting Enabled - showing CWIP buttons");
             // 🔹 Material Request Button
             frm.add_custom_button(__('Material Request'), function () {
                 frappe.route_options = {
@@ -93,16 +93,17 @@ frappe.ui.form.on("Asset Creation Request", {
                     schedule_date: frappe.datetime.get_today(),
                     custom_purchase_types: "Asset",
                     company: frm.doc.entinty,
-                    custom_requisitioner: frm.doc.employee
+                    custom_requisitioner: frm.doc.employee,
+                    custom_plant:frm.doc.plant
                 };
                 frappe.set_route('Form', 'Material Request', 'new-material-request');
             }, __('Create'));
           
-            
+            if (frm.doc.enable_cwip_accounting===1){
             // 🆕 ENHANCED: Asset Capitalization Button with Asset Item Creation
             frm.add_custom_button(__('Asset Capitalization'), function () {
                 // Check if target asset exists for composite items
-                if (frm.doc.target_asset_item_code && !frm.doc.cwip_asset) {
+                if (frm.doc.target_asset_item_code && !frm.doc.cwip_asset ) {
                     frappe.msgprint({
                         title: __('Target Asset Required'),
                         indicator: 'orange',
@@ -152,6 +153,7 @@ frappe.ui.form.on("Asset Creation Request", {
                     }
                 );
             }, __('Create'));
+        }
             
             // 🆕 NEW: View Created Assets Button
             if (frm.doc.custom_created_assets && frm.doc.custom_created_assets.length > 0) {
