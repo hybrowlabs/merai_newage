@@ -371,9 +371,16 @@ override_doctype_class = {
 }
 app_include_css = ["merai_newage.public.css.safety_check_custom.css"]
 
+# app_include_js = [
+#     "/assets/merai_newage/js/dimension_calculation.js",
+#     "/assets/merai_newage/js/pickup_request.js",
+#     "/assets/merai_newage/js/request_for_quotation.js",
+#     "/assets/merai_newage/js/workflow_attachment.js",
+# ]
 app_include_js = [
     "/assets/merai_newage/js/dimension_calculation.js",
+    "/assets/merai_newage/js/workflow_attachment_utils.js",   
     "/assets/merai_newage/js/pickup_request.js",
-    "/assets/merai_newage/js/request_for_quotation.js",
-    "/assets/merai_newage/js/workflow_attachment.js",
+    "/assets/merai_newage/js/request_for_quotation.js",           
+    "/assets/merai_newage/js/workflow_attachment.js"
 ]
