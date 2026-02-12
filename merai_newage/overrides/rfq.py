@@ -24,9 +24,9 @@ def validate_request_for_quotation(doc, method):
             if item.material_request:
                 mr_item_code = frappe.db.get_value("Material Request Item", 
                     {"parent": item.material_request}, "item_code")
-                if mr_item_code != acr.item:
-                    frappe.throw(_("Row {0}: Item {1} does not match Asset Creation Request").format(
-                        item.idx, item.item_code))
+                # if mr_item_code != acr.item:
+                #     frappe.throw(_("Row {0}: Item {1} does not match Asset Creation Request").format(
+                #         item.idx, item.item_code))
 
     from merai_newage.overrides.request_for_quotation import (
             copy_workflow_attachments_from_pickup_request

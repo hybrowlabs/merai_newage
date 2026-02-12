@@ -22,10 +22,10 @@ def validate_supplier_quotation(doc, method):
         acr = frappe.get_doc("Asset Creation Request", doc.custom_asset_creation_request)
         
         # Validate items
-        for item in doc.items:
-            if item.item_code != acr.item:
-                frappe.throw(_("Row {0}: Item {1} does not match Asset Creation Request").format(
-                    item.idx, item.item_code))
+        # for item in doc.items:
+        #     if item.item_code != acr.item:
+        #         frappe.throw(_("Row {0}: Item {1} does not match Asset Creation Request").format(
+        #             item.idx, item.item_code))
                 
                 
                 

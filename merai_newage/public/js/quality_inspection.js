@@ -173,6 +173,15 @@ frappe.ui.form.on("Quality Inspection", {
         handle_qc_items_visibility(frm);
         fetch_purchase_order_reference(frm); 
         fetch_material_received_qty(frm);
+        if (
+            frm.doc.reference_type === "Purchase Receipt" &&
+            frm.doc.reference_name &&
+            !frm.doc.__islocal
+        ) {
+            frm.add_custom_button("Generate AR No", () => {
+                generate_ar_no(frm);
+            });
+        }
     },
 
     reference_type: function(frm) {
@@ -187,6 +196,7 @@ frappe.ui.form.on("Quality Inspection", {
     item_code: function(frm) {
         fetch_material_received_qty(frm);
     },
+
     
 });
 
@@ -315,6 +325,86 @@ function fetch_material_received_qty(frm) {
                     frm.set_value("custom_material_received_quantity", new_qty);
                 }
             }
+        }
+    });
+}
+
+// function generate_ar_no(frm) {
+//     if (
+//         frm.doc.reference_type === "Purchase Receipt" &&
+//         frm.doc.reference_name &&
+//         frm.doc.item_code
+//     ) {
+//         frappe.call({
+//             method: "merai_newage.overrides.quality_inspection.generate_ar_no",
+//             args: {
+//                 reference_name: frm.doc.reference_name,
+//                 item_code: frm.doc.item_code,
+//                 qi_docname: frm.doc.name
+//             },
+//             callback: function (r) {
+//                 if (r.message && Array.isArray(r.message)) {
+
+//                     frm.clear_table("custom_analytic_no_details");
+
+//                     r.message.forEach(function (ar_no) {
+//                         let row = frm.add_child("custom_analytic_no_details");
+//                         row.ar_no = ar_no;
+//                     });
+
+//                     frm.refresh_field("custom_analytic_no_details");
+
+//                     frappe.msgprint({
+//                         title: "AR Numbers Generated",
+//                         message: `${r.message.length} AR Numbers added`,
+//                         indicator: "green"
+//                     });
+//                 }
+//             }
+//         });
+//     }
+// }
+
+
+
+function generate_ar_no(frm) {
+    if (
+        frm.doc.reference_type !== "Purchase Receipt" ||
+        !frm.doc.reference_name ||
+        !frm.doc.item_code ||
+        frm.doc.docstatus !== 0
+    ) {
+        return;
+    }
+
+    frappe.call({
+        method: "merai_newage.overrides.quality_inspection.generate_ar_no",
+        freeze: true,
+        freeze_message: __("Generating AR Numbers..."),
+        args: {
+            reference_name: frm.doc.reference_name,
+            item_code: frm.doc.item_code,
+            qi_docname: frm.doc.name
+        },
+        callback: function (r) {
+            if (!r.message || !Array.isArray(r.message)) return;
+
+            // 🚀 FAST WAY: replace entire child table at once
+            let rows = r.message.map(ar_no => ({
+                ar_no: ar_no
+            }));
+
+            frm.doc.custom_serial_no_details = rows;
+            frm.refresh_field("custom_serial_no_details");
+
+            // Save AFTER bulk update
+            frm.save().then(() => {
+                frappe.msgprint({
+                    title: "Success",
+                    message: `${rows.length} AR Numbers generated`,
+                    indicator: "green"
+                });
+            });
         }
     });
 }

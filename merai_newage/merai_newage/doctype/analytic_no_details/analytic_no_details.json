@@ -1,0 +1,47 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-12 12:36:52.641810",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_recn",
+  "ar_no",
+  "status"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_recn",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Status"
+  },
+  {
+   "fieldname": "ar_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "AR No.",
+   "options": "Analytic Number"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-02-12 14:18:01.461907",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Analytic No Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
