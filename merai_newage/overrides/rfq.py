@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 
 def before_save_request_for_quotation(doc, method):
     """Populate ACR from Material Request"""
@@ -26,3 +27,8 @@ def validate_request_for_quotation(doc, method):
                 if mr_item_code != acr.item:
                     frappe.throw(_("Row {0}: Item {1} does not match Asset Creation Request").format(
                         item.idx, item.item_code))
+
+    from merai_newage.overrides.request_for_quotation import (
+            copy_workflow_attachments_from_pickup_request
+        )
+    copy_workflow_attachments_from_pickup_request(doc, method)

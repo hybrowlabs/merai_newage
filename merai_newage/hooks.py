@@ -243,7 +243,6 @@ app_license = "mit"
 # }
 
 
-
 scheduler_events = {
     "weekly": [
         "merai_newage.merai_newage.utils.supplier_deletions.cleanup_temporary_suppliers"
@@ -259,7 +258,6 @@ override_whitelisted_methods = {
     
     # "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_asset": 
     #     "merai_newage.overrides.purchase_receipt.custom_make_asset",
-
     # "Stock Entry": "chatnext_manufacturing.config.py.stock_entry_override.StockEntry",
         # "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides.material_request_override.make_stock_entry",
 
@@ -267,16 +265,16 @@ override_whitelisted_methods = {
 
 
 doctype_js = {
-    "Batch":"public/js/batch_script.js",
-    "Job Card":"public/js/line_clearance.js",
-    "Job Card":"public/js/job_card.js",
-    "Quality Inspection":"public/js/quality_inspection.js",
-    "Work Order":"public/js/work_order.js",
-    "Stock Entry":"public/js/stock_entry.js",
-    "Employee":"public/js/employee.js",
-    "Material Request":"public/js/material_request.js",
+    "Batch": "public/js/batch_script.js",
+    "Job Card": "public/js/line_clearance.js",
+    "Job Card": "public/js/job_card.js",
+    "Quality Inspection": "public/js/quality_inspection.js",
+    "Work Order": "public/js/work_order.js",
+    "Stock Entry": "public/js/stock_entry.js",
+    "Employee": "public/js/employee.js",
+    "Material Request": "public/js/material_request.js",
     "Pre Alert": "public/js/pre_alert.js",
-    "Purchase Order":"public/js/purchase_order.js",
+    "Purchase Order": "public/js/purchase_order.js",
 }
 
 # doc_events = {
@@ -292,31 +290,34 @@ doc_events = {
         "on_submit": "merai_newage.overrides.work_order.on_submit",
         "autoname": "merai_newage.overrides.work_order.autoname",
         # "on_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
-
         # "on_update_after_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
-
     },
     "Job Card": {
         "before_submit": "merai_newage.overrides.job_card.before_submit",
         "on_submit": "merai_newage.overrides.job_card.on_submit",
         "before_insert": "merai_newage.overrides.job_card.before_insert",
-        "before_save":"merai_newage.overrides.job_card.before_save",
-		"before_validate": "merai_newage.overrides.apply_job_card_overrides"
+        "before_save": "merai_newage.overrides.job_card.before_save",
+        "before_validate": "merai_newage.overrides.apply_job_card_overrides",
     },
     "Quality Inspection": {
         "before_save": "merai_newage.overrides.quality_inspection.before_save",
-        "on_submit": "merai_newage.overrides.quality_inspection.on_submit",        
+        "on_submit": "merai_newage.overrides.quality_inspection.on_submit",
     },
+    # "Request for Quotation": {
+    #     "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
+    #     "validate": "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
+    #     "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
+    #     "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
+    # },
     "Request for Quotation": {
         "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
-        "validate": "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
-        "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
         "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
+        "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
     },
     "Pre Alert": {
         "validate": "merai_newage.overrides.pre_alert.validate_igcr_category"
     },
-     "Material Request": {
+    "Material Request": {
         "validate": "merai_newage.overrides.material_request.validate_material_request",
         "on_submit": "merai_newage.overrides.material_request.on_submit_material_request",
         "on_cancel": "merai_newage.overrides.material_request.on_cancel_material_request",
@@ -324,6 +325,7 @@ doc_events = {
     "Supplier Quotation": {
         "before_save": "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
         "validate": "merai_newage.overrides.supplier_quotation.validate_supplier_quotation",
+        "on_submit": "merai_newage.overrides.supplier_quotation.on_submit_supplier_quotation"
     },
     "Purchase Order": {
         "before_save": "merai_newage.overrides.purchase_order.before_save_purchase_order",
@@ -337,13 +339,12 @@ doc_events = {
         "on_submit": "merai_newage.overrides.purchase_receipt.on_submit_purchase_receipt",
         "on_cancel": "merai_newage.overrides.purchase_receipt.on_cancel_purchase_receipt",
     },
-     "Gate Entry": {
+    "Gate Entry": {
         "before_save": "merai_newage.overrides.gate_entry_override.before_save_gate_entry",
         "validate": "merai_newage.overrides.gate_entry_override.validate_gate_entry",
         "on_submit": "merai_newage.overrides.gate_entry_override.on_submit_gate_entry",
-        "on_cancel": "merai_newage.overrides.gate_entry_override.on_cancel_gate_entry",
+        "on_cancel": "merai7Y766Y_newage.overrides.gate_entry_override.on_cancel_gate_entry",
     },
-
 }
 # In your custom app's hooks.py
 
@@ -358,10 +359,8 @@ fixtures = [
     #  {
     #     "dt": "Workflow State",
     # },
-# {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
+    # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
     # {"dt": "Property Setter",  "filters": [ ["name", "=", "Material Request-material_request_type-options"]] }
-
-
 ]
 page_js = {"print": "public/js/print.js"}
 
@@ -370,12 +369,11 @@ override_doctype_class = {
     # "Job Card": "merai_newage.overrides.job_card.CustomJobCard",
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
 }
-app_include_css = [
-    "merai_newage.public.css.safety_check_custom.css"
-]
+app_include_css = ["merai_newage.public.css.safety_check_custom.css"]
 
 app_include_js = [
     "/assets/merai_newage/js/dimension_calculation.js",
     "/assets/merai_newage/js/pickup_request.js",
-    "/assets/merai_newage/js/workflow_attachment.js"
+    "/assets/merai_newage/js/request_for_quotation.js",
+    "/assets/merai_newage/js/workflow_attachment.js",
 ]
