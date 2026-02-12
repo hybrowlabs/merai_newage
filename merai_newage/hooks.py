@@ -275,6 +275,21 @@ doctype_js = {
     "Material Request": "public/js/material_request.js",
     "Pre Alert": "public/js/pre_alert.js",
     "Purchase Order": "public/js/purchase_order.js",
+    "Pickup Request": [
+        "public/js/workflow_attachment_utils.js",
+        "public/js/pickup_request.js",
+        "public/js/dimension_calculation.js",
+    ],
+
+    "Request for Quotation": [
+        "public/js/workflow_attachment_utils.js",
+        "public/js/request_for_quotation.js",
+    ],
+
+    "Supplier Quotation": [
+        "public/js/workflow_attachment_utils.js",
+    ],
+    
 }
 
 # doc_events = {
@@ -370,17 +385,3 @@ override_doctype_class = {
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
 }
 app_include_css = ["merai_newage.public.css.safety_check_custom.css"]
-
-# app_include_js = [
-#     "/assets/merai_newage/js/dimension_calculation.js",
-#     "/assets/merai_newage/js/pickup_request.js",
-#     "/assets/merai_newage/js/request_for_quotation.js",
-#     "/assets/merai_newage/js/workflow_attachment.js",
-# ]
-app_include_js = [
-    "/assets/merai_newage/js/dimension_calculation.js",
-    "/assets/merai_newage/js/workflow_attachment_utils.js",   
-    "/assets/merai_newage/js/pickup_request.js",
-    "/assets/merai_newage/js/request_for_quotation.js",           
-    "/assets/merai_newage/js/workflow_attachment.js"
-]
