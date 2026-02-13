@@ -19,23 +19,23 @@ frappe.ui.form.on("Material Request", {
 
 
         // Set warehouse from work order - only on first load
-        if (!frm.doc.set_from_warehouse && frm.doc.work_order) {
-            frappe.call({
-                method: "merai_newage.overrides.material_request.get_warehouse_and_set_in_material_request",
-                args: {
-                    work_order_name: frm.doc.work_order,
-                    name: frm.doc.name
-                },
-                callback: function (r) {
-                    if (r.message && r.message.status === "success") {
-                        // Reload the document to show updated warehouse values
-                        frm.reload_doc();
-                    } else if (r.message && r.message.status === "already_set") {
-                        console.log("Warehouses already set:", r.message);
-                    }
-                }
-            });
-        }
+        // if (!frm.doc.set_from_warehouse && frm.doc.work_order) {
+        //     frappe.call({
+        //         method: "merai_newage.overrides.material_request.get_warehouse_and_set_in_material_request",
+        //         args: {
+        //             work_order_name: frm.doc.work_order,
+        //             name: frm.doc.name
+        //         },
+        //         callback: function (r) {
+        //             if (r.message && r.message.status === "success") {
+        //                 // Reload the document to show updated warehouse values
+        //                 frm.reload_doc();
+        //             } else if (r.message && r.message.status === "already_set") {
+        //                 console.log("Warehouses already set:", r.message);
+        //             }
+        //         }
+        //     });
+        // }
 
         // Set requisitioner - only on first load when empty
         if (!frm.doc.custom_requisitioner) {

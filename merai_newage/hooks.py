@@ -384,4 +384,4 @@ override_doctype_class = {
     # "Job Card": "merai_newage.overrides.job_card.CustomJobCard",
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
 }
-app_include_css = ["merai_newage.public.css.safety_check_custom.css"]
+# app_include_css = ["merai_newage.public.css.safety_check_custom.css"]
