@@ -42,7 +42,6 @@
   {
    "fieldname": "view",
    "fieldtype": "Button",
-   "in_list_view": 1,
    "label": "View"
   },
   {
@@ -59,7 +58,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-02-06 12:38:09.423761",
+ "modified": "2026-02-14 12:31:40.141216",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Workflow Attachment",

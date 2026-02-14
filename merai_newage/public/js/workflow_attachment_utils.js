@@ -3,6 +3,7 @@ console.log("🔥 workflow_attachment_utils.js loaded");
 window.merai = window.merai || {};
 
 merai.sync_workflow_attachment_table = function (frm) {
+
   if (frm.is_new()) return;
   if (frm.__sync_in_progress) return;
 
@@ -15,12 +16,15 @@ merai.sync_workflow_attachment_table = function (frm) {
       docname: frm.doc.name
     },
     callback: function (r) {
-      if (r && r.message && r.message.added) {
+
+      if (r?.message && (r.message.added || r.message.removed)) {
         frm.reload_doc();
       }
+
     },
     always: function () {
       frm.__sync_in_progress = false;
     }
   });
+
 };
