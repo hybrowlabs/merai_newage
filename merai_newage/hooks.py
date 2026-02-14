@@ -250,17 +250,14 @@ scheduler_events = {
 }
 
 override_whitelisted_methods = {
-        # "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides..material_request_override.make_stock_entry",
-        #     "erpnext.controllers.buying_controller.auto_make_assets": 
-        # "merai_newage.overrides.purchase_receipt.auto_make_assets",
-        "erpnext.controllers.buying_controller.auto_make_assets": 
-        "merai_newage.overrides.purchase_receipt.auto_make_assets",
-    
-    # "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_asset": 
+    # "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides..material_request_override.make_stock_entry",
+    #     "erpnext.controllers.buying_controller.auto_make_assets":
+    # "merai_newage.overrides.purchase_receipt.auto_make_assets",
+    "erpnext.controllers.buying_controller.auto_make_assets": "merai_newage.overrides.purchase_receipt.auto_make_assets",
+    # "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_asset":
     #     "merai_newage.overrides.purchase_receipt.custom_make_asset",
     # "Stock Entry": "chatnext_manufacturing.config.py.stock_entry_override.StockEntry",
-        # "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides.material_request_override.make_stock_entry",
-
+    # "erpnext.stock.doctype.material_request.material_request.make_stock_entry": "merai_newage.overrides.material_request_override.make_stock_entry",
 }
 
 
@@ -280,16 +277,13 @@ doctype_js = {
         "public/js/pickup_request.js",
         "public/js/dimension_calculation.js",
     ],
-
     "Request for Quotation": [
         "public/js/workflow_attachment_utils.js",
         "public/js/request_for_quotation.js",
     ],
-
     "Supplier Quotation": [
         "public/js/workflow_attachment_utils.js",
     ],
-    
 }
 
 # doc_events = {
@@ -327,7 +321,10 @@ doc_events = {
     "Request for Quotation": {
         "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
         "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
-        "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
+        "before_save": [
+            "merai_newage.overrides.rfq.before_save_request_for_quotation",
+            "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
+        ],
     },
     "Pre Alert": {
         "validate": "merai_newage.overrides.pre_alert.validate_igcr_category"
@@ -340,7 +337,7 @@ doc_events = {
     "Supplier Quotation": {
         "before_save": "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
         "validate": "merai_newage.overrides.supplier_quotation.validate_supplier_quotation",
-        "on_submit": "merai_newage.overrides.supplier_quotation.on_submit_supplier_quotation"
+        "on_submit": "merai_newage.overrides.supplier_quotation.on_submit_supplier_quotation",
     },
     "Purchase Order": {
         "before_save": "merai_newage.overrides.purchase_order.before_save_purchase_order",
@@ -385,3 +382,5 @@ override_doctype_class = {
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
 }
 app_include_css = ["merai_newage.public.css.safety_check_custom.css"]
+
+app_include_js = "/assets/merai_newage/js/workflow_attachment.js"

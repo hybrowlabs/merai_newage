@@ -37,18 +37,53 @@
 //   });
 // }
 
+// console.log("🔥 Custom pickup_request.js loaded");
+
+// frappe.ui.form.on("Pickup Request", {
+//   onload: function (frm) {
+//     frappe.require("/assets/merai_newage/js/dimension_calculation.js");
+//   },
+
+//   // refresh: function (frm) {
+//   //   merai.sync_workflow_attachment_table(frm);
+//   // },
+
+//   after_save: function (frm) {
+//     merai.sync_workflow_attachment_table(frm);
+//   },
+//   on_submit: function (frm) {
+//     merai.sync_workflow_attachment_table(frm);
+//   }
+// });
+
 console.log("🔥 Custom pickup_request.js loaded");
 
 frappe.ui.form.on("Pickup Request", {
-  onload: function (frm) {
-    frappe.require("/assets/merai_newage/js/dimension_calculation.js");
-  },
+	onload: function (frm) {
+		frappe.require("/assets/merai_newage/js/dimension_calculation.js");
+	},
 
-  refresh: function (frm) {
-    merai.sync_workflow_attachment_table(frm);
-  },
+	refresh: function (frm) {
+		if (!frm._attachment_sync_bound && frm.attachments) {
+			frm._attachment_sync_bound = true;
 
-  after_save: function (frm) {
-    merai.sync_workflow_attachment_table(frm);
-  }
+			frm.attachments.on("change", function () {
+				if (merai?.sync_workflow_attachment_table) {
+					merai.sync_workflow_attachment_table(frm);
+				}
+			});
+		}
+	},
+
+	after_save: function (frm) {
+		if (merai?.sync_workflow_attachment_table) {
+			merai.sync_workflow_attachment_table(frm);
+		}
+	},
+
+	on_submit: function (frm) {
+		if (merai?.sync_workflow_attachment_table) {
+			merai.sync_workflow_attachment_table(frm);
+		}
+	},
 });
