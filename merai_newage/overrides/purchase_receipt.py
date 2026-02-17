@@ -1,11 +1,9 @@
-
-
 # import frappe
 # from frappe import _
-# from frappe.utils import nowdate, flt, cint, get_link_to_form
-# from erpnext.controllers.buying_controller import BuyingController ,get_asset_item_details, get_dimensions
+# from frappe.utils import nowdate, flt, cint, get_link_to_form, add_months, getdate
+# from erpnext.controllers.buying_controller import BuyingController, get_asset_item_details, get_dimensions
 
-# frappe.whitelist()
+# @frappe.whitelist()
 # def auto_make_assets(asset_items):
 #     print("Custom auto_make_assets override called=============================================================")
 #     """
@@ -53,6 +51,8 @@
     
 #     # Default behavior for non-ACR
 #     return asset_items
+
+
 # def before_save_purchase_receipt(doc, method):
 #     """Populate ACR from Purchase Order"""
 #     if hasattr(doc, 'custom_gate_entry_no') and doc.custom_gate_entry_no:
@@ -376,9 +376,50 @@
 #     return flt(pr_item.amount)
 
 
+# def setup_depreciation_schedule(asset_doc, asset_category_doc, purchase_date):
+#     """
+#     ✅ FIXED: Setup depreciation schedule from Asset Category
+#     This function adds finance books to the asset BEFORE it's inserted
+#     """
+    
+#     # Get finance books from Asset Category
+#     if not asset_category_doc.finance_books:
+#         print("⚠️ No finance books found in Asset Category")
+#         return False
+    
+#     print(f"✅ Found {len(asset_category_doc.finance_books)} finance book(s) in Asset Category")
+    
+#     # Add each finance book from Asset Category
+#     for fb in asset_category_doc.finance_books:
+#         finance_book_name = fb.finance_book if fb.finance_book else None
+        
+#         # Get depreciation method and details
+#         depreciation_method = fb.depreciation_method or "Straight Line"
+#         total_number_of_depreciations = cint(fb.total_number_of_depreciations) or 12
+#         frequency_of_depreciation = cint(fb.frequency_of_depreciation) or 1
+        
+#         # Calculate depreciation start date
+#         depreciation_start_date = add_months(getdate(purchase_date), frequency_of_depreciation)
+        
+#         print(f"✅ Adding finance book: {finance_book_name or 'None'}, Method: {depreciation_method}, Periods: {total_number_of_depreciations}")
+        
+#         # Add to asset's finance books
+#         asset_doc.append("finance_books", {
+#             "finance_book": finance_book_name,
+#             "depreciation_method": depreciation_method,
+#             "total_number_of_depreciations": total_number_of_depreciations,
+#             "frequency_of_depreciation": frequency_of_depreciation,
+#             "depreciation_start_date": depreciation_start_date,
+#             "expected_value_after_useful_life": flt(fb.expected_value_after_useful_life) or 0
+#         })
+    
+#     return True
+
+
 # def create_assets_from_asset_masters(pr_doc):
 #     """
 #     ✅ FIXED: Create assets based on ACTUAL PR quantity
+#     ✅ FIXED: Proper depreciation setup - set calculate_depreciation ONLY if finance books added
 #     Update Asset Masters with MR/PO references during asset creation
 #     """
     
@@ -471,17 +512,27 @@
 #                 asset_qty = 1
 #                 if cint(am.get("bulk_item")):
 #                     asset_qty = cint(am.get("qty")) or 1
+                
+#                 # Get Asset Category
 #                 asset_category_name = am.get("asset_category") or acr.category_of_asset
 #                 asset_category_doc = frappe.get_doc("Asset Category", asset_category_name)
+                
 #                 cost_per_asset = get_asset_cost(am, pr_item, asset_qty)
-#                 calculate_depreciation = calculate_depreciation = cint(asset_category_doc.get("custom_auto_depreciation", 0))
-#                 print("calculate_depreciation=================================================", calculate_depreciation,type(calculate_depreciation))
-#                 # Create Asset
+                
+#                 # ✅ Check custom field for auto depreciation
+#                 should_calculate_depreciation = cint(asset_category_doc.get("custom_auto_depreciation", 0))
+                
+#                 print(f"=" * 80)
+#                 print(f"Creating asset {idx} for {item_code_to_use}")
+#                 print(f"Asset Category: {asset_category_name}")
+#                 print(f"custom_auto_depreciation from category: {should_calculate_depreciation}")
+                
+#                 # ✅ FIX: Create Asset WITHOUT calculate_depreciation first
 #                 asset_doc = frappe.get_doc({
 #                     "doctype": "Asset",
 #                     "asset_name": f"{item_name_to_use}-{am['name']}",
 #                     "item_code": item_code_to_use,
-#                     "asset_category": am.get("asset_category") or acr.category_of_asset,
+#                     "asset_category": asset_category_name,
 #                     "company": am.get("company") or pr_doc.company,
                     
 #                     "location": am.get("location"),
@@ -503,9 +554,30 @@
 #                     "custom_purchase_order": po_name,
                     
 #                     "is_existing_asset": 0,
-#                     "calculate_depreciation": calculate_depreciation,
+#                     # ✅ DON'T set calculate_depreciation yet
 #                 })
                 
+#                 # ✅ FIX: Add finance books FIRST, then set calculate_depreciation
+#                 depreciation_added = False
+#                 if should_calculate_depreciation == 1:
+#                     print("Setting up depreciation for asset...")
+#                     depreciation_added = setup_depreciation_schedule(asset_doc, asset_category_doc, pr_doc.posting_date)
+                    
+#                     if depreciation_added:
+#                         # ✅ Only set calculate_depreciation if finance books were successfully added
+#                         asset_doc.calculate_depreciation = 1
+#                         print(f"✅ Depreciation enabled: finance books added = {len(asset_doc.finance_books)}")
+#                     else:
+#                         print("⚠️ Could not add finance books, calculate_depreciation will be 0")
+#                         asset_doc.calculate_depreciation = 0
+#                 else:
+#                     asset_doc.calculate_depreciation = 0
+#                     print("Depreciation disabled (custom_auto_depreciation = 0)")
+                
+#                 print(f"Final calculate_depreciation value: {asset_doc.calculate_depreciation}")
+#                 print(f"=" * 80)
+                
+#                 # ✅ Insert asset
 #                 asset_doc.insert(ignore_permissions=True)
                 
 #                 created_assets.append({
@@ -513,7 +585,8 @@
 #                     "item": item_code_to_use,
 #                     "item_name": item_name_to_use
 #                 })
-                
+#                 if should_calculate_depreciation==1:
+#                     asset_doc.submit()  # Submit immediately after insert
 #                 # ✅ Update Asset Master with MR/PO/PR references
 #                 frappe.db.set_value("Asset Master", am["name"], {
 #                     "custom_asset_created": 1,
@@ -529,11 +602,14 @@
 #                 }, update_modified=False)
                 
 #             except Exception as e:
+#                 import traceback
+#                 error_trace = traceback.format_exc()
 #                 error_msg = _("❌ Error creating asset from Asset Master {0}: {1}").format(
 #                     am["name"], str(e))
 #                 errors.append(error_msg)
-#                 frappe.log_error(message=str(e), title=f"Asset Creation Error - {am['name']}")
+#                 frappe.log_error(message=error_trace, title=f"Asset Creation Error - {am['name']}")
 #                 frappe.msgprint(error_msg, alert=True, indicator="red")
+#                 print(f"ERROR: {error_trace}")
     
 #     # Update ACR status
 #     if created_assets:
@@ -565,6 +641,8 @@
 #         )
     
 #     return [asset_info["asset"] for asset_info in created_assets]
+
+
 # def on_cancel_purchase_receipt(doc, method):
 #     """Handle PR cancellation for both CWIP and regular assets"""
     
@@ -644,7 +722,6 @@
 #     """, pr_doc.name)
     
 #     frappe.db.commit()
-
 
 
 
@@ -779,11 +856,264 @@ def on_submit_purchase_receipt(doc, method):
         
         # Check if CWIP is enabled (core field)
         if asset_category.enable_cwip_accounting:
-            # Handle CWIP flow - just track PRs, don't create asset yet
-            handle_cwip_purchase_receipt(doc, acr, asset_category)
+            # Check if this is a return
+            if cint(doc.is_return):
+                # Handle purchase return for CWIP
+                handle_purchase_return_cwip(doc, method)
+            else:
+                # Handle CWIP flow - just track PRs, don't create asset yet
+                handle_cwip_purchase_receipt(doc, acr, asset_category)
         else:
             # Normal flow - create assets directly
             create_assets_from_asset_masters(doc)
+
+
+def on_cancel_purchase_receipt(doc, method):
+    """Handle PR cancellation for both CWIP and regular assets"""
+    
+    if doc.custom_asset_creation_request:
+        acr = frappe.get_doc("Asset Creation Request", doc.custom_asset_creation_request)
+        asset_category = frappe.get_doc("Asset Category", acr.category_of_asset)
+        
+        if asset_category.enable_cwip_accounting:
+            # Check if this is a return being cancelled
+            if cint(doc.is_return):
+                # When cancelling a return, we need to ADD BACK the items
+                cancel_purchase_return_cwip(doc, acr)
+            else:
+                # Handle CWIP asset cancellation (original PR)
+                cancel_cwip_purchase_receipt(doc, acr)
+        else:
+            # Cancel regular assets
+            cancel_regular_assets(doc)
+
+
+def handle_purchase_return_cwip(return_doc, method):
+    """
+    ✅ Handle Purchase Return for CWIP Assets
+    Called on_submit of Purchase Receipt with is_return=1
+    
+    This function:
+    1. Finds the original PR items being returned
+    2. Removes corresponding rows from ACR CWIP child table (or reduces qty/amount)
+    3. Updates total CWIP amount
+    4. Optionally tracks returns in separate child table for audit trail
+    """
+    
+    # Check if this is a return against an ACR
+    if not return_doc.custom_asset_creation_request:
+        return
+    
+    acr = frappe.get_doc("Asset Creation Request", return_doc.custom_asset_creation_request)
+    asset_category = frappe.get_doc("Asset Category", acr.category_of_asset)
+    
+    # Only handle CWIP returns
+    if not asset_category.enable_cwip_accounting:
+        return
+    
+    print("=" * 80)
+    print(f"🔄 Processing Purchase Return for CWIP Asset")
+    print(f"Return PR: {return_doc.name}")
+    print(f"ACR: {acr.name}")
+    print("=" * 80)
+    
+    # ✅ FIX: Get original PR from parent field (not child table)
+    original_pr = return_doc.return_against
+    
+    if not original_pr:
+        frappe.throw(_("Return Against field is empty. Cannot process return."))
+        return
+    
+    print(f"Original PR: {original_pr}")
+    
+    items_to_remove = []
+    total_return_amount = 0
+    
+    # Process each return item
+    for return_item in return_doc.items:
+        # ✅ FIX: Original PR is from parent field, only get the item reference
+        original_pr_item = return_item.purchase_receipt_item
+        
+        if not original_pr_item:
+            continue
+        
+        print(f"Processing return item: {return_item.item_code}")
+        print(f"  Original PR: {original_pr}")
+        print(f"  Original PR Item: {original_pr_item}")
+        print(f"  Return Qty: {abs(flt(return_item.qty))}")
+        
+        # Find matching row(s) in CWIP child table
+        matching_rows = [
+            row for row in acr.custom_cwip_purchase_receipts
+            if row.purchase_receipt == original_pr 
+            and row.purchase_receipt_item == original_pr_item
+        ]
+        
+        if matching_rows:
+            for row in matching_rows:
+                # Calculate proportional return amount
+                return_qty = abs(flt(return_item.qty))
+                original_qty = flt(row.qty)
+                
+                if return_qty >= original_qty:
+                    # Full return of this item
+                    items_to_remove.append(row.name)
+                    total_return_amount += flt(row.amount)
+                    
+                    print(f"  ✅ Removing full entry: {row.item_code}, Qty: {original_qty}, Amount: ₹{row.amount}")
+                else:
+                    # Partial return - reduce quantity and amount
+                    return_ratio = return_qty / original_qty
+                    amount_to_deduct = flt(row.amount) * return_ratio
+                    
+                    row.qty = original_qty - return_qty
+                    row.amount = flt(row.amount) - amount_to_deduct
+                    total_return_amount += amount_to_deduct
+                    
+                    print(f"  📉 Partial return: {row.item_code}, Return Qty: {return_qty}/{original_qty}, Amount reduced by: ₹{amount_to_deduct}")
+        else:
+            print(f"  ⚠️ No matching row found in CWIP child table!")
+    
+    # Remove fully returned items
+    if items_to_remove:
+        acr.custom_cwip_purchase_receipts = [
+            row for row in acr.custom_cwip_purchase_receipts
+            if row.name not in items_to_remove
+        ]
+        print(f"🗑️ Removed {len(items_to_remove)} row(s) from CWIP tracking")
+    
+    # Recalculate total CWIP amount
+    new_total_cwip_amount = sum(
+        flt(row.amount)
+        for row in acr.custom_cwip_purchase_receipts
+    )
+    
+    acr.custom_total_cwip_amount = new_total_cwip_amount
+    
+    # Optional: Add to returns child table for audit trail
+    # You need to create a child table in ACR called 'custom_cwip_returns'
+    # with fields: return_pr, return_date, original_pr, item_code, qty, amount
+    
+    if hasattr(acr, 'acr_return_purchase_details'):
+        for return_item in return_doc.items:
+            acr.append("acr_return_purchase_details", {
+                "return_pr": return_doc.name,
+                "return_date": return_doc.posting_date,
+                "original_pr": original_pr,  # ✅ FIX: Use parent-level original_pr
+                "supplier": return_doc.supplier,
+                "item_code": return_item.item_code,
+                "item_name": return_item.item_name,
+                "qty": abs(flt(return_item.qty)),
+                "rate": return_item.rate,
+                "amount": abs(flt(return_item.amount)),
+                "description": f"Return from {original_pr}"  # ✅ FIX: Use parent-level original_pr
+            })
+    
+    # Save ACR
+    acr.flags.ignore_validate_update_after_submit = True
+    acr.flags.ignore_permissions = True
+    acr.save()
+    
+    frappe.msgprint(_("""✅ Purchase Return Processed for CWIP!<br><br>
+        <b>Return PR:</b> {0}<br>
+        <b>Returned Amount:</b> ₹{1:,.2f}<br>
+        <b>New Total CWIP:</b> ₹{2:,.2f}<br>
+        <b>Items Processed:</b> {3}<br>
+        <b>Remaining PRs:</b> {4}<br><br>
+        
+        <b>Accounting:</b><br>
+        - CWIP amount reduced by ₹{1:,.2f}<br>
+        - GL entries reversed automatically by ERPNext<br><br>
+        
+        <b>Note:</b> Original PR entries updated in ACR tracking
+    """).format(
+        return_doc.name,
+        total_return_amount,
+        new_total_cwip_amount,
+        len(items_to_remove) if items_to_remove else len(return_doc.items),
+        len(set([row.purchase_receipt for row in acr.custom_cwip_purchase_receipts]))
+    ), alert=True, indicator="orange")
+    
+    frappe.db.commit()
+    
+    print(f"✅ CWIP Return processed successfully")
+    print(f"Total returned: ₹{total_return_amount}")
+    print(f"New CWIP total: ₹{new_total_cwip_amount}")
+    print("=" * 80)
+
+
+def cancel_purchase_return_cwip(return_doc, acr):
+    """
+    ✅ Handle CANCELLATION of Purchase Return for CWIP
+    When a return is cancelled, we need to ADD BACK the items to CWIP tracking
+    """
+    
+    print("=" * 80)
+    print(f"🔄 Cancelling Purchase Return for CWIP")
+    print(f"Return PR: {return_doc.name}")
+    print("=" * 80)
+    
+    # ✅ FIX: Get original PR from parent field
+    original_pr = return_doc.return_against
+    
+    # When cancelling a return, we need to restore the original PR entries
+    # This is complex because we need to know what was removed/reduced
+    
+    # Option 1: If you have custom_cwip_returns child table, use that to restore
+    if hasattr(acr, 'acr_return_purchase_details'):
+        returns_to_remove = []
+        
+        for return_row in acr.acr_return_purchase_details:
+            if return_row.return_pr == return_doc.name:
+                # Find the original PR entry and restore qty/amount
+                item_code = return_row.item_code
+                
+                # Try to find existing row for this PR+item
+                matching_rows = [
+                    row for row in acr.custom_cwip_purchase_receipts
+                    if row.purchase_receipt == original_pr 
+                    and row.item_code == item_code
+                ]
+                
+                if matching_rows:
+                    # Restore to existing row
+                    matching_rows[0].qty = flt(matching_rows[0].qty) + flt(return_row.qty)
+                    matching_rows[0].amount = flt(matching_rows[0].amount) + flt(return_row.amount)
+                else:
+                    # Re-create the row (it was fully removed)
+                    # You'll need to fetch original PR item details
+                    pass
+                
+                returns_to_remove.append(return_row.name)
+        
+        # Remove from returns table
+        acr.acr_return_purchase_details = [
+            row for row in acr.acr_return_purchase_details
+            if row.name not in returns_to_remove
+        ]
+    
+    # Recalculate total
+    new_total_cwip_amount = sum(
+        flt(row.amount)
+        for row in acr.custom_cwip_purchase_receipts
+    )
+    
+    acr.custom_total_cwip_amount = new_total_cwip_amount
+    
+    acr.flags.ignore_validate_update_after_submit = True
+    acr.flags.ignore_permissions = True
+    acr.save()
+    
+    frappe.msgprint(_("""✅ Purchase Return Cancelled<br><br>
+        <b>Return PR:</b> {0}<br>
+        <b>New Total CWIP:</b> ₹{1:,.2f}<br><br>
+        <b>Note:</b> Items restored to CWIP tracking
+    """).format(
+        return_doc.name,
+        new_total_cwip_amount
+    ), alert=True, indicator="blue")
+    
+    frappe.db.commit()
 
 
 def handle_cwip_purchase_receipt(pr_doc, acr, asset_category):
@@ -1051,7 +1381,7 @@ def setup_depreciation_schedule(asset_doc, asset_category_doc, purchase_date):
         frequency_of_depreciation = cint(fb.frequency_of_depreciation) or 1
         
         # Calculate depreciation start date
-        depreciation_start_date = add_months(getdate(purchase_date), frequency_of_depreciation)
+        depreciation_start_date = getdate(purchase_date)
         
         print(f"✅ Adding finance book: {finance_book_name or 'None'}, Method: {depreciation_method}, Periods: {total_number_of_depreciations}")
         
@@ -1293,21 +1623,6 @@ def create_assets_from_asset_masters(pr_doc):
         )
     
     return [asset_info["asset"] for asset_info in created_assets]
-
-
-def on_cancel_purchase_receipt(doc, method):
-    """Handle PR cancellation for both CWIP and regular assets"""
-    
-    if doc.custom_asset_creation_request:
-        acr = frappe.get_doc("Asset Creation Request", doc.custom_asset_creation_request)
-        asset_category = frappe.get_doc("Asset Category", acr.category_of_asset)
-        
-        if asset_category.enable_cwip_accounting:
-            # Handle CWIP asset cancellation
-            cancel_cwip_purchase_receipt(doc, acr)
-        else:
-            # Cancel regular assets
-            cancel_regular_assets(doc)
 
 
 def cancel_cwip_purchase_receipt(pr_doc, acr):

@@ -1,0 +1,135 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-13 16:21:46.440472",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_lwaj",
+  "return_pr",
+  "item_code",
+  "rate",
+  "amount",
+  "qty",
+  "supplier",
+  "purchase_order",
+  "purchase_receipt_item",
+  "is_service_item",
+  "is_stock_item",
+  "is_asset_item",
+  "return_date",
+  "original_pr",
+  "item_name",
+  "description"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_lwaj",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "rate",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Rate"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "in_list_view": 1,
+   "label": "Amount"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Qty"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "purchase_order",
+   "fieldtype": "Link",
+   "label": "Purchase Order",
+   "options": "Purchase Order"
+  },
+  {
+   "fieldname": "purchase_receipt_item",
+   "fieldtype": "Data",
+   "label": "Purchase Receipt Item"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_service_item",
+   "fieldtype": "Check",
+   "label": "Is Service Item"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_stock_item",
+   "fieldtype": "Check",
+   "label": "Is Stock Item"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_asset_item",
+   "fieldtype": "Check",
+   "label": "Is Asset Item"
+  },
+  {
+   "fieldname": "return_pr",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Return PR",
+   "options": "Purchase Receipt"
+  },
+  {
+   "fieldname": "return_date",
+   "fieldtype": "Date",
+   "label": "Return Date"
+  },
+  {
+   "fieldname": "original_pr",
+   "fieldtype": "Link",
+   "label": "Original PR",
+   "options": "Purchase Receipt"
+  },
+  {
+   "fieldname": "item_name",
+   "fieldtype": "Data",
+   "label": "Item Name"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "label": "description"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-02-13 17:25:21.252629",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "ACR Return Purchase Details",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

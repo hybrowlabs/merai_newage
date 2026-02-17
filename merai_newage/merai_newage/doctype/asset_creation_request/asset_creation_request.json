@@ -55,6 +55,7 @@
   "custom_created_assets",
   "acr_stock_items",
   "acr_service_items",
+  "acr_return_purchase_details",
   "tab_break_cyks",
   "attachments"
  ],
@@ -391,13 +392,20 @@
    "fieldtype": "Table",
    "label": "ACR Service Items",
    "options": "ACR Service Items"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "acr_return_purchase_details",
+   "fieldtype": "Table",
+   "label": "ACR Return Purchase Details",
+   "options": "ACR Return Purchase Details"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-11 13:57:02.097547",
+ "modified": "2026-02-13 16:58:20.556205",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",
