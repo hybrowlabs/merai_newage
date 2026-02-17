@@ -1,4 +1,4 @@
-// console.log("🔥 Custom pickup_request.js loaded");
+// console.log("Custom pickup_request.js loaded");
 
 // frappe.ui.form.on("Pickup Request", {
 //   onload: function (frm) {
@@ -37,7 +37,7 @@
 //   });
 // }
 
-// console.log("🔥 Custom pickup_request.js loaded");
+// console.log("Custom pickup_request.js loaded");
 
 // frappe.ui.form.on("Pickup Request", {
 //   onload: function (frm) {
@@ -56,7 +56,7 @@
 //   }
 // });
 
-console.log("🔥 Custom pickup_request.js loaded");
+console.log("Custom pickup_request.js loaded");
 
 frappe.ui.form.on("Pickup Request", {
 	onload: function (frm) {
