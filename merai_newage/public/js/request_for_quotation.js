@@ -1,4 +1,4 @@
-// console.log("🔥 Custom rfq.js loaded");
+// console.log("Custom rfq.js loaded");
 
 // frappe.ui.form.on("Request for Quotation", {
 
@@ -117,7 +117,7 @@
 // });
 
 
-console.log("🔥 Custom rfq.js loaded");
+console.log("Custom rfq.js loaded");
 
 frappe.ui.form.on("Request for Quotation", {
 
