@@ -283,6 +283,7 @@ doctype_js = {
     ],
     "Supplier Quotation": [
         "public/js/workflow_attachment_utils.js",
+        "public/js/supplier_quotation.js",
     ],
 }
 
@@ -357,6 +358,7 @@ doc_events = {
         "on_submit": "merai_newage.overrides.gate_entry_override.on_submit_gate_entry",
         "on_cancel": "merai7Y766Y_newage.overrides.gate_entry_override.on_cancel_gate_entry",
     },
+    
 }
 # In your custom app's hooks.py
 
