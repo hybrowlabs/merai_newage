@@ -47,6 +47,7 @@
   "column_break_tmkd",
   "custom_asset_created",
   "custom_purchase_receipt",
+  "purchase_receipt_item",
   "custom_asset_number",
   "custom_pr_date",
   "gate_entry",
@@ -327,13 +328,18 @@
   {
    "fieldname": "column_break_tmkd",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "purchase_receipt_item",
+   "fieldtype": "Data",
+   "label": "Purchase Receipt Item"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-09 16:29:05.793177",
+ "modified": "2026-02-18 12:11:03.567382",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Master",

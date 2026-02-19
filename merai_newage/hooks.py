@@ -356,8 +356,12 @@ doc_events = {
         "before_save": "merai_newage.overrides.gate_entry_override.before_save_gate_entry",
         "validate": "merai_newage.overrides.gate_entry_override.validate_gate_entry",
         "on_submit": "merai_newage.overrides.gate_entry_override.on_submit_gate_entry",
-        "on_cancel": "merai7Y766Y_newage.overrides.gate_entry_override.on_cancel_gate_entry",
+        "on_cancel": "merai_newage.overrides.gate_entry_override.on_cancel_gate_entry",
     },
+    "Purchase Invoice": {
+        "before_save": "merai_newage.overrides.purchase_invoice.before_save_purchase_invoice",
+        "on_submit": "merai_newage.overrides.purchase_invoice.on_submit_purchase_invoice",
+    }
     
 }
 # In your custom app's hooks.py

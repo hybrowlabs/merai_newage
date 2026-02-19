@@ -7,12 +7,14 @@ from frappe.utils import flt,cint
 def before_save_purchase_order(doc, method):
     """Populate ACR from Material Request or Supplier Quotation"""
     
-    # Method 1: From Material Request
     for item in doc.items:
         if item.material_request:
             mr = frappe.get_doc("Material Request", item.material_request)
+            doc.plant = mr.custom_plant  # Set plant at PO level from MR
+            # doc.cost_center = mr.custom_cost_center  
             if mr.custom_asset_creation_request:
                 doc.custom_asset_creation_request = mr.custom_asset_creation_request
+                
                 break
     
     # Method 2: From Supplier Quotation (if no MR)
