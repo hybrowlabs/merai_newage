@@ -2,6 +2,8 @@ frappe.ui.form.on("Supplier Quotation", {
     // This trigger will run when the form is refreshed, and it will add a custom button to view the revision history of the RFQ if the document is submitted and is the latest revision.
     refresh(frm) {
         calculate_freight(frm);
+        set_requisitioner_from_reference(frm);
+
     },
 
     custom_rate_kg: function(frm) {
@@ -130,3 +132,64 @@ function fetch_exchange_rate(frm) {
     });
 }
 
+
+
+function set_requisitioner_from_reference(frm) {
+    // already set → do nothing
+    if (frm.doc.custom_requisitioner && frm.doc.cost_center && frm.doc.plant) return;
+
+    if (!frm.doc.items || !frm.doc.items.length) return;
+
+    // 1️⃣ Try direct Material Request from PO items
+    let mr = frm.doc.items.find(d => d.material_request)?.material_request;
+
+    if (mr) {
+        fetch_mr_details(frm, mr);
+        return;
+    }
+
+    // 2️⃣ Try via Supplier Quotation
+    let sq = frm.doc.items.find(d => d.supplier_quotation)?.supplier_quotation;
+
+    if (!sq) return;
+
+    frappe.db.get_value(
+        "Supplier Quotation Item",
+        { parent: sq },
+        ["material_request"]
+    ).then(r => {
+        if (r.message?.material_request) {
+            fetch_mr_details(frm, r.message.material_request);
+        }
+    });
+}
+
+
+function fetch_mr_details(frm, mr) {
+
+    frappe.db.get_value(
+        "Material Request",
+        mr,
+        [
+            "custom_requisitioner",
+            "custom_cost_center",
+            "custom_plant" // change to custom_plant if needed
+        ]
+    ).then(r => {
+
+        if (!r.message) return;
+
+        // if (r.message.custom_requisitioner) {
+        //     frm.set_value("custom_requisitioner", r.message.custom_requisitioner);
+        // }
+
+        if (r.message.custom_cost_center) {
+            frm.set_value("cost_center", r.message.custom_cost_center);
+        }
+
+        if (r.message.custom_plant) {
+            frm.set_value("plant", r.message.custom_plant); // change if custom field
+        }
+
+    });
+}

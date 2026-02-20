@@ -8,7 +8,14 @@ frappe.ui.form.on("Material Request", {
     
     onload: function (frm) {
         set_segment_filter(frm);
-
+        frm.set_query("custom_cost_center", () => {
+            return {
+                filters: {
+                    // company: frm.doc.entinty,
+                    is_group: 0
+                }
+            };
+        });
         // frm.set_query("custom_segment_master", () => {
         //     return {
         //         filters: [

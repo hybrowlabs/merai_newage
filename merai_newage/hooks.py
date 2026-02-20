@@ -285,6 +285,9 @@ doctype_js = {
         "public/js/workflow_attachment_utils.js",
         "public/js/supplier_quotation.js",
     ],
+    "Purchase Invoice": [
+        "public/js/purchase_invoice.js",
+    ],
 }
 
 # doc_events = {
