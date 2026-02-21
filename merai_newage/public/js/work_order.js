@@ -26,8 +26,10 @@ frappe.ui.form.on("Work Order", {
                     frm.remove_custom_button("Create Job Card");
                     frm.remove_custom_button("Material Consumption");
                     frm.remove_custom_button("Create Pick List");
-                    frm.remove_custom_button("Finish");
+                    // frm.remove_custom_button("Finish");
                     frm.remove_custom_button("Start");
+                    frm.remove_custom_button("Print Work Order");
+
 
 
                 }
@@ -64,6 +66,7 @@ frappe.ui.form.on("Work Order", {
                 });
             });
         }
+        if(frm.doc.docstatus === 1) {
         frm.add_custom_button(
                     __("BRC"),
                     function () {
@@ -89,10 +92,10 @@ frappe.ui.form.on("Work Order", {
                             }
                         });
                     },
-                    __("Create")  // This adds it to the "Create" dropdown
+                    __("Make")  // This adds it to the "Create" dropdown
                 );
 
-
+            }
         setTimeout(() => {
                         var completed = true;
                         console.log("-----324------",frm.doc.operations)

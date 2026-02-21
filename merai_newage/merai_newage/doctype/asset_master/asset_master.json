@@ -11,6 +11,8 @@
   "item",
   "item_name",
   "asset_category",
+  "is_manual_asset",
+  "manual_asset_no",
   "asset_id",
   "asset_count",
   "qty",
@@ -34,6 +36,7 @@
   "asset_code",
   "company_code",
   "asset_creation_request",
+  "buying_refrence_section",
   "custom_material_request",
   "custom_mr_date",
   "custom_mr_status",
@@ -41,10 +44,16 @@
   "custom_supplier",
   "custom_po_status",
   "custom_purchase_order",
+  "column_break_tmkd",
   "custom_asset_created",
   "custom_purchase_receipt",
   "custom_asset_number",
-  "custom_pr_date"
+  "custom_pr_date",
+  "gate_entry",
+  "gate_entry_date",
+  "gate_entry_status",
+  "ordered_qty",
+  "received_qty"
  ],
  "fields": [
   {
@@ -124,12 +133,14 @@
   {
    "fieldname": "purchase_amount_approx",
    "fieldtype": "Data",
-   "label": "Purchase Amount (Approx)"
+   "label": "Purchase Amount (Approx)",
+   "read_only": 1
   },
   {
    "fieldname": "purchase_amount_actual",
    "fieldtype": "Data",
-   "label": "Purchase Amount (Actual)"
+   "label": "Purchase Amount (Actual)",
+   "read_only": 1
   },
   {
    "fieldname": "custodian",
@@ -141,24 +152,27 @@
    "fieldname": "department",
    "fieldtype": "Link",
    "label": "Department",
-   "options": "Department"
+   "options": "Department",
+   "read_only": 1
   },
   {
    "fieldname": "plant",
    "fieldtype": "Link",
    "label": "Plant",
-   "options": "Plant"
+   "options": "Plant",
+   "read_only": 1
   },
   {
    "fieldname": "employee_id",
    "fieldtype": "Data",
-   "label": "Employee ID"
+   "label": "Employee ID",
+   "read_only": 1
   },
   {
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Naming Series",
-   "options": "{company_code}.{asset_code}.#####"
+   "options": "{company_code}.{asset_code}.#####\n{manual_asset_no}"
   },
   {
    "fieldname": "asset_id",
@@ -265,13 +279,61 @@
    "fieldname": "asset_name",
    "fieldtype": "Data",
    "label": "Asset Name"
+  },
+  {
+   "depends_on": "eval:doc.docstatus==1",
+   "fieldname": "buying_refrence_section",
+   "fieldtype": "Section Break",
+   "label": "Buying Refrence"
+  },
+  {
+   "fieldname": "gate_entry",
+   "fieldtype": "Link",
+   "label": "Gate Entry",
+   "options": "Gate Entry"
+  },
+  {
+   "fieldname": "gate_entry_date",
+   "fieldtype": "Date",
+   "label": "Gate Entry Date"
+  },
+  {
+   "fieldname": "gate_entry_status",
+   "fieldtype": "Data",
+   "label": "Gate Entry Status"
+  },
+  {
+   "fieldname": "ordered_qty",
+   "fieldtype": "Data",
+   "label": "Ordered Qty"
+  },
+  {
+   "fieldname": "received_qty",
+   "fieldtype": "Data",
+   "label": "Received Qty"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_manual_asset",
+   "fieldtype": "Check",
+   "label": "Is Manual Asset"
+  },
+  {
+   "fieldname": "manual_asset_no",
+   "fieldtype": "Data",
+   "label": "Manual Asset No",
+   "mandatory_depends_on": "eval:doc.is_manual_asset==1"
+  },
+  {
+   "fieldname": "column_break_tmkd",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-21 16:16:16.704166",
+ "modified": "2026-02-09 16:29:05.793177",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Master",

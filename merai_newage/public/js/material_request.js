@@ -1,25 +1,41 @@
 
 
 frappe.ui.form.on("Material Request", {
+       custom_plant: function (frm) {
+               set_segment_filter(frm);
+
+    },
+    
     onload: function (frm) {
+        set_segment_filter(frm);
+
+        // frm.set_query("custom_segment_master", () => {
+        //     return {
+        //         filters: [
+        //             ["Contact", "custom_contact_type", "=", "Clinical Specialist"]
+        //         ]
+        //     };
+        // });
+
+
         // Set warehouse from work order - only on first load
-        if (!frm.doc.set_from_warehouse && frm.doc.work_order) {
-            frappe.call({
-                method: "merai_newage.overrides.material_request.get_warehouse_and_set_in_material_request",
-                args: {
-                    work_order_name: frm.doc.work_order,
-                    name: frm.doc.name
-                },
-                callback: function (r) {
-                    if (r.message && r.message.status === "success") {
-                        // Reload the document to show updated warehouse values
-                        frm.reload_doc();
-                    } else if (r.message && r.message.status === "already_set") {
-                        console.log("Warehouses already set:", r.message);
-                    }
-                }
-            });
-        }
+        // if (!frm.doc.set_from_warehouse && frm.doc.work_order) {
+        //     frappe.call({
+        //         method: "merai_newage.overrides.material_request.get_warehouse_and_set_in_material_request",
+        //         args: {
+        //             work_order_name: frm.doc.work_order,
+        //             name: frm.doc.name
+        //         },
+        //         callback: function (r) {
+        //             if (r.message && r.message.status === "success") {
+        //                 // Reload the document to show updated warehouse values
+        //                 frm.reload_doc();
+        //             } else if (r.message && r.message.status === "already_set") {
+        //                 console.log("Warehouses already set:", r.message);
+        //             }
+        //         }
+        //     });
+        // }
 
         // Set requisitioner - only on first load when empty
         if (!frm.doc.custom_requisitioner) {
@@ -267,4 +283,29 @@ function show_acr_quantity_status(frm) {
             }
         }
     });
+}
+
+function set_segment_filter(frm) {
+    frm.set_query("custom_segment_master", function() {
+        console.log("Setting query for custom_segment_master with plant:", frm.doc.custom_plant);
+        
+        if (!frm.doc.custom_plant) {
+            // If no plant selected, return empty result
+            return {
+                filters: {
+                    "name": ["=", ""]  // This ensures nothing shows up
+                }
+            };
+        }
+
+        return {
+            query: "merai_newage.overrides.material_request.get_segments_from_plant",
+            filters: {
+                custom_plant: frm.doc.custom_plant
+            }
+        };
+    });
+    
+    // Refresh the field to apply the filter
+    frm.refresh_field("custom_segment_master");
 }
