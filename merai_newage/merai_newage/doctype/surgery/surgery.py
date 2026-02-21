@@ -49,19 +49,55 @@ from datetime import datetime
 import frappe, json
 from datetime import datetime, timedelta
 
+# @frappe.whitelist()
+# def total_minutes_for_surgery(doc):
+#     data = frappe._dict(json.loads(doc))
+
+#     start = datetime.strptime(data.robot_surgery_start_time, "%H:%M:%S")
+#     end = datetime.strptime(data.robot_surgery_end_time, "%H:%M:%S")
+
+#     start_dt = datetime.combine(datetime.today(), start.time())
+#     end_dt = datetime.combine(datetime.today(), end.time())
+
+#     if end_dt < start_dt:
+#         end_dt += timedelta(days=1)
+
+#     diff_minutes = (end_dt - start_dt).total_seconds() / 60
+
+#     return round(diff_minutes)
+
 @frappe.whitelist()
 def total_minutes_for_surgery(doc):
     data = frappe._dict(json.loads(doc))
 
-    start = datetime.strptime(data.robot_surgery_start_time, "%H:%M:%S")
-    end = datetime.strptime(data.robot_surgery_end_time, "%H:%M:%S")
+    def calculate_diff(start_time, end_time):
+        if not start_time or not end_time:
+            return 0
 
-    start_dt = datetime.combine(datetime.today(), start.time())
-    end_dt = datetime.combine(datetime.today(), end.time())
+        start = datetime.strptime(start_time, "%H:%M:%S")
+        end = datetime.strptime(end_time, "%H:%M:%S")
 
-    if end_dt < start_dt:
-        end_dt += timedelta(days=1)
+        start_seconds = start.hour * 3600 + start.minute * 60 + start.second
+        end_seconds = end.hour * 3600 + end.minute * 60 + end.second
 
-    diff_minutes = (end_dt - start_dt).total_seconds() / 60
+        # Handle overnight case
+        if end_seconds < start_seconds:
+            end_seconds += 24 * 3600
+
+        return (end_seconds - start_seconds) / 60
+
+    diff_minutes = 0
+
+    # First surgery duration
+    diff_minutes += calculate_diff(
+        data.robot_surgery_start_time,
+        data.robot_surgery_end_time
+    )
+
+    # Second surgery duration (for bilateral)
+    diff_minutes += calculate_diff(
+        data.robot_surgery_start_time_2,
+        data.robot_surgery_end_time_2
+    )
 
     return round(diff_minutes)

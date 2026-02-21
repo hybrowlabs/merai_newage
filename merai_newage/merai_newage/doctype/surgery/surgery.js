@@ -65,7 +65,21 @@ frappe.ui.form.on("Surgery", {
                     }
                 }
             });
-        }
+        },
+        robot_surgery_end_time_2:function(frm){
+            frappe.call({
+                method: "merai_newage.merai_newage.doctype.surgery.surgery.total_minutes_for_surgery",
+                args: {
+                    doc: JSON.stringify(frm.doc)
+                },
+                callback: function (r) {
+                    if (r.message) {
+
+                        frm.set_value("overal_robotic_surgery_time_minutes", r.message);
+                    }
+                }
+            });
+        }        
 ,robot_serial_no: function (frm) {
     if (!frm.doc.robot_serial_no) {
         frm.set_value("installed_robot", "");

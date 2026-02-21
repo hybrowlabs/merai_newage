@@ -183,7 +183,7 @@
   {
    "depends_on": "eval:doc.surgery_type==\"Bilateral\"",
    "fieldname": "robot_surgery_end_time_2",
-   "fieldtype": "Data",
+   "fieldtype": "Time",
    "label": "Robot Surgery End Time 2"
   },
   {
@@ -198,7 +198,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-12 16:55:28.495258",
+ "modified": "2026-02-20 17:22:41.045437",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Surgery",

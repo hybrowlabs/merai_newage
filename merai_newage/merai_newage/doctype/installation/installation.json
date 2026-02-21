@@ -13,6 +13,7 @@
   "installation_status",
   "assign_installation",
   "work_order",
+  "batch_number",
   "column_break_jygi",
   "date",
   "timing",
@@ -216,13 +217,20 @@
    "fieldtype": "Table",
    "label": "Hardware Or Software Replacement Tracking Log",
    "options": "Hardware Or Software Replacement Tracking Log"
+  },
+  {
+   "fetch_from": "work_order.custom_batch_number",
+   "fieldname": "batch_number",
+   "fieldtype": "Data",
+   "label": "Batch Number",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-12-22 10:48:23.129380",
+ "modified": "2026-02-20 17:03:56.244314",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Installation",
