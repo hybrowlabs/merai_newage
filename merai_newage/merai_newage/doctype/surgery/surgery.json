@@ -114,12 +114,12 @@
   },
   {
    "fieldname": "feedbackremarks",
-   "fieldtype": "Data",
+   "fieldtype": "Long Text",
    "label": "Remarks"
   },
   {
    "fieldname": "any_robotic_issues_if_yeselaboarte",
-   "fieldtype": "Data",
+   "fieldtype": "Long Text",
    "label": "Any Robotic Issues ? If Yes,Elaboarte"
   },
   {
@@ -198,7 +198,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-20 17:22:41.045437",
+ "modified": "2026-02-23 10:10:55.915770",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Surgery",
