@@ -272,6 +272,8 @@ doctype_js = {
     "Material Request": "public/js/material_request.js",
     "Pre Alert": "public/js/pre_alert.js",
     "Purchase Order": "public/js/purchase_order.js",
+    "Purchase Receipt": "public/js/purchase_receipt.js",
+
     "Pickup Request": [
         "public/js/workflow_attachment_utils.js",
         "public/js/pickup_request.js",
@@ -351,9 +353,12 @@ doc_events = {
     },
     "Purchase Receipt": {
         "before_save": "merai_newage.overrides.purchase_receipt.before_save_purchase_receipt",
+        "before_validate": "merai_newage.overrides.purchase_receipt.before_validate_purchase_receipt",
         "validate": "merai_newage.overrides.purchase_receipt.validate_purchase_receipt",
         "on_submit": "merai_newage.overrides.purchase_receipt.on_submit_purchase_receipt",
         "on_cancel": "merai_newage.overrides.purchase_receipt.on_cancel_purchase_receipt",
+        "before_submit": "merai_newage.overrides.purchase_receipt.before_submit"
+
     },
     "Gate Entry": {
         "before_save": "merai_newage.overrides.gate_entry_override.before_save_gate_entry",
@@ -364,6 +369,9 @@ doc_events = {
     "Purchase Invoice": {
         "before_save": "merai_newage.overrides.purchase_invoice.before_save_purchase_invoice",
         "on_submit": "merai_newage.overrides.purchase_invoice.on_submit_purchase_invoice",
+    },
+     "Communication": {
+        "on_update": "purchase_booking.purchase_booking_request.doctype.mail_approval.mail_approval.create_mail_approval_from_email"
     }
     
 }

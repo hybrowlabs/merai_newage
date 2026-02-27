@@ -329,44 +329,6 @@ function fetch_material_received_qty(frm) {
     });
 }
 
-// function generate_ar_no(frm) {
-//     if (
-//         frm.doc.reference_type === "Purchase Receipt" &&
-//         frm.doc.reference_name &&
-//         frm.doc.item_code
-//     ) {
-//         frappe.call({
-//             method: "merai_newage.overrides.quality_inspection.generate_ar_no",
-//             args: {
-//                 reference_name: frm.doc.reference_name,
-//                 item_code: frm.doc.item_code,
-//                 qi_docname: frm.doc.name
-//             },
-//             callback: function (r) {
-//                 if (r.message && Array.isArray(r.message)) {
-
-//                     frm.clear_table("custom_analytic_no_details");
-
-//                     r.message.forEach(function (ar_no) {
-//                         let row = frm.add_child("custom_analytic_no_details");
-//                         row.ar_no = ar_no;
-//                     });
-
-//                     frm.refresh_field("custom_analytic_no_details");
-
-//                     frappe.msgprint({
-//                         title: "AR Numbers Generated",
-//                         message: `${r.message.length} AR Numbers added`,
-//                         indicator: "green"
-//                     });
-//                 }
-//             }
-//         });
-//     }
-// }
-
-
-
 function generate_ar_no(frm) {
     if (
         frm.doc.reference_type !== "Purchase Receipt" ||
@@ -380,31 +342,23 @@ function generate_ar_no(frm) {
     frappe.call({
         method: "merai_newage.overrides.quality_inspection.generate_ar_no",
         freeze: true,
-        freeze_message: __("Generating AR Numbers..."),
+        freeze_message: __("Generating AR Numbers... Please wait, this may take a moment."),
         args: {
             reference_name: frm.doc.reference_name,
             item_code: frm.doc.item_code,
             qi_docname: frm.doc.name
         },
         callback: function (r) {
-            if (!r.message || !Array.isArray(r.message)) return;
+            if (!r.message) return;
 
-            // 🚀 FAST WAY: replace entire child table at once
-            let rows = r.message.map(ar_no => ({
-                ar_no: ar_no
-            }));
-
-            frm.doc.custom_serial_no_details = rows;
-            frm.refresh_field("custom_serial_no_details");
-
-            // Save AFTER bulk update
-            frm.save().then(() => {
-                frappe.msgprint({
-                    title: "Success",
-                    message: `${rows.length} AR Numbers generated`,
-                    indicator: "green"
-                });
+            frappe.msgprint({
+                title: "Success",
+                message: r.message.message,
+                indicator: "green"
             });
+
+            // Reload form from server to show updated child table
+            frm.reload_doc();
         }
     });
 }

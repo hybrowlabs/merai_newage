@@ -73,7 +73,10 @@ def validate_purchase_order(doc, method):
 
 def on_submit_purchase_order(doc, method):
     """Update Asset Masters with PO details"""
-    
+    is_mail_required = frappe.db.get_single_value("Purchase And Selling Settings", "mail_to_supplier_for_invoice")
+    print("is_mail_required========",is_mail_required)
+    if is_mail_required:
+        send_invoice_form_to_supplier(doc)
     if doc.custom_asset_creation_request:
         # Get ACR item to match
         acr = frappe.get_doc("Asset Creation Request", doc.custom_asset_creation_request)
@@ -114,3 +117,142 @@ def on_cancel_purchase_order(doc, method):
         """, doc.name)
         
         frappe.db.commit()
+
+
+import frappe
+from frappe.utils import get_url
+
+
+def get_supplier_email(supplier_name):
+    """
+    Try multiple sources to get supplier email:
+    1. Primary Contact linked to supplier
+    2. Address email (like your screenshot shows)
+    3. Contact email_ids child table
+    """
+    
+    # Method 1: From Contact linked via Dynamic Link
+    contact_email = frappe.db.sql("""
+        SELECT cei.email_id 
+        FROM `tabContact` c
+        JOIN `tabDynamic Link` dl ON dl.parent = c.name
+        JOIN `tabContact Email` cei ON cei.parent = c.name
+        WHERE dl.link_doctype = 'Supplier' 
+          AND dl.link_name = %s
+          AND cei.email_id IS NOT NULL
+          AND c.status != 'Passive'
+        ORDER BY cei.is_primary DESC
+        LIMIT 1
+    """, supplier_name, as_dict=True)
+    
+    if contact_email:
+        return contact_email[0].email_id
+    
+    # Method 2: From Address linked to supplier (your case - email in address)
+    address_email = frappe.db.sql("""
+        SELECT a.email_id
+        FROM `tabAddress` a
+        JOIN `tabDynamic Link` dl ON dl.parent = a.name
+        WHERE dl.link_doctype = 'Supplier'
+          AND dl.link_name = %s
+          AND a.email_id IS NOT NULL
+        ORDER BY a.is_primary_address DESC
+        LIMIT 1
+    """, supplier_name, as_dict=True)
+    
+    if address_email:
+        return address_email[0].email_id
+    
+    # Method 3: From tabSupplier direct email fields (custom fields)
+    supplier_doc = frappe.get_doc("Supplier", supplier_name)
+    for field in ["email", "email_id", "contact_email", "supplier_email"]:
+        val = supplier_doc.get(field)
+        if val:
+            return val
+    
+    return None
+
+
+def send_invoice_form_to_supplier(po):
+    
+    supplier_email = get_supplier_email(po.supplier)
+    
+    frappe.logger().info(f"Supplier email for {po.supplier}: {supplier_email}")
+    
+    if not supplier_email:
+        frappe.log_error(
+            f"No email found for supplier {po.supplier} on PO {po.name}",
+            "Supplier Invoice Form Email"
+        )
+        frappe.msgprint(
+            f"⚠️ Could not send invoice form: No email found for supplier {po.supplier_name}. "
+            f"Please add an email in the supplier's Contact or Address.",
+            alert=True,
+            indicator="orange"
+        )
+        return
+
+    # Build pre-filled web form URL
+    base_url = get_url("/supplier-invoice-form/new")
+    params = (
+        f"?po_number={po.name}"
+        f"&vendor_id={po.supplier}"
+        f"&vendor_name={po.supplier_name}"
+    )
+    form_url = base_url + params
+
+    subject = f"Action Required: Upload Invoice for PO {po.name}"
+
+    message = f"""
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:24px;
+                border:1px solid #e0e0e0;border-radius:8px;">
+        <h2 style="color:#333;">Invoice Submission Required</h2>
+        <p>Dear <strong>{po.supplier_name}</strong>,</p>
+        <p>Your Purchase Order <strong>{po.name}</strong> has been approved. 
+        Please upload your invoice using the link below.</p>
+        <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+            <tr style="background:#f5f5f5;">
+                <td style="padding:8px 12px;font-weight:bold;border:1px solid #ddd;">PO Number</td>
+                <td style="padding:8px 12px;border:1px solid #ddd;">{po.name}</td>
+            </tr>
+            <tr>
+                <td style="padding:8px 12px;font-weight:bold;border:1px solid #ddd;">PO Date</td>
+                <td style="padding:8px 12px;border:1px solid #ddd;">{po.transaction_date}</td>
+            </tr>
+            <tr style="background:#f5f5f5;">
+                <td style="padding:8px 12px;font-weight:bold;border:1px solid #ddd;">Amount</td>
+                <td style="padding:8px 12px;border:1px solid #ddd;">{po.grand_total} {po.currency}</td>
+            </tr>
+            <tr>
+                <td style="padding:8px 12px;font-weight:bold;border:1px solid #ddd;">Supplier</td>
+                <td style="padding:8px 12px;border:1px solid #ddd;">{po.supplier_name}</td>
+            </tr>
+        </table>
+        <p style="text-align:center;margin:28px 0;">
+            <a href="{form_url}" 
+               style="background:#1a73e8;color:white;padding:14px 32px;
+                      text-decoration:none;border-radius:6px;font-size:16px;
+                      font-weight:bold;display:inline-block;">
+                📎 Upload Invoice Now
+            </a>
+        </p>
+        <p style="color:#666;font-size:13px;">
+            The form is pre-filled with your PO details. 
+            Simply attach your invoice PDF and click Save.
+        </p>
+    </div>
+    """
+
+    frappe.sendmail(
+        recipients=[supplier_email],
+        subject=subject,
+        message=message,
+        reference_doctype="Purchase Order",
+        reference_name=po.name
+    )
+
+    frappe.msgprint(
+        f"✅ Invoice form link sent to {supplier_email}",
+        alert=True,
+        indicator="green"
+    )
