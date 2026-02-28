@@ -370,9 +370,9 @@ doc_events = {
         "before_save": "merai_newage.overrides.purchase_invoice.before_save_purchase_invoice",
         "on_submit": "merai_newage.overrides.purchase_invoice.on_submit_purchase_invoice",
     },
-     "Communication": {
-        "on_update": "purchase_booking.purchase_booking_request.doctype.mail_approval.mail_approval.create_mail_approval_from_email"
-    }
+    #  "Communication": {
+    #     "on_update": "purchase_booking.purchase_booking_request.doctype.mail_approval.mail_approval.create_mail_approval_from_email"
+    # }
     
 }
 # In your custom app's hooks.py
