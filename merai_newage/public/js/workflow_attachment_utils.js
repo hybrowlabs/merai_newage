@@ -1,5 +1,3 @@
-console.log("🔥 workflow_attachment_utils.js loaded");
-
 window.merai = window.merai || {};
 
 merai.sync_workflow_attachment_table = function (frm) {
