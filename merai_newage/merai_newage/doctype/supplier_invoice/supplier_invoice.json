@@ -45,12 +45,11 @@
   "abbr",
   "remark",
   "mail_approval_reference",
-  "section_break_glzs",
-  "po_items",
-  "section_break_owl4",
   "column_break_6aj2",
   "preview_html",
   "column_break_83dz",
+  "section_break_glzs",
+  "po_items",
   "file_preview_tab",
   "custom_file_preview",
   "naming_series"
@@ -220,7 +219,7 @@
   },
   {
    "fieldname": "invoice_date",
-   "fieldtype": "Data",
+   "fieldtype": "Date",
    "label": "Invoice Date"
   },
   {
@@ -310,17 +309,13 @@
    "fieldtype": "Table",
    "label": "PO Items",
    "options": "PO Items"
-  },
-  {
-   "fieldname": "section_break_owl4",
-   "fieldtype": "Section Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-27 17:25:29.826162",
+ "modified": "2026-03-02 13:13:32.006006",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Supplier Invoice",

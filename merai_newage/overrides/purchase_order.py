@@ -119,8 +119,9 @@ def on_cancel_purchase_order(doc, method):
         frappe.db.commit()
 
 
-import frappe
+import frappe , json
 from frappe.utils import get_url
+import hashlib
 
 
 def get_supplier_email(supplier_name):
@@ -191,7 +192,11 @@ def send_invoice_form_to_supplier(po):
             indicator="orange"
         )
         return
-
+    po_items = frappe.get_all(
+        "Purchase Order Item",
+        filters={"parent": po.name},
+        fields=["item_code", "item_name", "description", "qty", "uom", "name"]
+    )
     # Build pre-filled web form URL
     base_url = get_url("/supplier-invoice-form/new")
     params = (
@@ -256,3 +261,22 @@ def send_invoice_form_to_supplier(po):
         alert=True,
         indicator="green"
     )
+
+
+@frappe.whitelist(allow_guest=True)  # allow_guest since supplier is not logged in
+def get_po_items(po_number):
+    """Fetch PO items for the supplier invoice form"""
+    if not po_number:
+        return []
+    
+    # Verify PO exists and is submitted
+    if not frappe.db.exists("Purchase Order", po_number):
+        frappe.throw("Invalid PO Number")
+    
+    items = frappe.get_all(
+        "Purchase Order Item",
+        filters={"parent": po_number},
+        fields=["name", "item_code", "item_name", "description", "qty", "uom","rate","amount"],
+        order_by="idx asc"
+    )
+    return items

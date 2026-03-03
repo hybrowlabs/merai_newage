@@ -18,7 +18,7 @@
  "list_columns": [],
  "login_required": 0,
  "max_attachment_size": 50,
- "modified": "2026-02-27 17:27:26.347116",
+ "modified": "2026-03-02 12:24:49.678799",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "supplier-invoice-form",
@@ -54,7 +54,7 @@
    "max_value": 0,
    "options": "Purchase Order",
    "precision": "",
-   "read_only": 0,
+   "read_only": 1,
    "reqd": 0,
    "show_in_filter": 0
   },
@@ -68,7 +68,7 @@
    "max_value": 0,
    "options": "Supplier",
    "precision": "",
-   "read_only": 0,
+   "read_only": 1,
    "reqd": 0,
    "show_in_filter": 0
   },
@@ -81,7 +81,7 @@
    "max_length": 0,
    "max_value": 0,
    "precision": "",
-   "read_only": 0,
+   "read_only": 1,
    "reqd": 0,
    "show_in_filter": 0
   },

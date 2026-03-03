@@ -1,0 +1,82 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-03-02 12:14:40.435885",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_vsvo",
+  "query",
+  "raised_by",
+  "assigned_to",
+  "status",
+  "resolved_on",
+  "raised_on",
+  "related_field"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_vsvo",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "query",
+   "fieldtype": "Small Text",
+   "in_list_view": 1,
+   "label": "Query"
+  },
+  {
+   "fieldname": "raised_by",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Raised by",
+   "options": "User"
+  },
+  {
+   "fieldname": "assigned_to",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Assigned To",
+   "options": "User"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "\nOpen\nClosed"
+  },
+  {
+   "fieldname": "resolved_on",
+   "fieldtype": "Datetime",
+   "label": "Resolved On"
+  },
+  {
+   "fieldname": "raised_on",
+   "fieldtype": "Datetime",
+   "label": "Raised On"
+  },
+  {
+   "fieldname": "related_field",
+   "fieldtype": "Select",
+   "label": "Related Field",
+   "options": "\nSupplier Invoice No.\nSupplier Invoice Date\nCost Center\nPlant\nDue Date\nItems"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-03-02 14:48:25.050179",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Purchase Invoice Query",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
