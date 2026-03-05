@@ -1,0 +1,130 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:analytical_no",
+ "creation": "2026-02-12 14:11:28.588456",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_haj8",
+  "analytical_no",
+  "item_code",
+  "item_group",
+  "purchase_receipt",
+  "creation_from",
+  "creation_from_no",
+  "company",
+  "enabled",
+  "quality_insepction",
+  "item_month_counter",
+  "qty_sequence",
+  "posting_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_haj8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "analytical_no",
+   "fieldtype": "Data",
+   "label": "Analytical No",
+   "unique": 1
+  },
+  {
+   "fieldname": "item_code",
+   "fieldtype": "Link",
+   "label": "Item Code",
+   "options": "Item"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "creation_from",
+   "fieldtype": "Link",
+   "label": "Creation From",
+   "options": "DocType"
+  },
+  {
+   "fieldname": "creation_from_no",
+   "fieldtype": "Dynamic Link",
+   "label": "Creation From No",
+   "options": "creation_from"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "default": "0",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "quality_insepction",
+   "fieldtype": "Link",
+   "label": "Quality Insepction",
+   "options": "Quality Inspection"
+  },
+  {
+   "fieldname": "item_month_counter",
+   "fieldtype": "Int",
+   "label": "Item Counter / Month",
+   "read_only": 1
+  },
+  {
+   "fieldname": "qty_sequence",
+   "fieldtype": "Int",
+   "label": "Qty Sequence",
+   "read_only": 1
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "purchase_receipt",
+   "fieldtype": "Link",
+   "label": "Purchase Receipt",
+   "options": "Purchase Receipt"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-02-12 16:18:14.877429",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Analytic Number",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

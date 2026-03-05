@@ -1,5 +1,6 @@
 import frappe
-from frappe.utils import add_days, today
+import requests
+from frappe.utils import add_days, today, flt
 
 
 def cleanup_temporary_suppliers():
@@ -51,3 +52,41 @@ def cleanup_temporary_suppliers():
                     frappe.get_traceback(),
                     f"Failed deleting supplier {supplier}"
                 )
+
+
+@frappe.whitelist()
+def get_exchange_rate(from_currency=None, to_currency=None):
+
+    if not from_currency or not to_currency:
+        frappe.throw("Both From Currency and To Currency are required.")
+
+    if from_currency == to_currency:
+        return 1
+
+    api_key = frappe.conf.get("exchange_api_key")
+    if not api_key:
+        frappe.throw("Exchange API Key not configured in site_config.json")
+
+    url = f"https://v6.exchangerate-api.com/v6/{api_key}/pair/{from_currency}/{to_currency}"
+
+    try:
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+
+        data = response.json()
+
+        if data.get("result") == "success":
+            return flt(data.get("conversion_rate"))
+
+        frappe.log_error(
+            message=frappe.as_json(data),
+            title="Exchange API Response Error"
+        )
+        return 0
+
+    except requests.exceptions.RequestException as e:
+        frappe.log_error(
+            message=str(e),
+            title="Exchange Rate API Request Error"
+        )
+        return 0
