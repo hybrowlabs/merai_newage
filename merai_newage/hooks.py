@@ -276,15 +276,18 @@ doctype_js = {
 
     "Pickup Request": [
         "public/js/workflow_attachment_utils.js",
+        "public/js/workflow_attachment.js",
         "public/js/pickup_request.js",
         "public/js/dimension_calculation.js",
     ],
     "Request for Quotation": [
         "public/js/workflow_attachment_utils.js",
+        "public/js/workflow_attachment.js",
         "public/js/request_for_quotation.js",
     ],
     "Supplier Quotation": [
         "public/js/workflow_attachment_utils.js",
+        "public/js/workflow_attachment.js",
         "public/js/supplier_quotation.js",
     ],
     "Purchase Invoice": [
@@ -400,5 +403,3 @@ override_doctype_class = {
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
 }
 # app_include_css = ["merai_newage.public.css.safety_check_custom.css"]
-
-app_include_js = "/assets/merai_newage/js/workflow_attachment.js"
