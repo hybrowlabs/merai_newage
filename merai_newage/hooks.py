@@ -270,10 +270,8 @@ doctype_js = {
     "Stock Entry": "public/js/stock_entry.js",
     "Employee": "public/js/employee.js",
     "Material Request": "public/js/material_request.js",
-    "Pre Alert": "public/js/pre_alert.js",
     "Purchase Order": "public/js/purchase_order.js",
     "Purchase Receipt": "public/js/purchase_receipt.js",
-
     "Pickup Request": [
         "public/js/workflow_attachment_utils.js",
         "public/js/workflow_attachment.js",
@@ -289,6 +287,26 @@ doctype_js = {
         "public/js/workflow_attachment_utils.js",
         "public/js/workflow_attachment.js",
         "public/js/supplier_quotation.js",
+    ],
+    "Pre Alert": [
+        "public/js/workflow_attachment_utils.js",
+        "public/js/workflow_attachment.js",
+        "public/js/pre_alert.js",
+    ],
+    "Pre-Alert Check List":[
+        "public/js/workflow_attachment_utils.js",
+        "public/js/workflow_attachment.js",
+        "public/js/pre_alert_check_list.js",
+    ],
+    "BOE Entry": [
+        "public/js/workflow_attachment_utils.js",
+        "public/js/workflow_attachment.js",
+        "public/js/boe_entry.js",
+    ],
+    "E-way Bill": [
+        "public/js/workflow_attachment_utils.js",
+        "public/js/workflow_attachment.js",
+        "public/js/e_way_bill.js",
     ],
     "Purchase Invoice": [
         "public/js/purchase_invoice.js",
