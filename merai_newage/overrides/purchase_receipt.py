@@ -1160,3 +1160,29 @@ def validate_qi(doc, method=None):
                 qi_list[0].name,
                 update_modified=False
             )
+
+
+import frappe
+
+@frappe.whitelist()
+def get_po_details_from_gate_entry(gate_entry):
+
+    gate_doc = frappe.get_doc("Gate Entry", gate_entry)
+
+    if not gate_doc.purchase_order_in_gate_entry:
+        return {}
+
+    # first row of child table
+    first_row = gate_doc.purchase_order_in_gate_entry[0]
+
+    purchase_order = first_row.purchase_order
+
+    if not purchase_order:
+        return {}
+
+    po = frappe.get_doc("Purchase Order", purchase_order)
+
+    return {
+        "cost_center": po.cost_center,
+        "plant": po.plant
+    }
