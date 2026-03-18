@@ -15,10 +15,10 @@ def refresh_ocr_token():
 		login_url = "http://10.10.3.205:5001/login"
 
 		# Get credentials from site_config (works for both local and Frappe Cloud)
-		email = frappe.get_site_config().get("ocr_login_email")
-		password = frappe.get_site_config().get("ocr_login_password")
-		# email ="pranav@mail.hybrowlabs.com"
-		# password = "Pranav@99"
+		#email = frappe.get_site_config().get("ocr_login_email")
+		#password = frappe.get_site_config().get("ocr_login_password")
+		email ="pranav@mail.hybrowlabs.com"
+		password = "Pranav@99"
 
 		if not email or not password:
 			error_msg = "OCR login credentials not configured in site_config. Please add ocr_login_email and ocr_login_password"
@@ -98,6 +98,7 @@ def get_document_data(docname):
 
 @frappe.whitelist(allow_guest=True)
 def send_file_to_external_api(docname):
+	
 	"""
 	Sends uploaded file to external OCR API and updates the Supplier Invoice.
 	"""
@@ -605,3 +606,5 @@ def process_bulk_ocr(docnames, user, log_name=None):
 
 	# Log the results
 	frappe.logger().info(f"Bulk OCR completed: {len(results['success'])} success, {len(results['failed'])} failed")
+
+	
