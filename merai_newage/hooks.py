@@ -328,6 +328,9 @@ doc_events = {
         # "on_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
         # "on_update_after_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
     },
+
+
+
     "Job Card": {
         "before_submit": "merai_newage.overrides.job_card.before_submit",
         "on_submit": "merai_newage.overrides.job_card.on_submit",
@@ -395,8 +398,11 @@ doc_events = {
     #  "Communication": {
     #     "on_update": "purchase_booking.purchase_booking_request.doctype.mail_approval.mail_approval.create_mail_approval_from_email"
     # }
+
     
 }
+    
+
 # In your custom app's hooks.py
 
 fixtures = [
@@ -421,3 +427,4 @@ override_doctype_class = {
     # "Work Order":"merai_newage.overrides.work_order.CustomWorkOrder"
 }
 # app_include_css = ["merai_newage.public.css.safety_check_custom.css"]
+

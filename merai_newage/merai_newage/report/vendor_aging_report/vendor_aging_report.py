@@ -25,6 +25,8 @@ def get_columns():
 	return [
 		{"label": _("Vendor"),           "fieldname": "vendor",           "fieldtype": "Link",     "options": "Supplier", "width": 100},
 		{"label": _("Vendor Name"),      "fieldname": "vendor_name",      "fieldtype": "Data",     "width": 200},
+		{"label": _("Is MSME Registered"),      "fieldname": "is_msme",      "fieldtype": "Check",     "width": 200},
+
 		{"label": _("City"),             "fieldname": "city",             "fieldtype": "Data",     "width": 100},
 		{"label": _("State"),            "fieldname": "state",            "fieldtype": "Data",     "width": 120},
 		{"label": _("Country"),          "fieldname": "country",          "fieldtype": "Data",     "width": 60},
@@ -93,6 +95,7 @@ def get_data(filters):
 			pi.name                   AS document_number,
 			pi.supplier               AS vendor,
 			pi.supplier_name          AS vendor_name,
+			pi.custom_is_msme	      AS is_msme,
 			pi.bill_no                AS invoice_no,
 			pi.bill_date              AS document_date,
 			pi.posting_date,

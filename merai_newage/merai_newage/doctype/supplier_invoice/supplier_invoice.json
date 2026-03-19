@@ -10,6 +10,7 @@
   "amended_from",
   "company",
   "year",
+  "invoice_type",
   "upload_file",
   "is_priority",
   "expense_type",
@@ -25,6 +26,7 @@
   "service_entry_user",
   "service_entry",
   "cost_center",
+  "plant",
   "vendor_details_section",
   "vendor_id",
   "vendor_name",
@@ -50,6 +52,7 @@
   "column_break_83dz",
   "section_break_glzs",
   "po_items",
+  "non_po_items",
   "file_preview_tab",
   "custom_file_preview",
   "naming_series"
@@ -120,6 +123,7 @@
    "label": "Category"
   },
   {
+   "depends_on": "eval:doc.invoice_type==\"PO\"",
    "fetch_from": "po_number.custom_requisitioner",
    "fieldname": "po_user",
    "fieldtype": "Link",
@@ -127,6 +131,7 @@
    "options": "Employee"
   },
   {
+   "depends_on": "eval:doc.invoice_type==\"PO\"",
    "fieldname": "po_number",
    "fieldtype": "Link",
    "label": "PO Number",
@@ -155,10 +160,12 @@
    "label": "Service Entry"
   },
   {
-   "fetch_from": "po_number.cost_center",
    "fieldname": "cost_center",
-   "fieldtype": "Data",
-   "label": "Cost Center"
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "mandatory_depends_on": "eval:doc.invoice_type==\"Non PO\"",
+   "options": "Cost Center",
+   "read_only_depends_on": "eval:doc.invoice_type==\"PO\""
   },
   {
    "fieldname": "vendor_details_section",
@@ -305,21 +312,42 @@
    "fieldtype": "Section Break"
   },
   {
+   "depends_on": "eval:doc.invoice_type==\"PO\"",
    "fieldname": "po_items",
    "fieldtype": "Table",
    "label": "PO Items",
    "options": "PO Items"
+  },
+  {
+   "fieldname": "invoice_type",
+   "fieldtype": "Select",
+   "label": "Invoice Type",
+   "options": "\nPO\nNon PO"
+  },
+  {
+   "depends_on": "eval:doc.invoice_type==\"Non PO\"",
+   "fieldname": "non_po_items",
+   "fieldtype": "Table",
+   "label": "Non PO Items",
+   "options": "Non PO Items"
+  },
+  {
+   "fieldname": "plant",
+   "fieldtype": "Link",
+   "label": "Plant",
+   "mandatory_depends_on": "eval:doc.invoice_type==\"Non PO\"",
+   "options": "Plant",
+   "read_only_depends_on": "eval:doc.invoice_type==\"PO\""
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-02 13:13:32.006006",
- "modified_by": "Administrator",
+ "modified": "2026-03-17 18:24:30.924497",
+ "modified_by": "prajakta@123gmail.com",
  "module": "Merai Newage",
  "name": "Supplier Invoice",
- "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
