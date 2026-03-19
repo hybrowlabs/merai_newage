@@ -214,8 +214,6 @@ def get_exchange_rate(from_currency=None, to_currency=None):
 #     return pi.as_dict()
 #     #return pi.name
 
-import frappe
-from frappe.utils import today
 
 @frappe.whitelist()
 def create_purchase_invoice(source_name):
@@ -223,36 +221,56 @@ def create_purchase_invoice(source_name):
 
     if not source.invoice_no:
         frappe.throw("Supplier Invoice No is required")
-
     if not source.invoice_date:
         frappe.throw("Invoice Date is required")
-
     if not source.non_po_items:
         frappe.throw("No items found in Non PO Items")
 
-    items = []
+    company = getattr(source, "company", None) or frappe.defaults.get_user_default("Company")
+
+    pi = frappe.new_doc("Purchase Invoice")
+    pi.supplier = source.vendor_id
+    pi.bill_no = source.invoice_no
+    pi.bill_date = source.invoice_date
+    pi.posting_date = today()
+    pi.company = company
+    pi.cost_center = source.cost_center
+    if hasattr(source, "plant"):
+        pi.plant = source.plant
+
     for row in source.non_po_items:
         stock_uom = frappe.db.get_value("Item", row.item, "stock_uom") or row.uom
+        item_name = frappe.db.get_value("Item", row.item, "item_name") or row.item
+        expense_account = frappe.db.get_value(
+            "Item Default",
+            {"parent": row.item, "company": company},
+            "expense_account"
+        )
+        default_warehouse = frappe.db.get_value(
+            "Item Default",
+            {"parent": row.item, "company": company},
+            "default_warehouse"
+        )
 
-        items.append({
+        pi.append("items", {
             "item_code": row.item,
-            "description": row.item,
-            "qty": row.required_qty or 1,
-            "uom": stock_uom,  
-            "rate": row.rate,
-            "amount": row.amount,
-            "cost_center": source.cost_center
+            "item_name": item_name,
+            "description": item_name,
+            "qty": flt(row.required_qty) or 1,
+            "uom": stock_uom,
+            "stock_uom": stock_uom,
+            "conversion_factor": 1,
+            "rate": flt(row.rate),
+            "amount": flt(row.required_qty) * flt(row.rate),
+            "base_rate": flt(row.rate),
+            "base_amount": flt(row.required_qty) * flt(row.rate),
+            "expense_account": expense_account,
+            "warehouse": default_warehouse,
+            "cost_center": source.cost_center,
         })
 
-    return {
-        "supplier": source.vendor_id,
-        "bill_no": source.invoice_no,
-        "bill_date": source.invoice_date,
-        "cost_center": source.cost_center,
-        "plant": source.plant,
-        "posting_date": today(),
-        "company": source.company if hasattr(source, "company") else frappe.defaults.get_user_default("Company"),
-        "items": items
-    }
-    
+    pi.set_missing_values()          # fills all mandatory fields like expense_account, taxes
+    pi.calculate_taxes_and_totals()  # calculates amounts, base amounts
 
+    # return as dict — NOT saved to DB
+    return pi.as_dict()

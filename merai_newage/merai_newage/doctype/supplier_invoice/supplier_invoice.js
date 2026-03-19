@@ -155,27 +155,25 @@ frappe.ui.form.on("Supplier Invoice", {
             });
         }
 
-        if (frm.doc.docstatus === 1) {
-            frm.add_custom_button(' Purchase Invoice', function() {
-            frappe.call({
-                method: 'merai_newage.merai_newage.api.create_purchase_invoice',
-                args: { source_name: frm.doc.name },
-                callback: function(r) {
-                    if (r.message) {
-                    var doc = r.message;
-                
-                    frappe.model.with_doctype('Purchase Invoice', function() {
-                        var new_doc = frappe.model.get_new_doc('Purchase Invoice');
-                        $.extend(new_doc, doc);
-                        new_doc.items = doc.items || [];
-                        frappe.set_route('Form', 'Purchase Invoice', new_doc.name);
-                    });
+   if (frm.doc.docstatus === 1) {
+    frm.add_custom_button('Purchase Invoice', function () {
+        frappe.call({
+            method: 'merai_newage.merai_newage.api.create_purchase_invoice',
+            args: { source_name: frm.doc.name },
+            callback: function (r) {
+                if (r.message) {
+                    let doc = r.message;
+
+                    // put the doc into frappe locals so the form can read it
+                    frappe.model.sync(doc);
+
+                    // open the form — it will read from locals, not DB
+                    frappe.set_route('Form', 'Purchase Invoice', doc.name);
                 }
             }
         });
     }, 'Create');
 }
-
         /// Gate Entry (only for PO)
         
 
@@ -268,3 +266,28 @@ frappe.ui.form.on('Non PO Items', {
         }
     }
 });
+
+function show_preview(frm) {
+    const file_url = frm.doc.upload_file;
+
+    if (!file_url) {
+        frm.fields_dict.preview_html.$wrapper.html('');
+        frm.fields_dict.custom_file_preview.$wrapper.html('');
+        return;
+    }
+
+    const lower_url = file_url.toLowerCase();
+    let htmlContent;
+
+    if (lower_url.endsWith('.pdf')) {
+        htmlContent = `<iframe src="${file_url}" width="210%" height="700px" style="border:none;"></iframe>`;
+    } else if (/\.(jpg|jpeg|png|gif|webp)$/.test(lower_url)) {
+        htmlContent = `<img src="${file_url}" width="100%" style="max-height:600px;">`;
+    } else {
+        htmlContent = `<p>Preview not available for this file type.</p>`;
+    }
+
+    // Set HTML for both fields
+    frm.fields_dict.preview_html.$wrapper.html(htmlContent);
+    frm.fields_dict.custom_file_preview.$wrapper.html(htmlContent);
+}
