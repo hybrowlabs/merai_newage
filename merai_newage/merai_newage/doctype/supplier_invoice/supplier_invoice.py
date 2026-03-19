@@ -4,26 +4,26 @@
 # import frappe
 import frappe
 from frappe.model.document import Document
-from frappe.model.naming import make_autoname
 
 
 class SupplierInvoice(Document):
 
     def autoname(self):
         if self.invoice_type == "Non PO":
-            self.name = make_autoname("Non PO-.YYYY.-.#####")
+            self.name = frappe.model.naming.make_autoname("Non PO-.YYYY.-.#####")
 
         elif self.invoice_type == "PO":
-            
-            base_name = make_autoname("PUR-ORD-.YYYY.-.#####")
+
+            if not self.po_number:
+                frappe.throw("PO Number is required")
 
             count = frappe.db.count("Supplier Invoice", {
-                "name": ["like", f"{base_name}%"]
+                "po_number": self.po_number
             })
 
             suffix = str(count + 1).zfill(2)
 
-            self.name = f"{base_name}-{suffix}"
+            self.name = f"{self.po_number}-{suffix}"
 
         else:
-            self.name = make_autoname("SUP-INV-.YYYY.-.#####")
+            self.name = frappe.model.naming.make_autoname("SUP-INV-.YYYY.-.#####")

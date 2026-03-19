@@ -96,16 +96,17 @@
    "options": "\nYes\nNo"
   },
   {
-   "depends_on": "eval:doc.invoice_type==\"PO\"",
+   "depends_on": "eval:0",
    "fieldname": "expense_type",
    "fieldtype": "Select",
    "label": "Expense Type",
    "options": "\nFI\nPO"
   },
   {
-   "depends_on": "eval:doc.invoice_type==\"PO\"",
+   "depends_on": "eval:0",
    "fieldname": "grn_number",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "GRN Number",
    "options": "Purchase Receipt"
   },
@@ -324,7 +325,7 @@
    "fieldname": "invoice_type",
    "fieldtype": "Select",
    "label": "Invoice Type",
-   "options": "\nPO\nNon PO"
+   "options": "PO\nNon PO"
   },
   {
    "depends_on": "eval:doc.invoice_type==\"Non PO\"",
@@ -346,7 +347,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-19 15:37:08.675677",
+ "modified": "2026-03-19 18:45:52.142583",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Supplier Invoice",
