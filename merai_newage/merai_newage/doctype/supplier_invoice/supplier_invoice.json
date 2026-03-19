@@ -96,12 +96,14 @@
    "options": "\nYes\nNo"
   },
   {
+   "depends_on": "eval:doc.invoice_type==\"PO\"",
    "fieldname": "expense_type",
    "fieldtype": "Select",
    "label": "Expense Type",
    "options": "\nFI\nPO"
   },
   {
+   "depends_on": "eval:doc.invoice_type==\"PO\"",
    "fieldname": "grn_number",
    "fieldtype": "Link",
    "label": "GRN Number",
@@ -344,10 +346,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-17 18:24:30.924497",
- "modified_by": "prajakta@123gmail.com",
+ "modified": "2026-03-19 15:37:08.675677",
+ "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Supplier Invoice",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
