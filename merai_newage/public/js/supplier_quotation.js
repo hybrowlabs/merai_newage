@@ -1,8 +1,18 @@
 frappe.ui.form.on("Supplier Quotation", {
     // This trigger will run when the form is refreshed, and it will add a custom button to view the revision history of the RFQ if the document is submitted and is the latest revision.
-    refresh(frm) {
+    refresh: function (frm) {
         calculate_freight(frm);
         set_requisitioner_from_reference(frm);
+
+        if (!frm._attachment_sync_bound && frm.attachments) {
+			frm._attachment_sync_bound = true;
+
+			frm.attachments.on("change", function () {
+				if (merai?.sync_workflow_attachment_table) {
+					merai.sync_workflow_attachment_table(frm);
+				}
+			});
+		}
 
     },
 
@@ -63,6 +73,18 @@ frappe.ui.form.on("Supplier Quotation", {
         console.log("To currency changed");
         fetch_exchange_rate(frm);
     },
+
+    after_save: function (frm) {
+        if (merai?.sync_workflow_attachment_table) {
+            merai.sync_workflow_attachment_table(frm);
+        }
+    },
+
+    on_submit: function (frm) {
+        if (merai?.sync_workflow_attachment_table) {
+            merai.sync_workflow_attachment_table(frm);
+        }
+    }
 
 });
 
