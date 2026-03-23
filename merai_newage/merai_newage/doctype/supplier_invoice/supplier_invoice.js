@@ -155,7 +155,7 @@ frappe.ui.form.on("Supplier Invoice", {
             });
         }
 
-   if (frm.doc.docstatus === 1) {
+   if (frm.doc.docstatus === 1 && frm.doc.invoice_type === "Non PO") {
     frm.add_custom_button('Purchase Invoice', function () {
         frappe.call({
             method: 'merai_newage.merai_newage.api.create_purchase_invoice',
@@ -177,33 +177,92 @@ frappe.ui.form.on("Supplier Invoice", {
         /// Gate Entry (only for PO)
         
 
-//             if (frm.doc.invoice_type === "PO") {
-//             frm.add_custom_button('Create Gate Entry', function () {
+    //         if (frm.doc.invoice_type === "PO") {
+    //         frm.add_custom_button('Create Gate Entry', function () {
 
-//             frappe.call({
-//             method: 'cn_exim.cn_exim.doctype.gate_entry.gate_entry.get_supplier_document_details_from_po',
-//             args: { doc_name: frm.doc.name },
+    //         frappe.call({
+    //         method: 'cn_exim.cn_exim.doctype.gate_entry.gate_entry.get_supplier_document_details_from_po',
+    //         args: { doc_name: frm.doc.name },
 
-//             callback: function (r) {
-//                 if (r.message) {
-//                     var data = r.message;
+    //         callback: function (r) {
+    //             if (r.message) {
+    //                 var data = r.message;
 
-//                     frappe.new_doc('Gate Entry', {
-//                         po_number: frm.doc.name,
-//                         bill_number: frm.doc.invoice_no,             
-//                         bill_date: frm.doc.invoice_date,
-//                         supplier: frm.doc.vendor_id,             
-//                         supplier_name: frm.doc.vendor_name, 
-//                     });
+    //                 frappe.new_doc('Gate Entry', {
+    //                     po_number: frm.doc.name,
+    //                     bill_number: frm.doc.invoice_no,             
+    //                     bill_date: frm.doc.invoice_date,
+    //                     supplier: frm.doc.vendor_id,             
+    //                     supplier_name: frm.doc.vendor_name, 
+    //                 });
 
-//                 } else {
-//                     frappe.msgprint("No Supplier Invoice found linked to this PO.");
-//                 }
-//             }
-//         });
+    //             } else {
+    //                 frappe.msgprint("No Supplier Invoice found linked to this PO.");
+    //             }
+    //         }
+    //     });
 
-//     }, 'Create');
-// }
+    // }, 'Create');
+    // }
+
+    //Gate Entry
+    
+if (frm.doc.docstatus === 1 && frm.doc.invoice_type === "PO" && frm.doc.po_number) {
+
+    frm.add_custom_button("Create Gate Entry", function () {
+
+        frappe.call({
+            //method: "cn_exim.cn_exim.doctype.gate_entry.gate_entry.get_supplier_document_details_from_po_new",
+            method: "merai_newage.merai_newage.api.get_supplier_document_details_from_po_new",
+
+            args: {
+                po_name: frm.doc.po_number,
+                supplier_invoice: frm.doc.name
+            },
+            callback: function(res) {
+
+                if (res.message) {
+
+                    frappe.model.sync(res.message);
+                    frappe.set_route("Form", res.message.doctype, res.message.name);
+
+                } else {
+                    frappe.msgprint("No data found");
+                }
+
+            }
+        });
+
+    }, 'Create');   
+}
+    
+     // Purchase Receipt
+        if (frm.doc.docstatus === 1 && frm.doc.invoice_type === "PO") {
+
+            frm.add_custom_button('Purchase Receipt', function () {
+
+                frappe.call({
+                    method: 'merai_newage.merai_newage.api.create_purchase_receipt',
+                    args: {
+                        source_name: frm.doc.name
+                    },
+                    callback: function (r) {
+                        if (r.message) {
+
+                            let doc = r.message;
+
+                            frappe.model.sync(doc);
+
+                            frappe.set_route('Form', 'Purchase Receipt', doc.name);
+                        }
+                    }
+                });
+
+            }, 'Create');
+        }
+
+
+
     },
 
     onload: function(frm) {
