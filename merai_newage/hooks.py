@@ -303,6 +303,11 @@ doctype_js = {
         "public/js/workflow_attachment.js",
         "public/js/boe_entry.js",
     ],
+    "PO Condition Change": [
+        "public/js/workflow_attachment_utils.js",
+        "public/js/workflow_attachment.js",
+        "merai_newage/merai_newage/doctype/po_condition_change/po_condition_change.js",
+    ],
     "E-way Bill": [
         "public/js/workflow_attachment_utils.js",
         "public/js/workflow_attachment.js",
@@ -353,7 +358,9 @@ doc_events = {
         "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
         "before_save": [
             "merai_newage.overrides.rfq.before_save_request_for_quotation",
-            "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
+            # "merai_newage.overrides.request_for_quotation.sync_rfq_workflow_attachments",
+            # "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
         ],
     },
     "Pre Alert": {
@@ -365,7 +372,10 @@ doc_events = {
         "on_cancel": "merai_newage.overrides.material_request.on_cancel_material_request",
     },
     "Supplier Quotation": {
-        "before_save": "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
+        "before_save": [
+            "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
+        ],
         "validate": "merai_newage.overrides.supplier_quotation.validate_supplier_quotation",
         "on_submit": "merai_newage.overrides.supplier_quotation.on_submit_supplier_quotation",
     },

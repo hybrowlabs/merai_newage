@@ -315,19 +315,20 @@
   },
   {
    "fieldname": "section_break_owms",
-   "fieldtype": "Section Break",
-   "hidden": 1
+   "fieldtype": "Section Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "custom_workflow_attachment",
    "fieldtype": "Table",
    "label": "Workflow Attachment",
-   "options": "Workflow Attachment"
+   "options": "Workflow Attachment",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-19 15:25:13.729348",
+ "modified": "2026-03-21 11:01:40.063270",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "PO Condition Change",
