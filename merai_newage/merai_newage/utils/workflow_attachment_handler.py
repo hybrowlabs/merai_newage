@@ -34,11 +34,14 @@ DOCTYPE_SOURCE_MAP = {
     "Supplier Quotation": {
         "custom_request_for_quotation": "Request for Quotation",
     },
+    "Pre Alert": {
+        "custom_supplier_quotation": "Supplier Quotation",
+    },
 }
 
 
 def sync_workflow_attachments_for_logistics(doc, method):
-
+    
     if getattr(doc, "custom_type", None) != "Logistics":
         return
 
