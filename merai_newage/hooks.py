@@ -364,7 +364,8 @@ doc_events = {
         ],
     },
     "Pre Alert": {
-        "validate": "merai_newage.overrides.pre_alert.validate_igcr_category"
+        "validate": "merai_newage.overrides.pre_alert.validate_igcr_category",
+        "before_save": "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
     },
     "Material Request": {
         "validate": "merai_newage.overrides.material_request.validate_material_request",

@@ -29,51 +29,108 @@ def validate_supplier_quotation(doc, method):
                 
                 
                 
+# def assign_ranking_by_rfq(doc):
+#     """
+#     Auto assign L1–L4 ranking based on base_grand_total (INR)
+#     ERPNext v15 safe & optimized
+#     """
+
+#     rfq = get_rfq_from_supplier_quotation(doc)
+#     if not rfq:
+#         return
+
+#     # Fetch all submitted Supplier Quotations
+#     quotations = frappe.get_all(
+#         "Supplier Quotation",
+#         filters={"docstatus": 1},
+#         fields=["name", "base_grand_total"]
+#     )
+
+#     ranking_data = []
+
+#     for q in quotations:
+#         # Fetch RFQ directly from child table (NO get_doc)
+#         sq_rfq = frappe.get_value(
+#             "Supplier Quotation Item",
+#             {"parent": q.name, "request_for_quotation": rfq},
+#             "request_for_quotation"
+#         )
+
+#         if not sq_rfq:
+#             continue
+
+#         ranking_data.append({
+#             "name": q.name,
+#             "amount": q.base_grand_total or 0
+#         })
+
+#     # ❗ Ranking only meaningful if 2+ quotations
+#     if len(ranking_data) < 2:
+#         return
+
+#     ranking_data.sort(key=lambda x: x["amount"])
+
+#     levels = ["L1", "L2", "L3", "L4"]
+
+#     for idx, row in enumerate(ranking_data):
+#         level = levels[idx] if idx < len(levels) else None
+
+#         frappe.db.set_value(
+#             "Supplier Quotation",
+#             row["name"],
+#             {
+#                 "custom_ranking_amount": row["amount"],
+#                 "custom_ranking": level
+#             },
+#             update_modified=False  # avoids loop / noise
+#         )
+
 def assign_ranking_by_rfq(doc):
     """
-    Auto assign L1–L4 ranking based on base_grand_total (INR)
-    ERPNext v15 safe & optimized
+    Auto assign L1–L4 ranking based on custom_total_landing_pricecinr
     """
 
     rfq = get_rfq_from_supplier_quotation(doc)
     if not rfq:
         return
 
-    # Fetch all submitted Supplier Quotations
+    # Get all Supplier Quotations linked to this RFQ (optimized)
+    quotation_names = frappe.get_all(
+        "Supplier Quotation Item",
+        filters={"request_for_quotation": rfq},
+        pluck="parent"
+    )
+
+    if not quotation_names:
+        return
+
     quotations = frappe.get_all(
         "Supplier Quotation",
-        filters={"docstatus": 1},
-        fields=["name", "base_grand_total"]
+        filters={
+            "docstatus": 1,
+            "name": ["in", quotation_names]
+        },
+        fields=["name", "custom_total_landing_pricecinr"]
     )
 
     ranking_data = []
 
     for q in quotations:
-        # Fetch RFQ directly from child table (NO get_doc)
-        sq_rfq = frappe.get_value(
-            "Supplier Quotation Item",
-            {"parent": q.name, "request_for_quotation": rfq},
-            "request_for_quotation"
-        )
-
-        if not sq_rfq:
-            continue
-
         ranking_data.append({
             "name": q.name,
-            "amount": q.base_grand_total or 0
+            "amount": float(q.custom_total_landing_pricecinr or 0)
         })
 
-    # ❗ Ranking only meaningful if 2+ quotations
+    # Ranking only if 2+ quotations
     if len(ranking_data) < 2:
         return
 
+    # Sort by landing price
     ranking_data.sort(key=lambda x: x["amount"])
 
-    levels = ["L1", "L2", "L3", "L4"]
-
+    # Dynamic ranking (L1, L2, L3...)
     for idx, row in enumerate(ranking_data):
-        level = levels[idx] if idx < len(levels) else None
+        level = f"L{idx + 1}"
 
         frappe.db.set_value(
             "Supplier Quotation",
@@ -82,9 +139,9 @@ def assign_ranking_by_rfq(doc):
                 "custom_ranking_amount": row["amount"],
                 "custom_ranking": level
             },
-            update_modified=False  # avoids loop / noise
+            update_modified=False
         )
-
+        
 
 def get_rfq_from_supplier_quotation(doc):
     """
