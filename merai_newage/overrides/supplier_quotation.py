@@ -1,7 +1,9 @@
 # your_app/controllers/supplier_quotation.py
 
 import frappe
-from frappe import _
+from frappe import _ 
+from frappe.utils import now_datetime
+
 
 def before_save_supplier_quotation(doc, method):
     """Populate ACR from Material Request"""
@@ -27,63 +29,6 @@ def validate_supplier_quotation(doc, method):
         #         frappe.throw(_("Row {0}: Item {1} does not match Asset Creation Request").format(
         #             item.idx, item.item_code))
                 
-                
-                
-# def assign_ranking_by_rfq(doc):
-#     """
-#     Auto assign L1–L4 ranking based on base_grand_total (INR)
-#     ERPNext v15 safe & optimized
-#     """
-
-#     rfq = get_rfq_from_supplier_quotation(doc)
-#     if not rfq:
-#         return
-
-#     # Fetch all submitted Supplier Quotations
-#     quotations = frappe.get_all(
-#         "Supplier Quotation",
-#         filters={"docstatus": 1},
-#         fields=["name", "base_grand_total"]
-#     )
-
-#     ranking_data = []
-
-#     for q in quotations:
-#         # Fetch RFQ directly from child table (NO get_doc)
-#         sq_rfq = frappe.get_value(
-#             "Supplier Quotation Item",
-#             {"parent": q.name, "request_for_quotation": rfq},
-#             "request_for_quotation"
-#         )
-
-#         if not sq_rfq:
-#             continue
-
-#         ranking_data.append({
-#             "name": q.name,
-#             "amount": q.base_grand_total or 0
-#         })
-
-#     # ❗ Ranking only meaningful if 2+ quotations
-#     if len(ranking_data) < 2:
-#         return
-
-#     ranking_data.sort(key=lambda x: x["amount"])
-
-#     levels = ["L1", "L2", "L3", "L4"]
-
-#     for idx, row in enumerate(ranking_data):
-#         level = levels[idx] if idx < len(levels) else None
-
-#         frappe.db.set_value(
-#             "Supplier Quotation",
-#             row["name"],
-#             {
-#                 "custom_ranking_amount": row["amount"],
-#                 "custom_ranking": level
-#             },
-#             update_modified=False  # avoids loop / noise
-#         )
 
 def assign_ranking_by_rfq(doc):
     """
@@ -155,3 +100,17 @@ def get_rfq_from_supplier_quotation(doc):
 
 def on_submit_supplier_quotation(doc, method):
     assign_ranking_by_rfq(doc)
+    
+# quotation deadline validation moved to validate event to prevent submission of expired quotations.
+def Expire_validate_supplier_quotation(doc, method=None):
+    if not doc.custom_request_for_quotation:
+        return
+
+    deadline = frappe.db.get_value(
+        "Request for Quotation",
+        doc.custom_request_for_quotation,
+        "custom_quotation_deadline1"
+    )
+
+    if deadline and deadline <= now_datetime():
+        frappe.throw("This RFQ has expired. You cannot submit quotation.")
