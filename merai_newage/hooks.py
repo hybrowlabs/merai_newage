@@ -246,7 +246,12 @@ app_license = "mit"
 scheduler_events = {
     "weekly": [
         "merai_newage.merai_newage.utils.supplier_deletions.cleanup_temporary_suppliers"
-    ]
+    ],
+    "cron": {
+        "*/5 * * * *": [
+            "merai_newage.merai_newage.utils.rfq_expiry.update_all_rfq_expiry_status"
+        ]
+    }
 }
 
 override_whitelisted_methods = {
@@ -334,8 +339,6 @@ doc_events = {
         # "on_update_after_submit": "merai_newage.merai_newage.doctype.robot_tracker.robot_tracker.create_robot_tracker",
     },
 
-
-
     "Job Card": {
         "before_submit": "merai_newage.overrides.job_card.before_submit",
         "on_submit": "merai_newage.overrides.job_card.on_submit",
@@ -347,17 +350,15 @@ doc_events = {
         "before_save": "merai_newage.overrides.quality_inspection.before_save",
         "on_submit": "merai_newage.overrides.quality_inspection.on_submit",
     },
-    # "Request for Quotation": {
-    #     "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
-    #     "validate": "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
-    #     "before_save": "merai_newage.overrides.rfq.before_save_request_for_quotation",
-    #     "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
-    # },
     "Request for Quotation": {
         "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
-        "validate": "merai_newage.overrides.rfq.validate_request_for_quotation",
+        "validate": [
+            "merai_newage.overrides.rfq.validate_request_for_quotation",
+            "merai_newage.overrides.request_for_quotation.set_rfq_expiry_fields",
+        ],
         "before_save": [
             "merai_newage.overrides.rfq.before_save_request_for_quotation",
+            "merai_newage.overrides.request_for_quotation.set_rfq_expiry_fields",
             "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
             # "merai_newage.overrides.request_for_quotation.sync_rfq_workflow_attachments",
             # "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
@@ -377,8 +378,12 @@ doc_events = {
             "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
             "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
         ],
-        "validate": "merai_newage.overrides.supplier_quotation.validate_supplier_quotation",
+        "validate":[
+            "merai_newage.overrides.supplier_quotation.validate_supplier_quotation",
+            "merai_newage.overrides.supplier_quotation.Expire_validate_supplier_quotation"
+        ],
         "on_submit": "merai_newage.overrides.supplier_quotation.on_submit_supplier_quotation",
+        "before_submit": "merai_newage.overrides.supplier_quotation.Expire_validate_supplier_quotation"
     },
     "Purchase Order": {
         "before_save": "merai_newage.overrides.purchase_order.before_save_purchase_order",

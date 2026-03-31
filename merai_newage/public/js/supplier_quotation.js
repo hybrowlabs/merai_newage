@@ -1,6 +1,29 @@
 frappe.ui.form.on("Supplier Quotation", {
     // This trigger will run when the form is refreshed, and it will add a custom button to view the revision history of the RFQ if the document is submitted and is the latest revision.
     refresh: function (frm) {
+
+        // Check if the document is submitted and is the latest revision
+        if (!frm.doc.request_for_quotation) return;
+        // Fetch the quotation deadline from the linked RFQ and disable save if the deadline has passed
+        frappe.db.get_value(
+            'Request for Quotation',
+            frm.doc.request_for_quotation,
+            'custom_quotation_deadline1'
+        ).then(r => {
+            let deadline = r.message.custom_quotation_deadline1;
+            let now = frappe.datetime.now_datetime();
+
+            if (deadline && deadline <= now) {
+                frm.disable_save();
+
+                frappe.show_alert({
+                    message: "RFQ deadline has passed. You cannot submit quotation.",
+                    indicator: 'red'
+                });
+            }
+        });
+
+        // Calculate freight and set requisitioner from reference on refresh
         calculate_freight(frm);
         set_requisitioner_from_reference(frm);
 

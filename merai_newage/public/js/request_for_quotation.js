@@ -1,7 +1,85 @@
 frappe.ui.form.on("Request for Quotation", {
 
+  validate(frm) {
+        const now = frappe.datetime.now_datetime();
+
+        if (frm.doc.custom_quotation_deadline1) {
+            if (frm.doc.custom_quotation_deadline1 <= now) {
+                frappe.msgprint("Warning: Deadline already passed.");
+            }
+        }
+    },
+
   refresh: function (frm) {
 
+    if (frm.is_new()) return;
+    if (frm.doc.docstatus !== 1) return;
+    if (!frm.doc.custom_quotation_deadline1) return;
+
+    // prevent multiple intervals
+    if (frm._countdown_interval) {
+      clearInterval(frm._countdown_interval);
+    }
+
+    function updateCountdown(){
+      let deadline = moment(frm.doc.custom_quotation_deadline1);
+      let now1 = moment();
+
+      let diff = deadline.diff(now1, 'seconds');
+      let display = "";
+
+      if (diff <= 0) {
+        display = "Expired";
+
+        if (!frm._expiry_synced) {
+          frm._expiry_synced = true;
+
+          frappe.call({
+            method: "merai_newage.merai_newage.utils.rfq_expiry.update_rfq_status",
+            args: { name: frm.doc.name }
+          }).then(() => {
+            frm.reload_doc();
+          });
+        }
+
+      } else if (diff > 86400) {
+        let days = Math.floor(diff / 86400);
+        let hours = Math.floor((diff % 86400) / 3600);
+        display = `${days}d ${hours}h left`;
+
+      } else if (diff > 3600) {
+          let hours = Math.floor(diff / 3600);
+          let mins = Math.floor((diff % 3600) / 60);
+          display = `${hours}h ${mins}m left`;
+
+      } else if (diff > 60) {
+          let mins = Math.floor(diff / 60);
+          let secs = diff % 60;
+          display = `${mins}m ${secs}s left`;
+
+      } else {
+          display = `${diff}s left`;
+      }
+
+      //UI update only (NO dirty form)
+      frm.fields_dict.custom_remaining_time.$wrapper
+        .find('.control-value')
+        .text(display);
+    }
+    updateCountdown();
+    frm._countdown_interval = setInterval(updateCountdown, 1000);
+
+    const now = frappe.datetime.now_datetime();
+
+        if (frm.doc.custom_quotation_deadline1 &&
+            frm.doc.custom_quotation_deadline1 <= now) {
+
+            frm.dashboard.set_headline_alert(
+                "This RFQ has expired",
+                "red"
+            );
+        }
+    // Revise RFQ 
     frm.remove_custom_button("Revise RFQ");
     frm.remove_custom_button("Revision History", "View");
 
@@ -116,6 +194,7 @@ frappe.ui.form.on("Request for Quotation", {
     }
   },
 
+  
   after_save: function (frm) {
     if (merai?.sync_workflow_attachment_table) {
       merai.sync_workflow_attachment_table(frm);
@@ -129,3 +208,21 @@ frappe.ui.form.on("Request for Quotation", {
   }
 
 });
+
+// frappe.listview_settings['Request for Quotation'] = {
+
+//     // Quotation deadline
+//     add_fields: ["custom_quotation_deadline1"],
+
+//     get_indicator: function(doc) {
+//         let now = frappe.datetime.now_datetime();
+
+//         if (doc.custom_quotation_deadline1 &&
+//             doc.custom_quotation_deadline1 <= now) {
+
+//             return ['Expired', 'red'];
+//         }
+
+//         return [__(doc.status), 'blue'];
+//     }
+// };
