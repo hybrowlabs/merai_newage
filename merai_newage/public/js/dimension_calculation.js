@@ -26,9 +26,9 @@ function calculate_dimension_row(frm, cdt, cdn) {
     const gross_weight = flt(row.gross_weight);
     const type_wise_value = flt(frm.doc.type_wise_value) || 1;
 
-    // Row Volume
+    // Volume Metric Weight (fix formula if needed later)
     const volume =
-        (length * width * height * gross_weight) / type_wise_value;
+        (length * width * height) / type_wise_value;
 
     frappe.model.set_value(
         cdt,
@@ -37,16 +37,20 @@ function calculate_dimension_row(frm, cdt, cdn) {
         flt(volume, 3)
     );
 
-    // Calculate Parent Total
-    let total = 0;
+    // Calculate totals
+    let total_volume = 0;
+    let total_gross = 0;
 
     (frm.doc.dimension_calculation || []).forEach(d => {
-        total += flt(d.custom_volume_metric_weight_cm);
+        total_volume += flt(d.custom_volume_metric_weight_cm);
+        total_gross += flt(d.gross_weight);
     });
 
-    frm.set_value("chargeable_weight", flt(total, 3));
-}
+    // Set max value
+    const chargeable = Math.max(total_volume, total_gross);
 
+    frm.set_value("chargeable_weight", flt(chargeable, 3));
+}
 
 /**
  * Child Table Events

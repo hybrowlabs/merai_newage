@@ -4205,7 +4205,7 @@
    "name": "Request for Quotation-custom_select_service",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "Send Notification To All Service Provider\nSend Notification To Specific Premium Service Provider\nSend Notification To Specific Courrier Partner\nSend Notification To ADHOC Partner",
+   "options": "\nSend Notification To All Service Provider\nSend Notification To Specific Premium Service Provider\nSend Notification To Specific Courrier Partner\nSend Notification To ADHOC Partner Partner",
    "owner": "Administrator",
    "permlevel": 0,
    "placeholder": null,

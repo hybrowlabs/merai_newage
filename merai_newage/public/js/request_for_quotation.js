@@ -205,7 +205,55 @@ frappe.ui.form.on("Request for Quotation", {
     if (merai?.sync_workflow_attachment_table) {
       merai.sync_workflow_attachment_table(frm);
     }
-  }
+  },
+
+  // Filter Service provider on change of these fields
+  custom_select_service: function(frm) {
+    if (!frm.doc.custom_select_service) {
+        frm.clear_table("suppliers");
+        frm.refresh_field("suppliers");
+        return;
+    }
+
+    let service_map = {
+        "Send Notification To All Service Provider": "All Service Provider",
+        "Send Notification To Specific Premium Service Provider": "Premium Service Provider",
+        "Send Notification To Specific Courrier Partner": "Courrier Partner",
+        "Send Notification To ADHOC Partner": "ADHOC Partner"
+    };
+
+    let selected_type = service_map[frm.doc.custom_select_service];
+
+    if (!selected_type) {
+        frm.clear_table("suppliers");
+        frm.refresh_field("suppliers");
+        return;
+    }
+
+    // Child table clear karo
+    frm.clear_table("suppliers");
+
+    frappe.call({
+        method: "frappe.client.get_list",
+        args: {
+            doctype: "Supplier",
+            filters: {
+                custom_service_provider_type: selected_type
+            },
+            fields: ["name"]
+        },
+        callback: function(r) {
+            if (r.message) {
+                r.message.forEach(supplier => {
+                    let row = frm.add_child("suppliers");
+                    row.supplier = supplier.name;
+                });
+
+                frm.refresh_field("suppliers");
+            }
+        }
+    });
+}
 
 });
 
