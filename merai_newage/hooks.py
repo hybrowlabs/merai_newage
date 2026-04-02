@@ -376,6 +376,7 @@ doc_events = {
     "Supplier Quotation": {
         "before_save": [
             "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
+            "merai_newage.overrides.supplier_quotation.set_shipment_details_from_rfq",
             "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
         ],
         "validate":[

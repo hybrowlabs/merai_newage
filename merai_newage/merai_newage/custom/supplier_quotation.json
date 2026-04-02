@@ -2915,7 +2915,7 @@
    "insert_after": "custom_from_currency",
    "is_system_generated": 0,
    "is_virtual": 0,
-   "label": "Total Landing Pricec(Inr)",
+   "label": "Total Landing Price(Inr)",
    "length": 0,
    "link_filters": null,
    "mandatory_depends_on": null,

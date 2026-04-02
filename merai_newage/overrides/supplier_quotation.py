@@ -15,7 +15,9 @@ def before_save_supplier_quotation(doc, method):
             if mr.custom_asset_creation_request:
                 doc.custom_asset_creation_request = mr.custom_asset_creation_request
                 break
-
+            
+    #Set shipment details from RFQ
+    set_shipment_details_from_rfq(doc)
 
 def validate_supplier_quotation(doc, method):
     """Validate Supplier Quotation for Asset items"""
@@ -114,3 +116,30 @@ def Expire_validate_supplier_quotation(doc, method=None):
 
     if deadline and deadline <= now_datetime():
         frappe.throw("This RFQ has expired. You cannot submit quotation.")
+        
+        
+def set_shipment_details_from_rfq(doc, method=None):
+    """
+    Fetch shipment details from RFQ to Supplier Quotation
+    """
+
+    # Avoid overwrite if already set
+    if doc.custom_shipment_mode:
+        return
+
+    rfq_name = None
+
+    for item in doc.items:
+        if item.request_for_quotation:
+            rfq_name = item.request_for_quotation
+            break
+
+    if not rfq_name:
+        return
+
+    rfq = frappe.get_doc("Request for Quotation", rfq_name)
+
+    doc.custom_shipment_mode = rfq.custom_mode_of_shipment
+    doc.custom_vol_weightkg = rfq.custom_vol_weight
+    doc.custom_no_of_pkg_unit = rfq.custom_no_of_pkg_units
+    doc.custom_actual_weight = rfq.custom_actual_weights

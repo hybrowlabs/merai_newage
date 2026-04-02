@@ -1,7 +1,10 @@
 frappe.ui.form.on("Supplier Quotation", {
+
     // This trigger will run when the form is refreshed, and it will add a custom button to view the revision history of the RFQ if the document is submitted and is the latest revision.
     refresh: function (frm) {
 
+        set_shipment_details_from_rfq(frm);
+        
         // Check if the document is submitted and is the latest revision
         if (!frm.doc.request_for_quotation) return;
         // Fetch the quotation deadline from the linked RFQ and disable save if the deadline has passed
@@ -37,6 +40,10 @@ frappe.ui.form.on("Supplier Quotation", {
 			});
 		}
 
+    },
+    
+    request_for_quotation: function(frm) {
+        set_shipment_details_from_rfq(frm);
     },
 
     custom_rate_kg: function(frm) {
@@ -236,5 +243,34 @@ function fetch_mr_details(frm, mr) {
             frm.set_value("plant", r.message.custom_plant); // change if custom field
         }
 
+    });
+}
+
+// This function will fetch the details of the linked RFQ and set the corresponding fields in the Supplier Quotation form
+function set_shipment_details_from_rfq(frm) {
+
+    // prevent overwrite
+    if (frm.doc.custom_shipment_mode) return;
+
+    let rfq_name = null;
+
+    if (frm.doc.items && frm.doc.items.length) {
+        for (let item of frm.doc.items) {
+            if (item.request_for_quotation) {
+                rfq_name = item.request_for_quotation;
+                break;
+            }
+        }
+    }
+
+    if (!rfq_name) return;
+
+    frappe.db.get_doc('Request for Quotation', rfq_name).then(rfq => {
+        if (!rfq) return;
+
+        frm.set_value('custom_shipment_mode', rfq.custom_mode_of_shipment);
+        frm.set_value('custom_vol_weightkg', rfq.custom_vol_weight);
+        frm.set_value('custom_no_of_pkg_unit', rfq.custom_no_of_pkg_units);
+        frm.set_value('custom_actual_weight', rfq.custom_actual_weights);
     });
 }
