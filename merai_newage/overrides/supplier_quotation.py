@@ -2,7 +2,7 @@
 
 import frappe
 from frappe import _ 
-from frappe.utils import now_datetime
+from frappe.utils import now_datetime, getdate
 
 
 def before_save_supplier_quotation(doc, method):
