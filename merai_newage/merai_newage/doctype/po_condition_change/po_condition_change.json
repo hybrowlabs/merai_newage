@@ -106,19 +106,19 @@
   {
    "fieldname": "vendor",
    "fieldtype": "Link",
-   "label": "Vendor",
+   "label": "Supplier (Serive Provider)",
    "options": "Supplier"
   },
   {
    "fieldname": "vendor_name",
    "fieldtype": "Data",
-   "label": "Vendor Name",
+   "label": "Supplier (Serive Provider) Name",
    "read_only": 1
   },
   {
    "fieldname": "cha_vendor",
    "fieldtype": "Link",
-   "label": "CHA Vendor",
+   "label": "CHA",
    "options": "Supplier"
   },
   {
@@ -328,7 +328,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-21 11:01:40.063270",
+ "modified": "2026-04-02 11:02:03.953562",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "PO Condition Change",
