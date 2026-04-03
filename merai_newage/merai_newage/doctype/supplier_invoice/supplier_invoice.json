@@ -1,0 +1,380 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-02-23 14:20:02.985523",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_iu56",
+  "amended_from",
+  "company",
+  "year",
+  "invoice_type",
+  "upload_file",
+  "is_priority",
+  "expense_type",
+  "grn_number",
+  "accounting_dimensions_section",
+  "document_number",
+  "category",
+  "po_user",
+  "po_number",
+  "gl_account",
+  "column_break_lozt",
+  "concern_person",
+  "service_entry_user",
+  "service_entry",
+  "cost_center",
+  "plant",
+  "vendor_details_section",
+  "vendor_id",
+  "vendor_name",
+  "mobile_number",
+  "email_acc",
+  "column_break_cgev",
+  "gstin__uin",
+  "gst_category",
+  "pan",
+  "invoice_details_section",
+  "invoice_no",
+  "invoice_date",
+  "company_code",
+  "posting_date",
+  "period",
+  "tax_amount",
+  "total_amount",
+  "abbr",
+  "remark",
+  "mail_approval_reference",
+  "column_break_6aj2",
+  "preview_html",
+  "column_break_83dz",
+  "section_break_glzs",
+  "po_items",
+  "non_po_items",
+  "file_preview_tab",
+  "custom_file_preview",
+  "naming_series"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_iu56",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Supplier Invoice",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "year",
+   "fieldtype": "Link",
+   "label": "Year",
+   "options": "Fiscal Year"
+  },
+  {
+   "fieldname": "upload_file",
+   "fieldtype": "Attach",
+   "label": "Upload File"
+  },
+  {
+   "fieldname": "is_priority",
+   "fieldtype": "Select",
+   "label": "Is Priority",
+   "options": "\nYes\nNo"
+  },
+  {
+   "depends_on": "eval:0",
+   "fieldname": "expense_type",
+   "fieldtype": "Select",
+   "label": "Expense Type",
+   "options": "\nFI\nPO"
+  },
+  {
+   "depends_on": "eval:0",
+   "fieldname": "grn_number",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "GRN Number",
+   "options": "Purchase Receipt"
+  },
+  {
+   "fieldname": "accounting_dimensions_section",
+   "fieldtype": "Section Break",
+   "label": "Accounting Dimensions"
+  },
+  {
+   "fieldname": "document_number",
+   "fieldtype": "Data",
+   "label": "Document Number"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category"
+  },
+  {
+   "depends_on": "eval:doc.invoice_type==\"PO\"",
+   "fetch_from": "po_number.custom_requisitioner",
+   "fieldname": "po_user",
+   "fieldtype": "Link",
+   "label": "PO User",
+   "options": "Employee"
+  },
+  {
+   "depends_on": "eval:doc.invoice_type==\"PO\"",
+   "fieldname": "po_number",
+   "fieldtype": "Link",
+   "label": "PO Number",
+   "options": "Purchase Order"
+  },
+  {
+   "fieldname": "gl_account",
+   "fieldtype": "Link",
+   "label": "GL Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "concern_person",
+   "fieldtype": "Data",
+   "label": "Concern Person"
+  },
+  {
+   "fieldname": "service_entry_user",
+   "fieldtype": "Link",
+   "label": "Service Entry User",
+   "options": "User"
+  },
+  {
+   "fieldname": "service_entry",
+   "fieldtype": "Data",
+   "label": "Service Entry"
+  },
+  {
+   "fieldname": "cost_center",
+   "fieldtype": "Link",
+   "label": "Cost Center",
+   "mandatory_depends_on": "eval:doc.invoice_type==\"Non PO\"",
+   "options": "Cost Center",
+   "read_only_depends_on": "eval:doc.invoice_type==\"PO\""
+  },
+  {
+   "fieldname": "vendor_details_section",
+   "fieldtype": "Section Break",
+   "label": "Vendor Details"
+  },
+  {
+   "fieldname": "vendor_id",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Supplier ID",
+   "options": "Supplier",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "vendor_id.supplier_name",
+   "fieldname": "vendor_name",
+   "fieldtype": "Data",
+   "label": "Supplier Name",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "vendor_id.mobile_no",
+   "fieldname": "mobile_number",
+   "fieldtype": "Data",
+   "label": "Mobile Number"
+  },
+  {
+   "fetch_from": "vendor_id.email_id",
+   "fieldname": "email_acc",
+   "fieldtype": "Data",
+   "label": "Email Acc"
+  },
+  {
+   "fetch_from": "vendor_id.gstin",
+   "fieldname": "gstin__uin",
+   "fieldtype": "Data",
+   "label": "GSTIN / UIN"
+  },
+  {
+   "fetch_from": "vendor_id.gst_category",
+   "fieldname": "gst_category",
+   "fieldtype": "Data",
+   "label": "GST Category"
+  },
+  {
+   "fetch_from": "vendor_id.pan",
+   "fieldname": "pan",
+   "fieldtype": "Data",
+   "label": "PAN"
+  },
+  {
+   "fieldname": "invoice_details_section",
+   "fieldtype": "Section Break",
+   "label": "Invoice Details"
+  },
+  {
+   "fieldname": "invoice_no",
+   "fieldtype": "Data",
+   "label": "Invoice No"
+  },
+  {
+   "fieldname": "invoice_date",
+   "fieldtype": "Date",
+   "label": "Invoice Date"
+  },
+  {
+   "fieldname": "company_code",
+   "fieldtype": "Data",
+   "label": "Company Code"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "period",
+   "fieldtype": "Int",
+   "label": "Period"
+  },
+  {
+   "fieldname": "tax_amount",
+   "fieldtype": "Currency",
+   "label": "Tax Amount"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount"
+  },
+  {
+   "fieldname": "abbr",
+   "fieldtype": "Data",
+   "label": "Abbr"
+  },
+  {
+   "fieldname": "remark",
+   "fieldtype": "Small Text",
+   "label": "Remark"
+  },
+  {
+   "fieldname": "mail_approval_reference",
+   "fieldtype": "Link",
+   "label": "Mail Approval Reference",
+   "options": "Mail Approval"
+  },
+  {
+   "fieldname": "column_break_6aj2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "preview_html",
+   "fieldtype": "HTML",
+   "label": "File Preview"
+  },
+  {
+   "fieldname": "column_break_83dz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "file_preview_tab",
+   "fieldtype": "Tab Break",
+   "label": "File Preview"
+  },
+  {
+   "fieldname": "custom_file_preview",
+   "fieldtype": "HTML",
+   "label": "File Preview"
+  },
+  {
+   "fieldname": "column_break_lozt",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_cgev",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": ".po_number.-.##"
+  },
+  {
+   "fieldname": "section_break_glzs",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.invoice_type==\"PO\"",
+   "fieldname": "po_items",
+   "fieldtype": "Table",
+   "label": "PO Items",
+   "options": "PO Items"
+  },
+  {
+   "fieldname": "invoice_type",
+   "fieldtype": "Select",
+   "label": "Invoice Type",
+   "options": "PO\nNon PO"
+  },
+  {
+   "depends_on": "eval:doc.invoice_type==\"Non PO\"",
+   "fieldname": "non_po_items",
+   "fieldtype": "Table",
+   "label": "Non PO Items",
+   "options": "Non PO Items"
+  },
+  {
+   "fieldname": "plant",
+   "fieldtype": "Link",
+   "label": "Plant",
+   "mandatory_depends_on": "eval:doc.invoice_type==\"Non PO\"",
+   "options": "Plant",
+   "read_only_depends_on": "eval:doc.invoice_type==\"PO\""
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-03-20 12:27:49.592839",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Supplier Invoice",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

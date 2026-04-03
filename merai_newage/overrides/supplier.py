@@ -11,3 +11,5 @@ def supplier_quotation_has_website_permission(doc, ptype, user, verbose=False):
 
     # fallback to default behavior
     return False
+
+    

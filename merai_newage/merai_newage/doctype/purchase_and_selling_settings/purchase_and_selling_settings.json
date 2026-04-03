@@ -6,7 +6,8 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_boto",
-  "duration"
+  "duration",
+  "mail_to_supplier_for_invoice"
  ],
  "fields": [
   {
@@ -17,13 +18,20 @@
    "fieldname": "duration",
    "fieldtype": "Data",
    "label": "Duration For Suppliers"
+  },
+  {
+   "default": "1",
+   "description": "If this is checked, an email will be sent to the supplier for invoice attachment",
+   "fieldname": "mail_to_supplier_for_invoice",
+   "fieldtype": "Check",
+   "label": "Mail To Supplier For Invoice"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-26 17:05:29.735844",
+ "modified": "2026-02-25 11:49:32.832294",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Purchase And Selling Settings",

@@ -1,0 +1,72 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2026-02-06 12:20:29.203076",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "workflow_attachment",
+  "path",
+  "file_name",
+  "doctype_name",
+  "column_break_qqxa",
+  "doctype_id",
+  "view"
+ ],
+ "fields": [
+  {
+   "fieldname": "path",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Path"
+  },
+  {
+   "fieldname": "file_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "File Name"
+  },
+  {
+   "fieldname": "doctype_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Doctype Name"
+  },
+  {
+   "fieldname": "doctype_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Doctype Id"
+  },
+  {
+   "fieldname": "view",
+   "fieldtype": "Button",
+   "label": "View"
+  },
+  {
+   "fieldname": "column_break_qqxa",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "workflow_attachment",
+   "fieldtype": "Section Break",
+   "label": "Workflow Attachment"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-02-14 12:31:40.141216",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Workflow Attachment",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

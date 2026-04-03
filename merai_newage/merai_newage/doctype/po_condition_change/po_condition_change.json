@@ -1,0 +1,351 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "naming_series:",
+ "creation": "2026-03-19 11:06:46.700124",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_reference",
+  "amended_from",
+  "boe_entry_reference",
+  "boe_no",
+  "boe_date",
+  "pre_alert_req",
+  "pickup_req",
+  "rfq_number",
+  "column_break_krpp",
+  "vendor",
+  "vendor_name",
+  "cha_vendor",
+  "cha_name",
+  "exchange_rate",
+  "section_duty",
+  "bcd_amt",
+  "h_cess_amt",
+  "column_break_wjyr",
+  "sws_amt",
+  "igst_amt",
+  "total_duty",
+  "section_value",
+  "freight_amt",
+  "ex_works",
+  "insur_amt",
+  "insurance_percent",
+  "column_break_wurh",
+  "other_chrg",
+  "total_inr_val",
+  "accessible_val",
+  "section_additional_charges",
+  "cha_agency_ch",
+  "cha_clearing_ch",
+  "column_break_slbs",
+  "loc_trans_ch",
+  "loc_frt_vendor",
+  "f_f_vendor",
+  "section_shipment",
+  "house_number",
+  "master_number",
+  "job_number",
+  "column_break_doqs",
+  "ad_code",
+  "check_list_date",
+  "penalty",
+  "section_items",
+  "po_condition_change_items",
+  "naming_series",
+  "section_break_owms",
+  "custom_workflow_attachment"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_reference",
+   "fieldtype": "Section Break",
+   "label": "Reference Details"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "options": "PO Condition Change",
+   "read_only": 1
+  },
+  {
+   "fieldname": "boe_entry_reference",
+   "fieldtype": "Link",
+   "label": "BOE Entry Reference",
+   "options": "BOE Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "boe_no",
+   "fieldtype": "Data",
+   "label": "BOE No"
+  },
+  {
+   "fieldname": "boe_date",
+   "fieldtype": "Date",
+   "label": "BOE Date"
+  },
+  {
+   "fieldname": "pre_alert_req",
+   "fieldtype": "Link",
+   "label": "Pre-Alert Req.",
+   "options": "Pre-Alert Check List"
+  },
+  {
+   "fieldname": "pickup_req",
+   "fieldtype": "Data",
+   "label": "Pickup Req."
+  },
+  {
+   "fieldname": "rfq_number",
+   "fieldtype": "Data",
+   "label": "RFQ Number"
+  },
+  {
+   "fieldname": "vendor",
+   "fieldtype": "Link",
+   "label": "Supplier (Serive Provider)",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "vendor_name",
+   "fieldtype": "Data",
+   "label": "Supplier (Serive Provider) Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cha_vendor",
+   "fieldtype": "Link",
+   "label": "CHA",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "cha_name",
+   "fieldtype": "Data",
+   "label": "CHA Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "exchange_rate",
+   "fieldtype": "Currency",
+   "label": "Exchange Rate"
+  },
+  {
+   "fieldname": "section_duty",
+   "fieldtype": "Section Break",
+   "label": "Duty & Tax Details"
+  },
+  {
+   "fieldname": "bcd_amt",
+   "fieldtype": "Currency",
+   "label": "BCD Amount"
+  },
+  {
+   "fieldname": "h_cess_amt",
+   "fieldtype": "Currency",
+   "label": "H. Cess Amount"
+  },
+  {
+   "fieldname": "sws_amt",
+   "fieldtype": "Currency",
+   "label": "SWS Amount"
+  },
+  {
+   "fieldname": "igst_amt",
+   "fieldtype": "Currency",
+   "label": "IGST Amount"
+  },
+  {
+   "fieldname": "total_duty",
+   "fieldtype": "Currency",
+   "label": "Total Duty"
+  },
+  {
+   "fieldname": "section_value",
+   "fieldtype": "Section Break",
+   "label": "Value & Charges"
+  },
+  {
+   "fetch_from": "pre_alert_req.freight_amt",
+   "fieldname": "freight_amt",
+   "fieldtype": "Currency",
+   "label": "Freight Amount"
+  },
+  {
+   "fetch_from": "pre_alert_req.ex_works",
+   "fieldname": "ex_works",
+   "fieldtype": "Currency",
+   "label": "Ex-Works"
+  },
+  {
+   "fetch_from": "pre_alert_req.insurance_amount",
+   "fieldname": "insur_amt",
+   "fieldtype": "Currency",
+   "label": "Insurance Amount"
+  },
+  {
+   "fetch_from": "pre_alert_req.insurance",
+   "fieldname": "insurance_percent",
+   "fieldtype": "Percent",
+   "label": "Insurance %"
+  },
+  {
+   "fetch_from": "pre_alert_req.other_charges",
+   "fieldname": "other_chrg",
+   "fieldtype": "Currency",
+   "label": "Other Charges"
+  },
+  {
+   "fieldname": "total_inr_val",
+   "fieldtype": "Currency",
+   "label": "Total INR Value"
+  },
+  {
+   "fieldname": "accessible_val",
+   "fieldtype": "Currency",
+   "label": "Accessible Value"
+  },
+  {
+   "fieldname": "section_additional_charges",
+   "fieldtype": "Section Break",
+   "label": "Additional Charges"
+  },
+  {
+   "fieldname": "cha_agency_ch",
+   "fieldtype": "Currency",
+   "label": "CHA Agency Charges"
+  },
+  {
+   "fieldname": "cha_clearing_ch",
+   "fieldtype": "Currency",
+   "label": "CHA Clearing Charges"
+  },
+  {
+   "fieldname": "loc_trans_ch",
+   "fieldtype": "Currency",
+   "label": "Local Transport Charges"
+  },
+  {
+   "fieldname": "loc_frt_vendor",
+   "fieldtype": "Link",
+   "label": "Local Freight Vendor",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "f_f_vendor",
+   "fieldtype": "Link",
+   "label": "F&F Vendor",
+   "options": "Supplier"
+  },
+  {
+   "fieldname": "section_shipment",
+   "fieldtype": "Section Break",
+   "label": "Shipment Details"
+  },
+  {
+   "fieldname": "house_number",
+   "fieldtype": "Data",
+   "label": "House Number"
+  },
+  {
+   "fieldname": "master_number",
+   "fieldtype": "Data",
+   "label": "Master Number"
+  },
+  {
+   "fieldname": "job_number",
+   "fieldtype": "Data",
+   "label": "Job Number"
+  },
+  {
+   "fieldname": "ad_code",
+   "fieldtype": "Data",
+   "label": "AD Code"
+  },
+  {
+   "fieldname": "check_list_date",
+   "fieldtype": "Date",
+   "label": "Checklist Date"
+  },
+  {
+   "fieldname": "penalty",
+   "fieldtype": "Currency",
+   "label": "Penalty"
+  },
+  {
+   "fieldname": "section_items",
+   "fieldtype": "Section Break",
+   "hidden": 1,
+   "label": "Items"
+  },
+  {
+   "fieldname": "po_condition_change_items",
+   "fieldtype": "Table",
+   "label": "PO Condition Change Items",
+   "options": "PO Condition Change Item"
+  },
+  {
+   "default": "POCC-.###",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Naming Series",
+   "options": "POCC-.###"
+  },
+  {
+   "fieldname": "column_break_krpp",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_wjyr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_wurh",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_slbs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_doqs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_owms",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "custom_workflow_attachment",
+   "fieldtype": "Table",
+   "label": "Workflow Attachment",
+   "options": "Workflow Attachment",
+   "read_only": 1
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-04-02 11:02:03.953562",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "PO Condition Change",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "read": 1,
+   "role": "System Manager",
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

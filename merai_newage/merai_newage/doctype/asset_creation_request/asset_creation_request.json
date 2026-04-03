@@ -47,11 +47,15 @@
   "available_qty",
   "asset_creation_status",
   "cwip_details_section",
-  "custom_cwip_asset",
+  "cwip_asset",
+  "target_asset_item_code",
   "custom_total_cwip_amount",
+  "enable_cwip_accounting",
   "custom_cwip_purchase_receipts",
   "custom_created_assets",
-  "enable_cwip_accounting",
+  "acr_stock_items",
+  "acr_service_items",
+  "acr_return_purchase_details",
   "tab_break_cyks",
   "attachments"
  ],
@@ -191,6 +195,7 @@
   },
   {
    "default": "1.00",
+   "depends_on": "eval:doc.enable_cwip_accounting==0",
    "fieldname": "qty",
    "fieldtype": "Float",
    "label": "Qty"
@@ -221,18 +226,18 @@
    "label": "Approx Cost"
   },
   {
-   "depends_on": "eval:doc.workflow_state==\"Pending From Accountant\"",
    "fieldname": "cost_centre",
    "fieldtype": "Link",
    "label": "Cost Centre",
-   "mandatory_depends_on": "eval:doc.workflow_state==\"Pending From Accountant\"",
-   "options": "Cost Center"
+   "options": "Cost Center",
+   "reqd": 1
   },
   {
    "fieldname": "saftey_dep_approval_required",
    "fieldtype": "Select",
    "label": "Saftey Dep. Approval Required",
-   "options": "\nYes\nNo"
+   "options": "\nYes\nNo",
+   "reqd": 1
   },
   {
    "default": "ACR-ASS-.YYYY.-",
@@ -308,17 +313,10 @@
    "read_only": 1
   },
   {
-   "depends_on": "eval:doc.enable_cwip_accounting==1",
+   "depends_on": "eval:doc.enable_cwip_accounting==1 && doc.workflow_state==\"Approved\"",
    "fieldname": "cwip_details_section",
    "fieldtype": "Section Break",
    "label": "CWIP Details"
-  },
-  {
-   "depends_on": "eval:doc.enable_cwip_accounting==1",
-   "fieldname": "custom_cwip_asset",
-   "fieldtype": "Link",
-   "label": "Cwip Asset",
-   "options": "Asset"
   },
   {
    "depends_on": "eval:doc.enable_cwip_accounting==1",
@@ -354,6 +352,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "custom_created_assets",
    "fieldtype": "Table",
    "label": "ACR Created Assets",
@@ -364,13 +363,49 @@
    "fieldname": "composite_asset",
    "fieldtype": "Check",
    "label": "Composite Asset"
+  },
+  {
+   "allow_on_submit": 1,
+   "depends_on": "eval:doc.enable_cwip_accounting==1",
+   "fieldname": "target_asset_item_code",
+   "fieldtype": "Link",
+   "label": "Target Asset Item Code",
+   "options": "Item"
+  },
+  {
+   "depends_on": "eval:doc.enable_cwip_accounting==1",
+   "fieldname": "cwip_asset",
+   "fieldtype": "Link",
+   "label": "Cwip Asset",
+   "options": "Asset"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "acr_stock_items",
+   "fieldtype": "Table",
+   "label": "ACR Stock Items",
+   "options": "ACR Stock Items"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "acr_service_items",
+   "fieldtype": "Table",
+   "label": "ACR Service Items",
+   "options": "ACR Service Items"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "acr_return_purchase_details",
+   "fieldtype": "Table",
+   "label": "ACR Return Purchase Details",
+   "options": "ACR Return Purchase Details"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-31 16:20:57.218425",
+ "modified": "2026-02-13 16:58:20.556205",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Asset Creation Request",
