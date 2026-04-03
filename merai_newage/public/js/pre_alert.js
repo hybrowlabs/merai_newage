@@ -1,3 +1,5 @@
+frappe.require("/assets/merai_newage/js/pre_alert_rodtep_utils.js");
+
 frappe.ui.form.on('Pre Alert', {
 
     refresh: function (frm) {
