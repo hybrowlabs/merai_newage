@@ -115,3 +115,112 @@ def get_rfq_revisions(rfq_name):
     )
 
     return {"original_rfq": original, "revisions": revisions}
+
+import frappe
+from frappe.utils import get_url
+@frappe.whitelist()
+def send_supplier_quotation_to_supplier(doc, method):
+    mail_to_supplier_for_logisitics = frappe.db.get_single_value("Purchase And Selling Settings", "mail_to_supplier_for_logisitics")
+    print("is_mail_required========",mail_to_supplier_for_logisitics)
+    if mail_to_supplier_for_logisitics and doc.custom_type == "Logistics":
+        for supplier_row in doc.suppliers:
+            supplier_email = None
+
+            # 1. Try direct email on Supplier master
+            supplier_email = frappe.db.get_value(
+                "Supplier", supplier_row.supplier, "email_id"
+            )
+
+            # 2. Fallback: get email via Contact → Dynamic Link
+            if not supplier_email:
+                contact_name = frappe.db.get_value("Dynamic Link", {
+                    "parenttype": "Contact",
+                    "link_doctype": "Supplier",
+                    "link_name": supplier_row.supplier
+                }, "parent")
+
+                if contact_name:
+                    supplier_email = frappe.db.get_value(
+                        "Contact", contact_name, "email_id"
+                    )
+
+            if supplier_email:
+                form_url = "{}/supplier-quotation-logistics/new?rfq={}&supplier={}".format(
+                    frappe.utils.get_url(),
+                    doc.name,
+                    supplier_row.supplier
+                )
+
+                items_html = _build_items_table_html(doc.items)
+
+                frappe.sendmail(
+                    recipients=[supplier_email],
+                    subject="Request for Quotation - {} | {}".format(
+                        doc.name, doc.company
+                    ),
+                    message="""
+                        <p>Dear {},</p>
+                        <p>We request you to submit your quotation for the following items:</p>
+                        {}
+                        <p>Please click the link below to submit your quotation:</p>
+                        <p><a href="{}" style="padding:10px 20px;background:#4CAF50;
+                           color:white;text-decoration:none;border-radius:4px;">
+                           Submit Quotation</a></p>
+                        <br/>
+                        <p>Company: {}</p>
+                        <p>RFQ Reference: {}</p>
+                        <br/>
+                        <p>Regards,<br/>{}</p>
+                    """.format(
+                        supplier_row.supplier_name or supplier_row.supplier,
+                        items_html,
+                        form_url,
+                        doc.company,
+                        doc.name,
+                        doc.company
+                    )
+                )
+                frappe.msgprint(
+                    "Email sent to {} ({})".format(
+                        supplier_row.supplier, supplier_email
+                    ), 
+                    alert=True
+                )
+            else:
+                frappe.msgprint(
+                    "No email found for supplier: {}".format(supplier_row.supplier),
+                    alert=True,
+                    indicator="orange"
+                )
+
+
+def _build_items_table_html(items):
+    rows = ""
+    for item in items:
+        rows += """
+            <tr>
+                <td style="border:1px solid #ddd;padding:8px">{}</td>
+                <td style="border:1px solid #ddd;padding:8px">{}</td>
+                <td style="border:1px solid #ddd;padding:8px">{}</td>
+                <td style="border:1px solid #ddd;padding:8px">{}</td>
+            </tr>
+        """.format(
+            item.item_code,
+            item.item_name or "",
+            item.qty,
+            item.uom or ""
+        )
+
+    return """
+        <table style="border-collapse:collapse;width:100%;margin:15px 0">
+            <thead>
+                <tr style="background:#f2f2f2">
+                    <th style="border:1px solid #ddd;padding:8px;text-align:left">Item Code</th>
+                    <th style="border:1px solid #ddd;padding:8px;text-align:left">Item Name</th>
+                    <th style="border:1px solid #ddd;padding:8px;text-align:left">Quantity</th>
+                    <th style="border:1px solid #ddd;padding:8px;text-align:left">UOM</th>
+                </tr>
+            </thead>
+            <tbody>{}</tbody>
+        </table>
+    """.format(rows)

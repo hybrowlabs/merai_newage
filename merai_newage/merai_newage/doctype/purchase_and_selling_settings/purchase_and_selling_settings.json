@@ -7,7 +7,8 @@
  "field_order": [
   "section_break_boto",
   "duration",
-  "mail_to_supplier_for_invoice"
+  "mail_to_supplier_for_invoice",
+  "mail_to_supplier_for_logisitics"
  ],
  "fields": [
   {
@@ -25,13 +26,20 @@
    "fieldname": "mail_to_supplier_for_invoice",
    "fieldtype": "Check",
    "label": "Mail To Supplier For Invoice"
+  },
+  {
+   "default": "0",
+   "description": "If this is checked,mail will go to the supplier for filling supplier quotation after RFQ Submission",
+   "fieldname": "mail_to_supplier_for_logisitics",
+   "fieldtype": "Check",
+   "label": "Mail To Supplier For Logisitics"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-02-25 11:49:32.832294",
+ "modified": "2026-04-06 12:14:37.285899",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Purchase And Selling Settings",

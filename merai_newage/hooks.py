@@ -350,6 +350,7 @@ doc_events = {
         "before_save": "merai_newage.overrides.quality_inspection.before_save",
         "on_submit": "merai_newage.overrides.quality_inspection.on_submit",
     },
+    # send_supplier_quotation_to_supplier
     "Request for Quotation": {
         "before_validate": "merai_newage.merai_newage.doctype.rfq_entry.rfq_entry.allow_duplicate_suppliers_with_different_emails",
         "validate": [
@@ -363,6 +364,8 @@ doc_events = {
             # "merai_newage.overrides.request_for_quotation.sync_rfq_workflow_attachments",
             # "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
         ],
+        "on_submit": "merai_newage.overrides.rfq.send_supplier_quotation_to_supplier",
+
     },
     "Pre Alert": {
         "validate": "merai_newage.overrides.pre_alert.validate_igcr_category",
