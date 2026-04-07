@@ -369,7 +369,58 @@ doc_events = {
     },
     "Pre Alert": {
         "validate": "merai_newage.overrides.pre_alert.validate_igcr_category",
-        "before_save": "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
+        "before_save": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.copy_attachments_from_supplier_quotation",
+        ], 
+        "on_update": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.safe_sync_workflow_attachment"
+            ]
+    },
+    "Pre-Alert Check List": {
+        "before_save": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.copy_attachments_from_pre_alert"
+        ],
+        "on_update": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.safe_sync_workflow_attachment"
+        ]
+    },
+    "BOE Entry": {
+        "before_save": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.copy_attachments_from_pre_alert_checklist"
+        ],
+        "on_update": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.safe_sync_workflow_attachment"
+        ]
+    },
+    "PO Condition Change": {
+        "before_save": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.copy_attachments_from_boe"
+        ],
+        "on_update": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.safe_sync_workflow_attachment"
+        ]
+    },
+    
+    "E-way Bill": {
+        "before_save": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.copy_attachments_from_po_condition_change"
+        ],
+        "on_update": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.safe_sync_workflow_attachment"
+        ]
+    },
+    "Gate Entry": {
+        "before_save":[
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.copy_attachments_from_eway_bill",
+            "merai_newage.overrides.gate_entry_override.before_save_gate_entry",
+        ], 
+        "validate": "merai_newage.overrides.gate_entry_override.validate_gate_entry",
+        "on_submit": "merai_newage.overrides.gate_entry_override.on_submit_gate_entry",
+        "on_cancel": "merai_newage.overrides.gate_entry_override.on_cancel_gate_entry",
+        "on_update": [
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.safe_sync_workflow_attachment"
+        ]
     },
     "Material Request": {
         "validate": "merai_newage.overrides.material_request.validate_material_request",
@@ -403,12 +454,6 @@ doc_events = {
         "on_cancel": "merai_newage.overrides.purchase_receipt.on_cancel_purchase_receipt",
         "before_submit": "merai_newage.overrides.purchase_receipt.before_submit"
 
-    },
-    "Gate Entry": {
-        "before_save": "merai_newage.overrides.gate_entry_override.before_save_gate_entry",
-        "validate": "merai_newage.overrides.gate_entry_override.validate_gate_entry",
-        "on_submit": "merai_newage.overrides.gate_entry_override.on_submit_gate_entry",
-        "on_cancel": "merai_newage.overrides.gate_entry_override.on_cancel_gate_entry",
     },
     "Purchase Invoice": {
         "before_save": "merai_newage.overrides.purchase_invoice.before_save_purchase_invoice",

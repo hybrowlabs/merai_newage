@@ -1,3 +1,64 @@
+// frappe.ui.form.on("PO Condition Change", {
+//     refresh: function (frm) {
+
+//         if (frm.doc.docstatus == 1) {
+
+//             frm.add_custom_button("e-Waybill", function () {
+
+//                 let items = [];
+//                 let total_amount = 0;
+
+//                 // 🔹 Child table se items uthao
+//                 if (frm.doc.po_condition_change_items) {
+//                     frm.doc.po_condition_change_items.forEach(item => {
+
+//                         items.push({
+//                             purchase_order: item.purchasing_doc,
+//                             item_code: item.material,
+//                             item_name: item.material,
+//                             qty: item.order_quantity,
+//                             po_qty: item.order_quantity,
+//                             total_inr_value: item.amount,
+//                             rate: item.amount / (item.order_quantity || 1),
+//                             amount: item.amount,
+//                             currency: item.currency || frm.doc.currency,
+//                             rate_inr: item.amount / (item.order_quantity || 1)
+//                         });
+
+//                         total_amount += item.amount;
+//                     });
+//                 }
+
+//                 // 🔹 E-Waybill create karo
+//                 frappe.call({
+//                     method: "frappe.client.insert",
+//                     args: {
+//                         doc: {
+//                             doctype: "E-way Bill",
+
+//                             //SAME LOGIC (important)
+//                             select_doctype: frm.doctype,
+//                             doctype_id: frm.doc.name,
+
+//                             pre_alert_check_list: frm.doc.pre_alert_req,
+//                             supplier: frm.doc.vendor,
+
+//                             items: items
+//                         }
+//                     },
+//                     callback: function (r) {
+//                         if (r.message) {
+//                             frappe.set_route("Form", "E-way Bill", r.message.name);
+//                         }
+//                     }
+//                 });
+
+//             }, __("Create"));
+//         }
+//     }
+// });
+
+
 frappe.ui.form.on("PO Condition Change", {
     refresh: function (frm) {
 
@@ -104,43 +165,116 @@ frappe.ui.form.on("PO Condition Change", {
             }, __("Get Detail"));
         }
 
+
+        // 🔹 EXISTING E-WAYBILL BUTTON (UNCHANGED)
+        // if (frm.doc.docstatus == 1) {
+
+        //     frm.add_custom_button("e-Waybill", function () {
+
+        //         let items = [];
+        //         let total_amount = 0;
+
+        //         if (frm.doc.po_condition_change_items) {
+        //             frm.doc.po_condition_change_items.forEach(item => {
+
+        //                 items.push({
+        //                     purchase_order: item.purchasing_doc,
+        //                     item_code: item.material,
+        //                     item_name: item.material,
+        //                     qty: item.order_quantity,
+        //                     po_qty: item.order_quantity,
+        //                     total_inr_value: item.amount,
+        //                     rate: item.amount / (item.order_quantity || 1),
+        //                     amount: item.amount,
+        //                     currency: item.currency || frm.doc.currency,
+        //                     rate_inr: item.amount / (item.order_quantity || 1)
+        //                 });
+
+        //                 total_amount += item.amount;
+        //             });
+        //         }
+
+        //         frappe.call({
+        //             method: "frappe.client.insert",
+        //             args: {
+        //                 doc: {
+        //                     doctype: "E-way Bill",
+        //                     select_doctype: frm.doctype,
+        //                     doctype_id: frm.doc.name,
+        //                     pre_alert_check_list: frm.doc.pre_alert_req,
+        //                     supplier: frm.doc.vendor,
+        //                     items: items
+        //                 }
+        //             },
+        //             callback: function (r) {
+        //                 if (r.message) {
+        //                     frappe.set_route("Form", "E-way Bill", r.message.name);
+        //                 }
+        //             }
+        //         });
+
+        //     }, __("Create"));
+        // }
         if (frm.doc.docstatus == 1) {
 
             frm.add_custom_button("e-Waybill", function () {
 
-                // STEP 1: Check if already linked
+                // Prevent double click
+                if (frm.__creating_ewb) return;
+                frm.__creating_ewb = true;
+
+                // Already created check
                 if (frm.doc.e_way_bill) {
                     frappe.msgprint("E-Way Bill already created");
-
-                    // direct open existing EWB
                     frappe.set_route("Form", "E-way Bill", frm.doc.e_way_bill);
+                    frm.__creating_ewb = false;
                     return;
                 }
 
                 let items = [];
                 let total_amount = 0;
 
-                if (frm.doc.po_condition_change_items) {
-                    frm.doc.po_condition_change_items.forEach(item => {
+                let source_items = frm.doc.items || [];
 
-                        items.push({
-                            purchase_order: item.purchasing_doc,
-                            item_code: item.material,
-                            item_name: item.material,
-                            qty: item.order_quantity,
-                            po_qty: item.order_quantity,
-                            total_inr_value: item.amount,
-                            rate: item.amount / (item.order_quantity || 1),
-                            amount: item.amount,
-                            currency: item.currency || frm.doc.currency,
-                            rate_inr: item.amount / (item.order_quantity || 1)
-                        });
-
-                        total_amount += item.amount;
-                    });
+                // No items
+                if (!source_items.length) {
+                    frappe.msgprint("No items found in PO Condition Change");
+                    frm.__creating_ewb = false;
+                    return;
                 }
 
-                // STEP 2: Create new EWB
+                source_items.forEach(item => {
+
+                    // Skip if no item_code
+                    if (!item.item_code) return;
+
+                    let qty = item.qty || 0;
+                    let amt = item.amount || 0;
+
+                    items.push({
+                        purchase_order: item.purchase_order || "",
+                        item_code: item.item_code,
+                        item_name: item.item_name || item.item_code,
+                        qty: qty,
+                        po_qty: item.po_qty || qty,
+                        total_inr_value: amt,
+                        rate: qty ? (amt / qty) : 0,
+                        amount: amt,
+                        currency: item.currency || frm.doc.currency,
+                        rate_inr: qty ? (amt / qty) : 0
+                    });
+
+                    total_amount += amt;
+                });
+
+                // No valid items after filtering
+                if (!items.length) {
+                    frappe.msgprint("No valid items found. Check item_code and qty.");
+                    frm.__creating_ewb = false;
+                    return;
+                }
+
+                // Create E-Way Bill
                 frappe.call({
                     method: "frappe.client.insert",
                     args: {
@@ -150,24 +284,38 @@ frappe.ui.form.on("PO Condition Change", {
                             doctype_id: frm.doc.name,
                             pre_alert_check_list: frm.doc.pre_alert_req,
                             supplier: frm.doc.vendor,
+                            total_amount: total_amount,
                             items: items
                         }
                     },
                     callback: function (r) {
+                        frm.__creating_ewb = false;
+
                         if (r.message) {
 
-                            // Save link back in PO Condition Change
-                            frappe.db.set_value("PO Condition Change", frm.doc.name, "e_way_bill", r.message.name);
+                            // 🔗 Save link back
+                            frappe.db.set_value(
+                                "PO Condition Change",
+                                frm.doc.name,
+                                "e_way_bill",
+                                r.message.name
+                            );
 
                             frappe.set_route("Form", "E-way Bill", r.message.name);
+                        } else {
+                            frappe.msgprint("Failed to create E-Way Bill");
                         }
+                    },
+                    error: function () {
+                        frm.__creating_ewb = false;
+                        frappe.msgprint("Server error while creating E-Way Bill");
                     }
                 });
 
             }, __("Create"));
         }
     },
-    // Attachment Sync hooks
+    // 🔹 Attachment Sync hooks
     after_save: function(frm) {
         if (merai?.sync_workflow_attachment_table) {
             merai.sync_workflow_attachment_table(frm);
