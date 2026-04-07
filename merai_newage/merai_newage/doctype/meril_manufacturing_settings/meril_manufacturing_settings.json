@@ -6,7 +6,8 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_cgtg",
-  "auto_stock"
+  "auto_stock",
+  "engineers_cant_see_other_records"
  ],
  "fields": [
   {
@@ -18,13 +19,20 @@
    "fieldname": "auto_stock",
    "fieldtype": "Check",
    "label": "Auto Stock"
+  },
+  {
+   "default": "0",
+   "description": "If this is checked means field engineers cant able to see other engineers records",
+   "fieldname": "engineers_cant_see_other_records",
+   "fieldtype": "Check",
+   "label": "Engineers can't see other records"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-12-31 16:29:09.944407",
+ "modified": "2026-04-07 10:30:20.671437",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Meril Manufacturing Settings",

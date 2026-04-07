@@ -502,3 +502,58 @@ def create_ticket_again(old_doc):
         "naming_series": naming_series
     }
 
+
+import frappe
+
+
+def is_restriction_enabled():
+    """Check if restriction is enabled in Meril Manufacturing Settings."""
+    return frappe.db.get_single_value("Meril Manufacturing Settings", "engineers_cant_see_other_records")
+
+
+def get_permission_query_conditions(user=None):
+    """
+    If restriction enabled AND user has 'Engineers' role → only their own Ticket Master records.
+    All other roles or restriction disabled → see everything.
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if user == "Administrator":
+        return ""
+
+    if "System Manager" in roles:
+        return ""
+
+    # Engineer role + restriction enabled → only their own tickets
+    if is_restriction_enabled() and "Field Engineer" in roles:
+        return f"`tabTicket Master`.owner = '{user}'"
+
+    # All other roles or restriction disabled → no restriction
+    return ""
+
+
+def has_permission(doc, ptype="read", user=None):
+    """
+    If restriction enabled AND user has 'Engineers' role → only their own Ticket Master records.
+    All other roles or restriction disabled → full access.
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if user == "Administrator":
+        return True
+
+    if "System Manager" in roles:
+        return True
+
+    # Engineer role + restriction enabled → only their own tickets
+    if is_restriction_enabled() and "Field Engineer" in roles:
+        return doc.owner == user
+
+    # All other roles or restriction disabled → allow
+    return True

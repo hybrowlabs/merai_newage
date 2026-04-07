@@ -370,3 +370,10 @@ override_doctype_class = {
 # app_include_css = [
 #     "merai_newage.public.css.safety_check_custom.css"
 # ]
+permission_query_conditions = {
+    "Ticket Master": "merai_newage.merai_newage.doctype.ticket_master.ticket_master.get_permission_query_conditions",
+}
+
+has_permission = {
+    "Ticket Master": "merai_newage.merai_newage.doctype.ticket_master.ticket_master.has_permission",
+}
