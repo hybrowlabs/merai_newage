@@ -54,6 +54,8 @@
   "section_items",
   "po_condition_change_items",
   "naming_series",
+  "section_break_mhld",
+  "items",
   "section_break_owms",
   "custom_workflow_attachment"
  ],
@@ -324,11 +326,21 @@
    "label": "Workflow Attachment",
    "options": "Workflow Attachment",
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_mhld",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "E Waybill Items",
+   "options": "E Waybill Items"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-02 11:02:03.953562",
+ "modified": "2026-04-07 14:42:41.274299",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "PO Condition Change",
