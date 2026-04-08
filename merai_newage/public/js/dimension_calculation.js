@@ -1,34 +1,36 @@
-function calculation_box_and_gross_weight(frm, cdt, cdn) {
-
-    const row = frappe.get_doc(cdt, cdn);
-    if (!row) return;
-
-    const box = flt(row.box);
-    const weight = flt(row.weight);
-
-    const gross_weight = flt(box * weight, 3);
-
-    frappe.model.set_value(cdt, cdn, "gross_weight", gross_weight);
-}
-
-/**
- * Calculate Volume Metric Weight for Row
- * And Update Parent Chargeable Weight
- */
+// Dimension Calculation
 function calculate_dimension_row(frm, cdt, cdn) {
 
     const row = frappe.get_doc(cdt, cdn);
     if (!row) return;
 
-    const length = flt(row.length);
-    const width = flt(row.width);
-    const height = flt(row.height);
-    const gross_weight = flt(row.gross_weight);
-    const type_wise_value = flt(frm.doc.type_wise_value) || 1;
+    const length = flt(row.length) || 0;
+    const width = flt(row.width) || 0;
+    const height = flt(row.height) || 0;
+    const box = flt(row.box) || 1;
+    const gross_weight = flt(row.gross_weight) || 0;
 
-    // Volume Metric Weight (fix formula if needed later)
-    const volume =
-        (length * width * height) / type_wise_value;
+    const shipment_mode = frm.doc.mode_of_shipment;
+
+    // Divisor based on shipment mode
+    let divisor = 6000;
+
+    if (shipment_mode === "Air") {
+        divisor = 6000;
+    } 
+    else if (shipment_mode === "Ship") {
+        divisor = 1000000;
+    } 
+    else if (shipment_mode === "Courier") {
+        divisor = 5000;
+    }
+
+    // Volume calculation
+    let volume = 0;
+
+    if (length && width && height) {
+        volume = (length * width * height * box) / divisor;
+    }
 
     frappe.model.set_value(
         cdt,
@@ -37,7 +39,7 @@ function calculate_dimension_row(frm, cdt, cdn) {
         flt(volume, 3)
     );
 
-    // Calculate totals
+    // Total calculation
     let total_volume = 0;
     let total_gross = 0;
 
@@ -46,15 +48,20 @@ function calculate_dimension_row(frm, cdt, cdn) {
         total_gross += flt(d.gross_weight);
     });
 
-    // Set max value
-    const chargeable = Math.max(total_volume, total_gross);
+    // Final chargeable logic
+    let final_value = 0;
 
-    frm.set_value("chargeable_weight", flt(chargeable, 3));
+    if (shipment_mode === "Sea") {
+        final_value = total_volume;
+    } else {
+        final_value = Math.max(total_volume, total_gross);
+    }
+
+    frm.set_value("chargeable_weight", flt(final_value, 3));
 }
 
-/**
- * Child Table Events
- */
+
+// Child Table Events
 frappe.ui.form.on("Dimension Calculation", {
 
     length(frm, cdt, cdn) {
@@ -69,18 +76,24 @@ frappe.ui.form.on("Dimension Calculation", {
         calculate_dimension_row(frm, cdt, cdn);
     },
 
+    box(frm, cdt, cdn) {
+        calculate_dimension_row(frm, cdt, cdn);
+    },
+
     gross_weight(frm, cdt, cdn) {
         calculate_dimension_row(frm, cdt, cdn);
-    },
+    }
 
-    box(frm, cdt, cdn) {
-        calculation_box_and_gross_weight(frm, cdt, cdn);
-        calculate_dimension_row(frm, cdt, cdn);
-    },
+});
 
-    weight(frm, cdt, cdn) {
-        calculation_box_and_gross_weight(frm, cdt, cdn);
-        calculate_dimension_row(frm, cdt, cdn);
+
+// Parent Trigger
+frappe.ui.form.on("Pickup Request", {
+
+    mode_of_shipment(frm) {
+        (frm.doc.dimension_calculation || []).forEach(d => {
+            calculate_dimension_row(frm, d.doctype, d.name);
+        });
     }
 
 });
