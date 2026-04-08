@@ -224,3 +224,110 @@ def _build_items_table_html(items):
             <tbody>{}</tbody>
         </table>
     """.format(rows)
+
+
+import frappe
+from frappe.utils import now_datetime, get_datetime
+
+@frappe.whitelist(allow_guest=True)
+def check_auction_eligibility(rfq, supplier):
+    """
+    Check if supplier is eligible to submit/revise quotation.
+    Returns: { eligible: bool, is_last_hour: bool, has_existing_bid: bool, message: str }
+    """
+    rfq_doc = frappe.get_doc("Request for Quotation", rfq)
+    deadline = get_datetime(rfq_doc.custom_quotation_deadline1)
+    now = now_datetime()
+
+    diff_seconds = (deadline - now).total_seconds()
+
+    # Auction already closed
+    if diff_seconds <= 0:
+        return {
+            "eligible": False,
+            "is_last_hour": False,
+            "has_existing_bid": False,
+            "message": "Auction has closed. No more submissions allowed."
+        }
+
+    is_last_hour = diff_seconds <= 3600  # last 60 minutes
+
+    # Check if supplier has already submitted a bid
+    existing_bid = frappe.db.exists("Supplier Quotation", {
+        "quotation_number": rfq,
+        "supplier": supplier,
+        "docstatus": ["in", [0, 1]]  # draft or submitted
+    })
+    print("existing_bid=======261",existing_bid)
+
+    has_existing_bid = bool(existing_bid)
+
+    # Last hour restriction
+    if is_last_hour and not has_existing_bid:
+        return {
+            "eligible": False,
+            "is_last_hour": True,
+            "has_existing_bid": False,
+            "message": "The auction is in its final hour. Only existing bidders can revise their quotation. New submissions are not allowed."
+        }
+
+    return {
+        "eligible": True,
+        "is_last_hour": is_last_hour,
+        "has_existing_bid": has_existing_bid,
+        "message": "You can revise your quotation." if has_existing_bid else "You can submit your quotation.",
+        "time_left_seconds": int(diff_seconds)
+    }
+
+@frappe.whitelist(allow_guest=True)
+def get_existing_bid(rfq, supplier):
+    """Fetch supplier's last submitted bid for pre-filling."""
+    # ✅ Get most recent bid (order by creation desc)
+    existing_name = frappe.db.get_value(
+        "Supplier Quotation",
+        {
+            "quotation_number": rfq,
+            "supplier": supplier,
+            "docstatus": ["in", [0, 1]]
+        },
+        "name",
+        order_by="creation desc"  # ✅ get latest bid
+    )
+
+    if not existing_name:
+        return None
+
+    sq_doc = frappe.get_doc("Supplier Quotation", existing_name)
+
+    # ✅ Always return items even if rate is 0
+    return {
+        "name": sq_doc.name,
+        "items": [
+            {
+                "item_code": i.item_code,
+                "qty": i.qty,
+                "uom": i.uom or "",
+                "rate": i.rate or 0,
+                "amount": i.amount or 0,
+                "warehouse": i.warehouse or ""
+            }
+            for i in sq_doc.items
+        ] if sq_doc.items else [],
+    "custom_airline_name": sq_doc.custom_airline_name or "",
+    "custom_cw": sq_doc.custom_cw or 0,
+    "custom_rate_kg": sq_doc.custom_rate_kg or 0,
+    "custom_fsc": sq_doc.custom_fsc or 0,
+    "custom_sc": sq_doc.custom_sc or 0,
+    "custom_xray": sq_doc.custom_xray or 0,
+    "custom_pick_uporigin": sq_doc.custom_pick_uporigin or "",
+    "custom_ex_words": sq_doc.custom_ex_words or 0,
+    "custom_total_freight": sq_doc.custom_total_freight or 0,
+    "custom_from_currency": sq_doc.custom_from_currency or "",
+    "custom_to_currency": sq_doc.custom_to_currency or "",
+    "custom_xrxe_com": sq_doc.custom_xrxe_com or 0,
+    "custom_total_freight_inr": sq_doc.custom_total_freight_inr or 0,
+    "custom_total_landing_pricecinr": sq_doc.custom_total_landing_pricecinr or 0,
+    "custom_dc_inr":sq_doc.custom_dc_inr or 0,
+    "custom_transit_day":sq_doc.custom_transit_day or 0,
+    "custom_pickup_location":sq_doc.custom_pickup_location or 0
+    }
