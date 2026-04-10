@@ -240,13 +240,14 @@ frappe.ui.form.on("Request for Quotation", {
             filters: {
                 custom_service_provider_type: selected_type
             },
-            fields: ["name"]
+            fields: ["name", "supplier_name"]
         },
         callback: function(r) {
             if (r.message) {
                 r.message.forEach(supplier => {
                     let row = frm.add_child("suppliers");
                     row.supplier = supplier.name;
+                    row.supplier_name = supplier.supplier_name;
                 });
 
                 frm.refresh_field("suppliers");

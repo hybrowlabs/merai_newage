@@ -198,7 +198,6 @@ def copy_attachments_from_po_condition_change(doc, method=None):
 
 # copy from EWAY chnage to GATENETRY
 def copy_attachments_from_eway_bill(doc, method=None):
-    # frappe.msgprint("GATE ENTRY SYNC RUNNING")
 
     if not doc.e_waybill_no:
         return
