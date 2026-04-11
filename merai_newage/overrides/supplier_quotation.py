@@ -145,3 +145,31 @@ def set_shipment_details_from_rfq(doc, method=None):
     doc.custom_actual_weight = rfq.custom_actual_weights
     doc.custom_pickup_request = rfq.custom_pickup_request
     doc.custom_package_type = rfq.custom_package_type
+    
+    
+@frappe.whitelist()
+def get_po_numbers(pr_name):
+    pr = frappe.get_doc("Pickup Request", pr_name)
+
+    data = []
+
+    for row in pr.purchase_order_details:
+        if row.po_number:
+            data.append({
+                "po_number": row.po_number
+            })
+
+    return data
+
+
+@frappe.whitelist()
+def get_po_details(po_name):
+
+    po = frappe.get_doc("Purchase Order", po_name)
+
+    item = po.items[0] if po.items else None
+
+    return {
+        "cost_center": po.cost_center, 
+        "plant": po.plant
+    }

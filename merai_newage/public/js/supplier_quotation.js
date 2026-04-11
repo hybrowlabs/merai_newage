@@ -41,7 +41,60 @@ frappe.ui.form.on("Supplier Quotation", {
 		}
 
     },
+    custom_purchase_order: function(frm) {
+
+        if (!frm.doc.custom_purchase_order) return;
+
+        frappe.call({
+            method: "merai_newage.overrides.supplier_quotation.get_po_details",
+            args: {
+                po_name: frm.doc.custom_purchase_order
+            },
+            callback: function(r) {
+
+                if (!r.message) return;
+
+                // MAIN MAPPING
+                if (r.message.cost_center) {
+                    frm.set_value("cost_center", r.message.cost_center);
+                }
+
+                if (r.message.plant) {
+                    frm.set_value("plant", r.message.plant);
+                }
+            }
+        });
+    },
     
+    custom_pickup_request: function(frm) {
+
+        if (!frm.doc.custom_pickup_request) return;
+
+            frappe.call({
+                method: "merai_newage.overrides.supplier_quotation.get_po_numbers",
+                args: {
+                    pr_name: frm.doc.custom_pickup_request
+                },
+                callback: function(r) {
+
+                    if (!r.message || !r.message.length) return;
+
+                    let po_number = r.message[0].po_number;
+
+                    // prevent overwrite spam
+                    if (frm.doc.custom_purchase_order !== po_number) {
+                        frm.set_value("custom_purchase_order", po_number);
+                    }
+                }
+            });
+        },
+
+    onload: function(frm) {
+        if (frm.doc.custom_pickup_request && !frm.doc.custom_purchase_order) {
+            frm.trigger("custom_pickup_request");
+        }
+    },
+
     request_for_quotation: function(frm) {
         set_shipment_details_from_rfq(frm);
     },
