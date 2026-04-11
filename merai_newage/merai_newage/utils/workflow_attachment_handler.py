@@ -1,66 +1,102 @@
+
 # from merai_newage.merai_newage.utils.sync_workflow_attachments_from_source import sync_workflow_attachments_from_source
 
-# # 🔹 Global mapping (recommended)
-# SOURCE_MAP = {
-#     "custom_pickup_request": "Pickup Request",
-#     "custom_supplier_quotation": "Supplier Quotation",
-#     "custom_pre_alert": "Pre Alert",
-#     "custom_pre_alert_check_list": "Pre-Alert Check List",
-#     "custom_boe_entry": "BOE Entry",
+# # 🔹 Doctype-wise mapping (FLOW BASED)
+# DOCTYPE_SOURCE_MAP = {
+#     "Request for Quotation": {
+#         "custom_pickup_request": "Pickup Request",
+#     },
+#     "Supplier Quotation": {
+#         "custom_request_for_quotation": "Request for Quotation",
+#     },
+#     "Pre Alert": {
+#         "custom_supplier_quotation": "Supplier Quotation",
+#         "rfq_number": "Request for Quotation",
+#         "pickup_request": "Pickup Request",
+#     },
 # }
 
-
 # def sync_workflow_attachments_for_logistics(doc, method):
-
-#     if doc.custom_type != "Logistics":
+#     frappe.logger().info(f"RUNNING SYNC FOR {doc.doctype} - {doc.name}")
+    
+#     if getattr(doc, "custom_type", None) != "Logistics":
 #         return
 
-#     for field, doctype in SOURCE_MAP.items():
-#         source_name = getattr(doc, field, None)
+#     # Get mapping based on current doctype
+#     source_map = DOCTYPE_SOURCE_MAP.get(doc.doctype, {})
 
+#     for field, source_doctype in source_map.items():
+#         source_name = getattr(doc, field, None)
+        
 #         if source_name:
 #             sync_workflow_attachments_from_source(
-#                 doc, doctype, source_name
+#                 target_doc=doc,
+#                 source_doctype=source_doctype,
+#                 source_name=source_name,
 #             )
 
 import frappe
-from merai_newage.merai_newage.utils.sync_workflow_attachments_from_source import sync_workflow_attachments_from_source
 from merai_newage.overrides.workflow_attachment import sync_workflow_attachment
 
-# 🔹 Doctype-wise mapping (FLOW BASED)
-DOCTYPE_SOURCE_MAP = {
-    "Request for Quotation": {
-        "custom_pickup_request": "Pickup Request",
-    },
-    "Supplier Quotation": {
-        "custom_request_for_quotation": "Request for Quotation",
-    },
-    "Pre Alert": {
-        "custom_supplier_quotation": "Supplier Quotation",
-        "rfq_number": "Request for Quotation",
-        "pickup_request": "Pickup Request",
-    },
-}
+# copy from pickup request to rfq
+def copy_attachments_from_pickup_request_to_rfq(doc, method=None):
 
-
-def sync_workflow_attachments_for_logistics(doc, method):
-    frappe.logger().info(f"RUNNING SYNC FOR {doc.doctype} - {doc.name}")
-    
-    if getattr(doc, "custom_type", None) != "Logistics":
+    if not doc.custom_pickup_request:
         return
 
-    # Get mapping based on current doctype
-    source_map = DOCTYPE_SOURCE_MAP.get(doc.doctype, {})
+    # prevent repeated execution
+    if not doc.is_new() and not doc.has_value_changed("custom_pickup_request"):
+        return
 
-    for field, source_doctype in source_map.items():
-        source_name = getattr(doc, field, None)
+    source_doc = frappe.get_doc("Pickup Request", doc.custom_pickup_request)
+
+    source_rows = source_doc.get("custom_workflow_attachment") or []
+    target_rows = doc.get("custom_workflow_attachment") or []
+
+    existing_paths = {row.path for row in target_rows}
+
+    for row in source_rows:
+        if not row.path:
+            continue
+
+        if row.path in existing_paths:
+            continue
+
+        doc.append("custom_workflow_attachment", {
+            "path": row.path,
+            "file_name": row.file_name,
+            "doctype_name": row.doctype_name,
+            "doctype_id": row.doctype_id,
+        })
         
-        if source_name:
-            sync_workflow_attachments_from_source(
-                target_doc=doc,
-                source_doctype=source_doctype,
-                source_name=source_name,
-            )
+# rfq to supplier quotation            
+def copy_attachments_from_rfq_to_supplier_quotation(doc, method=None):
+
+    if not doc.custom_request_for_quotation:
+        return
+
+    source_doc = frappe.get_doc("Request for Quotation", doc.custom_request_for_quotation)
+
+    source_rows = source_doc.get("custom_workflow_attachment") or []
+    target_rows = doc.get("custom_workflow_attachment") or []
+
+    existing_paths = {row.path for row in target_rows}
+
+    for row in source_rows:
+        if not row.path:
+            continue
+
+        if row.path in existing_paths:
+            continue
+
+        doc.append("custom_workflow_attachment", {
+            "path": row.path,
+            "file_name": row.file_name,
+            "doctype_name": row.doctype_name,
+            "doctype_id": row.doctype_id,
+        })
+        
+        
 # copy from supplier quotation to pre alert
 def copy_attachments_from_supplier_quotation(doc, method=None):
 

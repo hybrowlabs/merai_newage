@@ -360,7 +360,8 @@ doc_events = {
         "before_save": [
             "merai_newage.overrides.rfq.before_save_request_for_quotation",
             "merai_newage.overrides.request_for_quotation.set_rfq_expiry_fields",
-            "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.copy_attachments_from_pickup_request_to_rfq",
+            # "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
             # "merai_newage.overrides.request_for_quotation.sync_rfq_workflow_attachments",
             # "merai_newage.overrides.request_for_quotation.copy_workflow_attachments_from_pickup_request",
         ],
@@ -370,8 +371,8 @@ doc_events = {
     "Pre Alert": {
         "validate": "merai_newage.overrides.pre_alert.validate_igcr_category",
         "before_save": [
-            "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
             "merai_newage.merai_newage.utils.workflow_attachment_handler.copy_attachments_from_supplier_quotation",
+            # "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
         ], 
         "on_update": [
             "merai_newage.merai_newage.utils.workflow_attachment_handler.safe_sync_workflow_attachment"
@@ -431,7 +432,8 @@ doc_events = {
         "before_save": [
             "merai_newage.overrides.supplier_quotation.before_save_supplier_quotation",
             "merai_newage.overrides.supplier_quotation.set_shipment_details_from_rfq",
-            "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
+            "merai_newage.merai_newage.utils.workflow_attachment_handler.copy_attachments_from_rfq_to_supplier_quotation",
+            # "merai_newage.merai_newage.utils.workflow_attachment_handler.sync_workflow_attachments_for_logistics",
         ],
         "validate":[
             "merai_newage.overrides.supplier_quotation.validate_supplier_quotation",
