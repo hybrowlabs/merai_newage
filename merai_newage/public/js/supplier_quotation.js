@@ -4,6 +4,36 @@ frappe.ui.form.on("Supplier Quotation", {
     refresh: function (frm) {
 
         set_shipment_details_from_rfq(frm);
+
+        //supplier REVISION BUTTON
+        if (frm.doc.docstatus === 1 && !frm.doc.custom_is_revision) {
+
+            if (!frm.custom_revision_added) {
+
+                frm.custom_revision_added = true;
+
+                frm.add_custom_button(
+                    'Revise Supplier Quotation',
+                    function () {
+
+                        frappe.call({
+                            method: "merai_newage.merai_newage.api.create_revision_supplier_quotation",
+                            args: {
+                                docname: frm.doc.name
+                            },
+                            callback: function (r) {
+                                if (r.message) {
+                                    frappe.set_route("Form", "Supplier Quotation", r.message);
+                                }
+                            }
+                        });
+
+                    },
+                    'Create'
+                );
+
+            }
+        }
         
         // Check if the document is submitted and is the latest revision
         if (!frm.doc.request_for_quotation) return;

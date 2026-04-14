@@ -540,3 +540,29 @@ def get_supplier_document_details_from_po_new(doc_name=None, po_name=None, suppl
 
     return gate_entry.as_dict()
 
+# supplier quotation revision
+@frappe.whitelist()
+def create_revision_supplier_quotation(docname):
+
+    source = frappe.get_doc("Supplier Quotation", docname)
+
+    new_doc = frappe.copy_doc(source)
+
+    # reset
+    new_doc.name = None
+    new_doc.docstatus = 0
+    new_doc.amended_from = None
+
+    # linking
+    new_doc.custom_previous_quotation = source.name
+    new_doc.custom_is_revision = 1
+    
+    symbol = frappe.get_cached_value("Currency", source.currency, "symbol")
+    # item logic
+    for item in new_doc.items:
+        item.custom_previous_rate_display = f"{symbol} {item.rate}"
+        item.rate = None
+
+    new_doc.insert(ignore_permissions=True)
+
+    return new_doc.name

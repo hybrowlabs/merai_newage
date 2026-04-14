@@ -5,7 +5,12 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "supplier"
+  "supplier",
+  "agreement_start_date",
+  "column_break_tfpz",
+  "agreement_end_date",
+  "agreement_status",
+  "is_terminated"
  ],
  "fields": [
   {
@@ -13,12 +18,38 @@
    "fieldtype": "Link",
    "label": "Supplier",
    "options": "Supplier"
+  },
+  {
+   "fieldname": "agreement_start_date",
+   "fieldtype": "Date",
+   "label": "Agreement Start Date"
+  },
+  {
+   "fieldname": "agreement_end_date",
+   "fieldtype": "Date",
+   "label": "Agreement End Date"
+  },
+  {
+   "fieldname": "agreement_status",
+   "fieldtype": "Select",
+   "label": "Agreement Status",
+   "options": "\nDraft\nActive\nExpired\nTerminated"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_terminated",
+   "fieldtype": "Check",
+   "label": "Manually Terminated"
+  },
+  {
+   "fieldname": "column_break_tfpz",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-04-13 12:55:02.458555",
+ "modified": "2026-04-14 09:45:03.819968",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Service Provider Agreement",
