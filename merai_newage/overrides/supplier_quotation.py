@@ -140,11 +140,16 @@ def set_shipment_details_from_rfq(doc, method=None):
     rfq = frappe.get_doc("Request for Quotation", rfq_name)
 
     doc.custom_shipment_mode = rfq.custom_mode_of_shipment
+    doc.custom_shipment_type = rfq.custom_shipment_type
     doc.custom_vol_weightkg = rfq.custom_vol_weight
     doc.custom_no_of_pkg_unit = rfq.custom_no_of_pkg_units
     doc.custom_actual_weight = rfq.custom_actual_weights
     doc.custom_pickup_request = rfq.custom_pickup_request
     doc.custom_package_type = rfq.custom_package_type
+    doc.custom_port_of_loading = rfq.custom_port_of_loading
+    doc.custom_port_of_destination = rfq.custom_port_of_destination
+    doc.custom_product_category = rfq.custom_product_category
+    doc.custom_eda = rfq.custom_eda
     
     
 @frappe.whitelist()
