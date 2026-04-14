@@ -2769,7 +2769,7 @@
    "description": null,
    "docstatus": 0,
    "dt": "Request for Quotation",
-   "fetch_from": "custom_pickup_request.pol",
+   "fetch_from": "",
    "fetch_if_empty": 0,
    "fieldname": "custom_port_of_loading",
    "fieldtype": "Link",
