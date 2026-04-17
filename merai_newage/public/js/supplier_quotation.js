@@ -3,6 +3,7 @@ frappe.ui.form.on("Supplier Quotation", {
     // This trigger will run when the form is refreshed, and it will add a custom button to view the revision history of the RFQ if the document is submitted and is the latest revision.
     refresh: function (frm) {
 
+        // toggle_previous_rate(frm);
         set_shipment_details_from_rfq(frm);
 
         //supplier REVISION BUTTON
@@ -357,3 +358,18 @@ function set_shipment_details_from_rfq(frm) {
         frm.set_value('custom_actual_weight', rfq.custom_actual_weights);
     });
 }
+
+
+// function toggle_previous_rate(frm) {
+
+//     let show = frm.doc.custom_is_revision ? 1 : 0;
+
+//     // child table column show/hide
+//     frm.fields_dict.items.grid.update_docfield_property(
+//         'custom_previous_rate_display',
+//         'hidden',
+//         show ? 0 : 1
+//     );
+
+//     frm.refresh_field('items');
+// }

@@ -206,12 +206,45 @@ def copy_attachments_from_boe(doc, method=None):
         })
         
 # copy from po condition change to e way bill
+# def copy_attachments_from_po_condition_change(doc, method=None):
+
+#     if not doc.doctype_id:
+#         return
+
+#     source_doc = frappe.get_doc("PO Condition Change", doc.doctype_id)
+
+#     source_rows = source_doc.get("custom_workflow_attachment") or []
+#     target_rows = doc.get("custom_workflow_attachment") or []
+
+#     existing_paths = {row.path for row in target_rows}
+
+#     for row in source_rows:
+#         if not row.path:
+#             continue
+
+#         if row.path in existing_paths:
+#             continue
+
+#         doc.append("custom_workflow_attachment", {
+#             "path": row.path,
+#             "file_name": row.file_name,
+#             "doctype_name": row.doctype_name,
+#             "doctype_id": row.doctype_id,
+#         })\
+    
 def copy_attachments_from_po_condition_change(doc, method=None):
 
     if not doc.doctype_id:
         return
 
-    source_doc = frappe.get_doc("PO Condition Change", doc.doctype_id)
+    if doc.select_doctype == "PO Condition Change":
+        source_doc = frappe.get_doc("PO Condition Change", doc.doctype_id)
+
+    elif doc.select_doctype == "BOE Entry":
+        source_doc = frappe.get_doc("BOE Entry", doc.doctype_id)
+
+    else:
+        return
 
     source_rows = source_doc.get("custom_workflow_attachment") or []
     target_rows = doc.get("custom_workflow_attachment") or []
@@ -261,6 +294,8 @@ def copy_attachments_from_eway_bill(doc, method=None):
         
 def safe_sync_workflow_attachment(doc, method=None):
     if doc.is_new():
+        return
+    if doc.doctype == "E-way Bill":
         return
     
     from merai_newage.overrides.workflow_attachment import sync_workflow_attachment
