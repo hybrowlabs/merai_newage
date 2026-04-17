@@ -1,0 +1,66 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "test_parameters",
+ "creation": "2026-04-16 14:21:52.991656",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "test_parameters",
+  "standard_limit",
+  "measured_value",
+  "result",
+  "remarks"
+ ],
+ "fields": [
+  {
+   "fieldname": "standard_limit",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Standard Limit"
+  },
+  {
+   "fieldname": "measured_value",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Measured Value"
+  },
+  {
+   "fieldname": "result",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Result",
+   "options": "\nPass\nFail"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "test_parameters",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Test Parameters",
+   "options": "Test Parameters and Activities"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-04-16 15:18:13.097143",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Power Testing Details",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

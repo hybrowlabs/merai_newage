@@ -1,0 +1,188 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:SRR-{YYYY}-{######}",
+ "creation": "2026-04-16 12:26:39.180000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "customer__hospital_details_section",
+  "customer__hospital_name",
+  "system_serial_no",
+  "installation_site_address",
+  "section_break_mout",
+  "salesperson_name",
+  "local_tas_name",
+  "column_break_jega",
+  "salesperson_contact",
+  "local_tas_contact",
+  "section_break_zu7m",
+  "custom_print_format",
+  "amended_from",
+  "column_break_fhxw",
+  "power_testing_tab",
+  "power_testing",
+  "pre_installation_activities_tab",
+  "pre_installation_table",
+  "sawbone_testing_plan_tab",
+  "sawbone_testing",
+  "closure_activities_tab",
+  "closure_activity"
+ ],
+ "fields": [
+  {
+   "collapsible": 1,
+   "fieldname": "section_break_zu7m",
+   "fieldtype": "Section Break",
+   "label": "Connections"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Site Readiness Report",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "power_testing_tab",
+   "fieldtype": "Tab Break",
+   "label": "Power Testing"
+  },
+  {
+   "fieldname": "pre_installation_activities_tab",
+   "fieldtype": "Tab Break",
+   "label": "Pre Installation Activities"
+  },
+  {
+   "fieldname": "sawbone_testing_plan_tab",
+   "fieldtype": "Tab Break",
+   "label": "Sawbone Testing Plan"
+  },
+  {
+   "fieldname": "closure_activities_tab",
+   "fieldtype": "Tab Break",
+   "label": "Closure Activities"
+  },
+  {
+   "fieldname": "customer__hospital_details_section",
+   "fieldtype": "Section Break",
+   "label": "Customer / Hospital Details"
+  },
+  {
+   "fieldname": "customer__hospital_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Customer / Hospital Name",
+   "options": "Account Master",
+   "reqd": 1
+  },
+  {
+   "fieldname": "system_serial_no",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "System Serial No.",
+   "options": "Robot Tracker",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "customer__hospital_name.address",
+   "fieldname": "installation_site_address",
+   "fieldtype": "Small Text",
+   "label": "Installation Site Address"
+  },
+  {
+   "fieldname": "section_break_mout",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "salesperson_name",
+   "fieldtype": "Link",
+   "label": "Salesperson Name",
+   "link_filters": "[[\"Employee\",\"department\",\"=\",\"Sales\"]]",
+   "options": "Employee"
+  },
+  {
+   "fieldname": "local_tas_name",
+   "fieldtype": "Data",
+   "label": "Local TAS Name"
+  },
+  {
+   "fieldname": "column_break_jega",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "salesperson_contact",
+   "fieldtype": "Phone",
+   "label": "Salesperson Contact"
+  },
+  {
+   "fieldname": "local_tas_contact",
+   "fieldtype": "Phone",
+   "label": "Local TAS Contact"
+  },
+  {
+   "fieldname": "column_break_fhxw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "power_testing",
+   "fieldtype": "Table",
+   "options": "Power Testing Details"
+  },
+  {
+   "fieldname": "pre_installation_table",
+   "fieldtype": "Table",
+   "options": "Activity Details"
+  },
+  {
+   "fieldname": "sawbone_testing",
+   "fieldtype": "Table",
+   "options": "Activity Details"
+  },
+  {
+   "fieldname": "closure_activity",
+   "fieldtype": "Table",
+   "options": "Activity Details"
+  },
+  {
+   "default": "SITE READINESS REPORT",
+   "fieldname": "custom_print_format",
+   "fieldtype": "Link",
+   "label": "Print Format",
+   "options": "Print Format"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2026-04-17 15:42:20.218213",
+ "modified_by": "Administrator",
+ "module": "Merai Newage",
+ "name": "Site Readiness Report",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
