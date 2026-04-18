@@ -20,6 +20,7 @@
   "cha_vendor",
   "cha_name",
   "exchange_rate",
+  "eway_bill_reference",
   "section_duty",
   "bcd_amt",
   "h_cess_amt",
@@ -336,11 +337,18 @@
    "fieldtype": "Table",
    "label": "E Waybill Items",
    "options": "E Waybill Items"
+  },
+  {
+   "fieldname": "eway_bill_reference",
+   "fieldtype": "Link",
+   "label": "E-way Bill Reference",
+   "options": "E-way Bill",
+   "read_only": 1
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-07 14:42:41.274299",
+ "modified": "2026-04-17 11:27:43.497854",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "PO Condition Change",

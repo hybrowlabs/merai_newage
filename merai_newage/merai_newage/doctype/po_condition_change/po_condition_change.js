@@ -326,6 +326,17 @@ frappe.ui.form.on("PO Condition Change", {
         if (merai?.sync_workflow_attachment_table) {
             merai.sync_workflow_attachment_table(frm);
         }
+        if (frm.doc.eway_bill_reference) {
+
+            frappe.db.set_value(
+                "E-way Bill",
+                frm.doc.eway_bill_reference,
+                "custom_po_condition_change",
+                frm.doc.name
+            ).then(() => {
+                frappe.set_route("Form", "E-way Bill", frm.doc.eway_bill_reference);
+            });
+        }
     }
 
 });
