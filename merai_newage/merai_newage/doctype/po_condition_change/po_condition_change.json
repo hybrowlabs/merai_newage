@@ -21,6 +21,8 @@
   "cha_name",
   "exchange_rate",
   "eway_bill_reference",
+  "show_service_bill_section",
+  "created_from_service_bill",
   "section_duty",
   "bcd_amt",
   "h_cess_amt",
@@ -55,6 +57,15 @@
   "section_items",
   "po_condition_change_items",
   "naming_series",
+  "service_bill_section",
+  "service_type",
+  "request_type",
+  "vendor_type",
+  "column_break_enla",
+  "service_company",
+  "service_bill_attachment",
+  "section_break_vgyl",
+  "uploaded_service_bills",
   "section_break_mhld",
   "items",
   "section_break_owms",
@@ -344,11 +355,75 @@
    "label": "E-way Bill Reference",
    "options": "E-way Bill",
    "read_only": 1
+  },
+  {
+   "fieldname": "service_type",
+   "fieldtype": "Select",
+   "label": "Service Type",
+   "options": "Import\nExport\nDomestic\nPurchase"
+  },
+  {
+   "default": "0",
+   "fieldname": "show_service_bill_section",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Show Service Bill Section"
+  },
+  {
+   "depends_on": "eval:doc.show_service_bill_section==1",
+   "fieldname": "service_bill_section",
+   "fieldtype": "Section Break",
+   "label": "Service Bill Details"
+  },
+  {
+   "fieldname": "request_type",
+   "fieldtype": "Select",
+   "label": "Request Type",
+   "options": "Logistic\nHotel\nVisa\nOther"
+  },
+  {
+   "fieldname": "vendor_type",
+   "fieldtype": "Select",
+   "label": "Vendor Type",
+   "options": "CHA\nCourier\nFreight"
+  },
+  {
+   "fieldname": "column_break_enla",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "service_bill_attachment",
+   "fieldtype": "Attach",
+   "label": "Upload Excel File"
+  },
+  {
+   "default": "0",
+   "fieldname": "created_from_service_bill",
+   "fieldtype": "Check",
+   "hidden": 1,
+   "label": "Created From Service Bill"
+  },
+  {
+   "fieldname": "service_company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "section_break_vgyl",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.show_service_bill_section==1",
+   "fieldname": "uploaded_service_bills",
+   "fieldtype": "Table",
+   "label": "Uploaded Service Bills",
+   "options": "PO Condition Change Service Bill File"
   }
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-17 11:27:43.497854",
+ "modified": "2026-04-20 10:41:14.461111",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "PO Condition Change",
