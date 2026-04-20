@@ -314,6 +314,56 @@ frappe.ui.form.on("PO Condition Change", {
 
             }, __("Create"));
         }
+        frm.add_custom_button("Service Bill", function () {
+
+            frm.set_value("show_service_bill_section", 1);
+
+            frm.set_df_property("service_bill_section", "hidden", 0);
+
+            frm.refresh_fields([
+                "show_service_bill_section",
+                "service_type",
+                "request_type",
+                "vendor_type",
+                "service_company",
+                "service_bill_attachment"
+            ]);
+
+            frm.scroll_to_field("service_type");
+
+            frm.save_or_update();
+
+            frappe.show_alert({
+                message: "Service Bill section enabled",
+                indicator: "green"
+            });
+
+        });
+    },
+    service_bill_attachment: function(frm) {
+
+        if (!frm.doc.service_bill_attachment) return;
+
+        let row = frm.add_child("uploaded_service_bills");
+
+        row.attachment = frm.doc.service_bill_attachment;
+        row.service_type = frm.doc.service_type || "";
+        row.request_type = frm.doc.request_type || "";
+        row.vendor_type = frm.doc.vendor_type || "";
+        row.company = frm.doc.service_company || "";
+        row.uploaded_by = frappe.session.user;
+        row.uploaded_on = frappe.datetime.now_datetime();
+
+        frm.refresh_field("uploaded_service_bills");
+
+        frm.set_value("service_bill_attachment", "");
+
+        frm.save_or_update();
+
+        frappe.show_alert({
+            message: "File added successfully",
+            indicator: "green"
+        });
     },
     // 🔹 Attachment Sync hooks
     after_save: function(frm) {
@@ -339,4 +389,16 @@ frappe.ui.form.on("PO Condition Change", {
         }
     }
 
+});
+
+frappe.ui.form.on("PO Condition Change Service Bill File", {
+    view_file: function(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+
+        if (row.attachment) {
+            window.open(row.attachment, "_blank");
+        } else {
+            frappe.msgprint("No file attached");
+        }
+    }
 });
