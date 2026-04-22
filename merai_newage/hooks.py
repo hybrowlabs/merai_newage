@@ -474,28 +474,28 @@ doc_events = {
 
 fixtures = [
     {"dt": "Batch Number Template"},
-    {
-        "dt": "Workflow",
-        "filters": [
-            ["name", "=", "Pre Alert Approval"]
-        ]
-    },
-    {
-        "dt": "Workflow State",
-        "filters": [
-            ["name", "in", [
-                "Draft",
-                "Pending Reporting Head",
-                "Pending SCM Head",
-                "Pending GST Team",
-                "Approved",
-                "Rejected"
-            ]]
-        ]
-    },
-    {
-        "dt": "Workflow Action Master"
-    },
+    # {
+    #     "dt": "Workflow",
+    #     "filters": [
+    #         ["name", "=", "Pre Alert Approval"]
+    #     ]
+    # },
+    # {
+    #     "dt": "Workflow State",
+    #     "filters": [
+    #         ["name", "in", [
+    #             "Draft",
+    #             "Pending Reporting Head",
+    #             "Pending SCM Head",
+    #             "Pending GST Team",
+    #             "Approved",
+    #             "Rejected"
+    #         ]]
+    #     ]
+    # },
+    # {
+    #     "dt": "Workflow Action Master"
+    # },
     {
         "dt": "Web Page",
     },
