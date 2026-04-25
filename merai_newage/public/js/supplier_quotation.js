@@ -6,6 +6,8 @@ frappe.ui.form.on("Supplier Quotation", {
         // toggle_previous_rate(frm);
         set_shipment_details_from_rfq(frm);
 
+        // base rate mandotory only for non-logistics items
+        toggle_base_rate_reqd(frm);
         //supplier REVISION BUTTON
         if (frm.doc.docstatus === 1 && !frm.doc.custom_is_revision) {
 
@@ -134,6 +136,10 @@ frappe.ui.form.on("Supplier Quotation", {
         calculate_freight(frm);
     },
 
+    custom_type: function(frm) {
+        toggle_base_rate_reqd(frm);
+    },
+    
     custom_fsc: function(frm) {
         calculate_freight(frm);
     },
@@ -373,3 +379,15 @@ function set_shipment_details_from_rfq(frm) {
 
 //     frm.refresh_field('items');
 // }
+
+function toggle_base_rate_reqd(frm) {
+    let is_required = frm.doc.custom_type !== "Logistics";
+
+    frm.fields_dict.items.grid.update_docfield_property(
+        'base_rate',
+        'reqd',
+        is_required ? 1 : 0
+    );
+
+    frm.refresh_field('items');
+}
