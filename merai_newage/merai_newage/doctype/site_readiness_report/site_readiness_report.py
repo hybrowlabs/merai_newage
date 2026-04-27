@@ -1,22 +1,21 @@
-# Copyright (c) 2026, Siddhant Hybrowlabs and contributors
-# For license information, please see license.txt
+# # Copyright (c) 2026, Siddhant Hybrowlabs and contributors
+# # For license information, please see license.txt
 
 import frappe
 from frappe.model.document import Document
 
 class SiteReadinessReport(Document):
     def before_insert(self):
+        self.set_default_rows()
 
+    def set_default_rows(self):
         # ---------- POWER TESTING ----------
         if not self.power_testing:
-            self.power_testing = []
-
             power_rows = [
                 {"test_parameters": "B/W Phase & Neutral", "standard_limit": "230 ± 10 volts"},
                 {"test_parameters": "B/W Phase & Earthing", "standard_limit": "230 ± 10 volts"},
                 {"test_parameters": "B/W Neutral & Earthing", "standard_limit": "Less than 2 Volts"}
             ]
-
             for row in power_rows:
                 self.append("power_testing", row)
 
@@ -44,7 +43,6 @@ class SiteReadinessReport(Document):
                     "remarks": "To be ready before departure of installation team from Vapi"
                 }
             ]
-
             for row in pre_rows:
                 self.append("pre_installation_table", row)
 
@@ -67,7 +65,6 @@ class SiteReadinessReport(Document):
                     "remarks": "Photos & surgeon feedback to be recorded and sent to Vapi"
                 }
             ]
-
             for row in sawbone_rows:
                 self.append("sawbone_testing", row)
 
@@ -80,6 +77,12 @@ class SiteReadinessReport(Document):
                     "remarks": "Installation sign-off to be taken from customer"
                 }
             ]
-
             for row in closure_rows:
                 self.append("closure_activity", row)
+
+
+@frappe.whitelist()
+def get_default_rows(doc):
+    doc = frappe.get_doc(frappe.parse_json(doc))
+    doc.set_default_rows()
+    return doc
