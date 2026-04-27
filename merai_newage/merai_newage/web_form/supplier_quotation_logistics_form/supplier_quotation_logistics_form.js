@@ -387,8 +387,8 @@ function fill_items(rfq_items, existing_rates, rfq_name) {
             qty: item.qty,
             uom: item.uom,
             warehouse: item.warehouse || "",
-            rate: rate_map[item.item_code] || 0,
-            amount: (rate_map[item.item_code] || 0) * item.qty,
+            rate: item.custom_rate || rate_map[item.item_code] || 1,
+            amount: (rate_map[item.item_code] || 1) * item.qty,
             request_for_quotation: rfq_name
         };
     });
@@ -471,6 +471,8 @@ function load_form(auction_status) {
                         show_revision_banner(res.message && res.message.name);
 
                         setTimeout(function () {
+                if (bid.custom_shipment_mode)
+                    frappe.web_form.set_value("custom_shipment_mode", bid.custom_shipment_mode);
                 if (bid.custom_airline_name)
                     frappe.web_form.set_value("custom_airline_name", bid.custom_airline_name);
                 if (bid.custom_cw)
@@ -489,6 +491,12 @@ function load_form(auction_status) {
                     frappe.web_form.set_value("custom_ex_words",bid.custom_ex_words)
                 if (bid.custom_total_freight)
                     frappe.web_form.set_value("custom_total_freight", bid.custom_total_freight);
+                if(bid.custom_dc_inr)
+                    frappe.web_form.set_value("custom_dc_inr",bid.custom_dc_inr)
+                if(bid.custom_shipping_line_charges)
+                    frappe.web_form.set_value("custom_shipping_line_charges",bid.custom_shipping_line_charges)
+                if(bid.custom_cfs_charges)
+                    frappe.web_form.set_value("custom_cfs_charges",bid.custom_cfs_charges)
                 if (bid.custom_from_currency)
                     frappe.web_form.set_value("custom_from_currency", bid.custom_from_currency);
                 if (bid.custom_to_currency)
@@ -499,8 +507,6 @@ function load_form(auction_status) {
                     frappe.web_form.set_value("custom_total_freight_inr", bid.custom_total_freight_inr);
                 if (bid.custom_total_landing_pricecinr)
                     frappe.web_form.set_value("custom_total_landing_pricecinr", bid.custom_total_landing_pricecinr);
-                if(bid.custom_dc_inr)
-                    frappe.web_form.set_value("custom_dc_inr",bid.custom_dc_inr)
                 if(bid.custom_transit_day)
                     frappe.web_form.set_value("custom_transit_day",bid.custom_transit_day)
                 if(bid.custom_pickup_location)
@@ -865,11 +871,14 @@ function load_form(auction_status) {
 // ─────────────────────────────────────────
 frappe.web_form.after_load = function () {
     attach_currency_listeners();
+    attach_landing_price_listeners();
+    attach_freight_listeners();   
 };
 
 // Also attach after a short delay as fallback
 setTimeout(function () {
     attach_currency_listeners();
+    attach_freight_listeners();
 }, 1000);
 
 function attach_currency_listeners() {
@@ -912,16 +921,51 @@ function fetch_exchange_rate_webform() {
     });
 }
 
+// Calculate freight in INR whenever total freight or exchange rate changes
 function calculate_freight_inr_webform() {
     const total_freight = parseFloat(frappe.web_form.get_value("custom_total_freight")) || 0;
     const xr            = parseFloat(frappe.web_form.get_value("custom_xrxe_com"))      || 0;
 
     if (total_freight && xr) {
         frappe.web_form.set_value("custom_total_freight_inr", total_freight * xr);
+
+        //  IMPORTANT: trigger landing price calculation
+        setTimeout(function () {
+            calculate_total_landing_price_inr_webform();
+        }, 100);
     }
 }
 
+// Calculate total landing price in INR whenever any of the components change
+function calculate_total_landing_price_inr_webform() {
+    const freight_inr = parseFloat(frappe.web_form.get_value("custom_total_freight_inr")) || 0;
+    const dc          = parseFloat(frappe.web_form.get_value("custom_dc_inr")) || 0;
+    const shipping    = parseFloat(frappe.web_form.get_value("custom_shipping_line_charges")) || 0;
+    const cfs         = parseFloat(frappe.web_form.get_value("custom_cfs_charges")) || 0;
 
+    const total = freight_inr + dc + shipping + cfs;
+
+    frappe.web_form.set_value("custom_total_landing_pricecinr", total);
+}
+
+
+function attach_landing_price_listeners() {
+    const fields = [
+        "custom_dc_inr",
+        "custom_shipping_line_charges",
+        "custom_cfs_charges"
+    ];
+
+    fields.forEach(field => {
+        const selector = `input[data-fieldname="${field}"]`;
+
+        $(document)
+            .off('input change blur', selector)
+            .on('input change blur', selector, function () {
+                calculate_total_landing_price_inr_webform();
+            });
+    });
+}
 
 // Fallback: watch DOM for success page appearance
 const success_observer = new MutationObserver(function () {
@@ -933,3 +977,46 @@ const success_observer = new MutationObserver(function () {
 });
 
 success_observer.observe(document.body, { childList: true, subtree: true });
+
+
+
+function calculate_total_freight_webform() {
+    const rate    = parseFloat(frappe.web_form.get_value("custom_rate_kg")) || 0;
+    const fsc     = parseFloat(frappe.web_form.get_value("custom_fsc")) || 0;
+    const sc      = parseFloat(frappe.web_form.get_value("custom_sc")) || 0;
+    const xray    = parseFloat(frappe.web_form.get_value("custom_xray")) || 0;
+    const weight  = parseFloat(frappe.web_form.get_value("custom_cw")) || 0;
+    const exwords = parseFloat(frappe.web_form.get_value("custom_ex_words")) || 0;
+
+    const total_rate = rate + fsc + sc + xray;
+    const freight    = (total_rate * weight) + exwords;
+
+    frappe.web_form.set_value("custom_total_freight", freight);
+
+    // CRITICAL: chain next calculation
+    setTimeout(function () {
+        calculate_freight_inr_webform();
+    }, 100);
+}
+
+
+function attach_freight_listeners() {
+    const fields = [
+        "custom_rate_kg",
+        "custom_fsc",
+        "custom_sc",
+        "custom_xray",
+        "custom_cw",
+        "custom_ex_words"
+    ];
+
+    fields.forEach(field => {
+        const selector = `input[data-fieldname="${field}"]`;
+
+        $(document)
+            .off('input change blur', selector)
+            .on('input change blur', selector, function () {
+                calculate_total_freight_webform();
+            });
+    });
+}
