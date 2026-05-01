@@ -118,40 +118,100 @@ def Expire_validate_supplier_quotation(doc, method=None):
         frappe.throw("This RFQ has expired. You cannot submit quotation.")
         
         
+# def set_shipment_details_from_rfq(doc, method=None):
+#     """
+#     Fetch shipment details from RFQ to Supplier Quotation
+#     """
+
+#     # Avoid overwrite if already set
+#     if doc.custom_shipment_mode:
+#         return
+
+#     rfq_name = None
+
+#     for item in doc.items:
+#         if item.request_for_quotation:
+#             rfq_name = item.request_for_quotation
+#             break
+
+#     if not rfq_name:
+#         return
+
+#     rfq = frappe.get_doc("Request for Quotation", rfq_name)
+
+#     doc.custom_shipment_mode = rfq.custom_mode_of_shipment
+#     doc.custom_shipment_type = rfq.custom_shipment_type
+#     doc.custom_vol_weightkg = rfq.custom_vol_weight
+#     doc.custom_no_of_pkg_unit = rfq.custom_no_of_pkg_units
+#     doc.custom_actual_weight = rfq.custom_actual_weights
+#     doc.custom_pickup_request = rfq.custom_pickup_request
+#     doc.custom_package_type = rfq.custom_package_type
+#     doc.custom_port_of_loading = rfq.custom_port_of_loading
+#     doc.custom_port_of_destination = rfq.custom_port_of_destination
+#     doc.custom_product_category = rfq.custom_product_category
+#     doc.custom_eda = rfq.custom_eda
+    
+
 def set_shipment_details_from_rfq(doc, method=None):
     """
-    Fetch shipment details from RFQ to Supplier Quotation
+    Map RFQ → Supplier Quotation
+    Includes parent fields and child field (custom_pick_qty)
     """
 
-    # Avoid overwrite if already set
-    if doc.custom_shipment_mode:
+    # Exit if no items exist
+    if not doc.items:
         return
 
-    rfq_name = None
-
-    for item in doc.items:
-        if item.request_for_quotation:
-            rfq_name = item.request_for_quotation
-            break
-
+    # Fetch RFQ from first item (assumes all items belong to same RFQ)
+    rfq_name = doc.items[0].request_for_quotation
     if not rfq_name:
         return
 
+    # Load RFQ document
     rfq = frappe.get_doc("Request for Quotation", rfq_name)
 
-    doc.custom_shipment_mode = rfq.custom_mode_of_shipment
-    doc.custom_shipment_type = rfq.custom_shipment_type
-    doc.custom_vol_weightkg = rfq.custom_vol_weight
-    doc.custom_no_of_pkg_unit = rfq.custom_no_of_pkg_units
-    doc.custom_actual_weight = rfq.custom_actual_weights
-    doc.custom_pickup_request = rfq.custom_pickup_request
-    doc.custom_package_type = rfq.custom_package_type
-    doc.custom_port_of_loading = rfq.custom_port_of_loading
-    doc.custom_port_of_destination = rfq.custom_port_of_destination
-    doc.custom_product_category = rfq.custom_product_category
-    doc.custom_eda = rfq.custom_eda
-    
-    
+    # Map parent-level fields from RFQ to Supplier Quotation
+    field_map = {
+        "custom_shipment_mode": "custom_mode_of_shipment",
+        "custom_shipment_type": "custom_shipment_type",
+        "custom_vol_weightkg": "custom_vol_weight",
+        "custom_no_of_pkg_unit": "custom_no_of_pkg_units",
+        "custom_actual_weight": "custom_actual_weights",
+        "custom_pickup_request": "custom_pickup_request",
+        "custom_package_type": "custom_package_type",
+        "custom_port_of_loading": "custom_port_of_loading",
+        "custom_port_of_destination": "custom_port_of_destination",
+        "custom_product_category": "custom_product_category",
+        "custom_eda": "custom_eda"
+    }
+
+    # Assign values only if target fields are empty
+    for target, source in field_map.items():
+        if not doc.get(target):
+            doc.set(target, rfq.get(source))
+
+    # Build lookup dictionary for RFQ items using item_code
+    rfq_item_map = {}
+    for rfq_item in rfq.items:
+        if rfq_item.item_code:
+            rfq_item_map[rfq_item.item_code] = rfq_item
+
+    # Map custom_pick_qty from RFQ items to Supplier Quotation items
+    for item in doc.items:
+        if not item.item_code:
+            continue
+
+        rfq_item = rfq_item_map.get(item.item_code)
+        if not rfq_item:
+            continue
+
+        # Assign only if value is not already set
+        if not item.custom_pick_qty:
+            item.custom_pick_qty = (
+                float(rfq_item.custom_pick_qty)
+                if rfq_item.custom_pick_qty else 0
+            )
+            
 @frappe.whitelist()
 def get_po_numbers(pr_name):
     pr = frappe.get_doc("Pickup Request", pr_name)
