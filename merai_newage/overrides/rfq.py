@@ -117,125 +117,272 @@ def get_rfq_revisions(rfq_name):
 
     return {"original_rfq": original, "revisions": revisions}
 
+# @frappe.whitelist()
+# def send_supplier_quotation_to_supplier(doc, method):
+#     mail_to_supplier_for_logisitics = frappe.db.get_single_value("Purchase And Selling Settings", "mail_to_supplier_for_logisitics")
+#     print("is_mail_required========",mail_to_supplier_for_logisitics)
+#     if mail_to_supplier_for_logisitics and doc.custom_type == "Logistics":
+#         for supplier_row in doc.suppliers:
+#             supplier_email = None
+
+#             # 1. Try direct email on Supplier master
+#             supplier_email = frappe.db.get_value(
+#                 "Supplier", supplier_row.supplier, "email_id"
+#             )
+
+#             # 2. Fallback: get email via Contact → Dynamic Link
+#             if not supplier_email:
+#                 contact_name = frappe.db.get_value("Dynamic Link", {
+#                     "parenttype": "Contact",
+#                     "link_doctype": "Supplier",
+#                     "link_name": supplier_row.supplier
+#                 }, "parent")
+
+#                 if contact_name:
+#                     supplier_email = frappe.db.get_value(
+#                         "Contact", contact_name, "email_id"
+#                     )
+
+#             if supplier_email:
+#                 form_url = "{}/supplier-quotation-logistics/new?rfq={}&supplier={}".format(
+#                     frappe.utils.get_url(),
+#                     doc.name,
+#                     supplier_row.supplier
+#                 )
+
+#                 items_html = _build_items_table_html(doc.items)
+
+#                 frappe.sendmail(
+#                     recipients=[supplier_email],
+#                     subject="Request for Quotation - {} | {}".format(
+#                         doc.name, doc.company
+#                     ),
+#                     message="""
+#                         <p>Dear Sir/Madam,</p>
+
+#                         <p>Kindly arrange to pickup the shipment as per the details given below.</p>
+
+#                         <table style="border-collapse:collapse;width:700px;font-family:Calibri;font-size:14px" border="1" cellpadding="6">
+#                             <tr><td><b>RFQ Reference Number</b></td><td>{}</td></tr>
+#                             <tr><td><b>RFQ Date</b></td><td>{}</td></tr>
+#                             <tr><td><b>Freight Forwarder</b></td><td>{}</td></tr>
+#                             <tr><td><b>FF Ref No</b></td><td>{}</td></tr>
+#                             <tr><td><b>Frieght Mode</b></td><td>{}</td></tr>
+#                             <tr><td><b>Origin Country</b></td><td>{}</td></tr>
+#                             <tr><td><b>Destination Port</b></td><td>{}</td></tr>
+#                             <tr><td><b>Port Code</b></td><td>{}</td></tr>
+#                             <tr><td><b>Freight Basis</b></td><td>{}</td></tr>
+#                             <tr><td><b>Meril Invoice No</b></td><td>{}</td></tr>
+#                             <tr><td><b>Invoice Date</b></td><td>{}</td></tr>
+#                             <tr><td><b>Shipper Name</b></td><td>{}</td></tr>
+#                             <tr><td><b>Shipment Type</b></td><td>{}</td></tr>
+#                             <tr><td><b>Package Type</b></td><td>{}</td></tr>
+#                             <tr><td><b>PKG Units</b></td><td>{}</td></tr>
+#                             <tr><td><b>Product Category</b></td><td>{}</td></tr>
+#                             <tr><td><b>Vol Weight</b></td><td>{}</td></tr>
+#                             <tr><td><b>Actual Weight (Kg)</b></td><td>{} Kg</td></tr>
+#                             <tr><td><b>Shipment Date Meril</b></td><td>{} Kg</td></tr>
+#                             <tr><td><b>Consignee Name</b></td><td>{}</td></tr>
+#                             <tr><td><b>Remarks</b></td><td>{}</td></tr>
+#                             <tr><td><b>Meril Contact Person</b></td><td>{}</td></tr>
+#                         </table>
+
+#                         <br/>
+
+#                         <p>We request you to submit your quotation for the following items:</p>
+
+#                         {}
+
+#                         <p>Please click the link below to submit your quotation:</p>
+
+#                         <p>
+#                             <a href="{}" style="padding:10px 20px;background:#4CAF50;
+#                                 color:white;text-decoration:none;border-radius:4px;">
+#                                 Submit Quotation
+#                             </a>
+#                         </p>
+
+#                         <br/>
+
+#                         <p>Thanking you,</p>
+
+#                         <br/>
+
+#                         <p><b>{}</b><br/>
+#                         Meril Supply Chain (EXIM)</p>
+#                         """.format(
+#                             rfq=doc.name,
+#                             rfq_date=doc.transaction_date,
+#                             ff=doc.custom_adhoc_partner or "",
+#                             ff_ref=doc.custom_pickup_request or "",
+#                             mode=doc.custom_mode_of_shipment or "",
+#                             country=doc.custom_country or "",
+#                             port=doc.custom_port_of_loading or "",
+#                             port_code=doc.custom_port_code or "",
+#                             incoterm=doc.incoterm or "",
+#                             invoice=doc.custom_supplier_purchase_invoice_no or "",
+#                             invoice_date=doc.custom_invoice_date or "",
+#                             shipper=doc.custom_pickup_supplier_name or "",
+#                             shipment_type=doc.custom_shipment_type or "",
+#                             package_type=doc.custom_package_type or "",
+#                             pkg_units=doc.custom_no_of_pkg_units or "",
+#                             category=doc.custom_product_category or "",
+#                             vol_weight=doc.custom_vol_weight or 0,
+#                             actual_weight=doc.custom_actual_weights or 0,
+#                             shipment_date=doc.custom_shipment_date or "",
+#                             consignee=doc.custom_shipment_address_details or "",
+#                             remarks=doc.custom_remarks or "",
+#                             contact="Binita Panchal",
+#                         )
+#                 )
+#                 frappe.msgprint(
+#                     "Email sent to {} ({})".format(
+#                         supplier_row.supplier, supplier_email
+#                     ), 
+#                     alert=True
+#                 )
+#             else:
+#                 frappe.msgprint(
+#                     "No email found for supplier: {}".format(supplier_row.supplier),
+#                     alert=True,
+#                     indicator="orange"
+#                 )
+
 @frappe.whitelist()
 def send_supplier_quotation_to_supplier(doc, method):
-    mail_to_supplier_for_logisitics = frappe.db.get_single_value("Purchase And Selling Settings", "mail_to_supplier_for_logisitics")
-    print("is_mail_required========",mail_to_supplier_for_logisitics)
-    if mail_to_supplier_for_logisitics and doc.custom_type == "Logistics":
-        for supplier_row in doc.suppliers:
-            supplier_email = None
+    is_enabled = frappe.db.get_single_value(
+        "Purchase And Selling Settings",
+        "mail_to_supplier_for_logisitics"
+    )
 
-            # 1. Try direct email on Supplier master
-            supplier_email = frappe.db.get_value(
-                "Supplier", supplier_row.supplier, "email_id"
-            )
+    if not (is_enabled and doc.custom_type == "Logistics"):
+        return
 
-            # 2. Fallback: get email via Contact → Dynamic Link
-            if not supplier_email:
-                contact_name = frappe.db.get_value("Dynamic Link", {
+    for supplier_row in doc.suppliers:
+        supplier_email = None
+
+        # ----------------------------
+        # 1. Direct email from Supplier
+        # ----------------------------
+        supplier_email = frappe.db.get_value(
+            "Supplier",
+            supplier_row.supplier,
+            "email_id"
+        )
+
+        # ----------------------------
+        # 2. Fallback → Contact
+        # ----------------------------
+        if not supplier_email:
+            contact_name = frappe.db.get_value(
+                "Dynamic Link",
+                {
                     "parenttype": "Contact",
                     "link_doctype": "Supplier",
-                    "link_name": supplier_row.supplier
-                }, "parent")
+                    "link_name": supplier_row.supplier,
+                },
+                "parent",
+            )
 
-                if contact_name:
-                    supplier_email = frappe.db.get_value(
-                        "Contact", contact_name, "email_id"
-                    )
-
-            if supplier_email:
-                form_url = "{}/supplier-quotation-logistics/new?rfq={}&supplier={}".format(
-                    frappe.utils.get_url(),
-                    doc.name,
-                    supplier_row.supplier
+            if contact_name:
+                supplier_email = frappe.db.get_value(
+                    "Contact", contact_name, "email_id"
                 )
 
-                items_html = _build_items_table_html(doc.items)
+        if not supplier_email:
+            frappe.msgprint(
+                f"No email found for supplier: {supplier_row.supplier}",
+                indicator="orange",
+                alert=True,
+            )
+            continue
 
-                frappe.sendmail(
-                    recipients=[supplier_email],
-                    subject="Request for Quotation - {} | {}".format(
-                        doc.name, doc.company
-                    ),
-                    message="""
-                        <p>Dear Sir/Madam,</p>
+        # ----------------------------
+        # URL
+        # ----------------------------
+        form_url = "{}/supplier-quotation-logistics/new?rfq={}&supplier={}".format(
+            frappe.utils.get_url(),
+            doc.name,
+            supplier_row.supplier,
+        )
 
-                        <p>Kindly arrange to pickup the shipment as per the details given below.</p>
+        # ----------------------------
+        # Items Table
+        # ----------------------------
+        items_html = _build_items_table_html(doc.items)
 
-                        <table style="border-collapse:collapse;width:700px;font-family:Calibri;font-size:14px" border="1" cellpadding="6">
-                            <tr><td><b>RFQ Reference Number</b></td><td>{}</td></tr>
-                            <tr><td><b>Destination Country</b></td><td>{}</td></tr>
-                            <tr><td><b>POD</b></td><td>{}</td></tr>
-                            <tr><td><b>Shipper Name</b></td><td>{}</td></tr>
-                            <tr><td><b>Shipper Mode</b></td><td>{}</td></tr>
-                            <tr><td><b>Port of Loading</b></td><td>{}</td></tr>
-                            <tr><td><b>Number of Boxes</b></td><td>{}</td></tr>
-                            <tr><td><b>Actual Weight (Kg)</b></td><td>{} Kg</td></tr>
-                            <tr><td><b>Product Category</b></td><td>{}</td></tr>
-                            <tr><td><b>Shipment Type</b></td><td>{}</td></tr>
-                            <tr><td><b>Pickup DateTime</b></td><td>{}</td></tr>
-                            <tr><td><b>Consignee Name</b></td><td>{}</td></tr>
-                            <tr><td><b>Remarks</b></td><td>{}</td></tr>
-                            <tr><td><b>Meril Contact Person</b></td><td>{}</td></tr>
-                        </table>
+        # ----------------------------
+        # Email Message (FIXED)
+        # ----------------------------
+        message = f"""
+        <p>Dear Sir/Madam,</p>
 
-                        <br/>
+        <p>Kindly arrange to pickup the shipment as per the details given below.</p>
 
-                        <p>We request you to submit your quotation for the following items:</p>
+        <table style="border-collapse:collapse;width:700px;font-family:Calibri;font-size:14px" border="1" cellpadding="6">
+            <tr><td><b>RFQ Reference Number</b></td><td>{doc.name}</td></tr>
+            <tr><td><b>RFQ Date</b></td><td>{doc.transaction_date}</td></tr>
+            <tr><td><b>Freight Forwarder</b></td><td>{supplier_row.supplier_name or supplier_row.supplier}</td></tr>
+            <tr><td><b>FF Ref No</b></td><td>{doc.custom_pickup_request or ""}</td></tr>
+            <tr><td><b>Freight Mode</b></td><td>{doc.custom_mode_of_shipment or ""}</td></tr>
+            <tr><td><b>Origin Country</b></td><td>{doc.custom_country or ""}</td></tr>
+            <tr><td><b>Destination Port</b></td><td>{doc.custom_port_of_loading or ""}</td></tr>
+            <tr><td><b>Port Code</b></td><td>{doc.custom_port_code or ""}</td></tr>
+            <tr><td><b>Freight Basis</b></td><td>{doc.incoterm or ""}</td></tr>
+            <tr><td><b>Meril Invoice No</b></td><td>{doc.custom_supplier_purchase_invoice_no or ""}</td></tr>
+            <tr><td><b>Invoice Date</b></td><td>{doc.custom_invoice_date or ""}</td></tr>
+            <tr><td><b>Shipper Name</b></td><td>{doc.custom_pickup_supplier_name or ""}</td></tr>
+            <tr><td><b>Shipment Type</b></td><td>{doc.custom_shipment_type or ""}</td></tr>
+            <tr><td><b>Package Type</b></td><td>{doc.custom_package_type or ""}</td></tr>
+            <tr><td><b>PKG Units</b></td><td>{doc.custom_no_of_pkg_units or ""}</td></tr>
+            <tr><td><b>Product Category</b></td><td>{doc.custom_product_category or ""}</td></tr>
+            <tr><td><b>Vol Weight</b></td><td>{doc.custom_vol_weight or 0}</td></tr>
+            <tr><td><b>Actual Weight (Kg)</b></td><td>{doc.custom_actual_weights or 0} Kg</td></tr>
+            <tr><td><b>Shipment Date Meril</b></td><td>{doc.custom_shipment_date or ""}</td></tr>
+            <tr><td><b>Consignee Name</b></td><td>{doc.custom_consinee_name or ""}</td></tr>
+            <tr><td><b>Remarks</b></td><td>{doc.custom_remarks or ""}</td></tr>
+            <tr><td><b>Meril Contact Person</b></td><td>Binita Panchal</td></tr>
+        </table>
+    
+        <br/>
 
-                        {}
+        <p>We request you to submit your quotation for the following items:</p>
 
-                        <p>Please click the link below to submit your quotation:</p>
+        {items_html}
 
-                        <p>
-                            <a href="{}" style="padding:10px 20px;background:#4CAF50;
-                                color:white;text-decoration:none;border-radius:4px;">
-                                Submit Quotation
-                            </a>
-                        </p>
+        <p>Please click the link below to submit your quotation:</p>
 
-                        <br/>
+        <p>
+            <a href="{form_url}" style="padding:10px 20px;background:#4CAF50;
+                color:white;text-decoration:none;border-radius:4px;">
+                Submit Quotation
+            </a>
+        </p>
 
-                        <p>Thanking you,</p>
+        <br/>
 
-                        <br/>
+        <p>Thanking you,</p>
 
-                        <p><b>{}</b><br/>
-                        Meril Supply Chain (EXIM)</p>
-                        """.format(
-                            doc.name,
-                            doc.custom_country or "",
-                            doc.custom_port_of_destination or "",
-                            doc.custom_pickup_supplier_name or "",
-                            doc.custom_mode_of_shipment or "",
-                            doc.custom_local_transport_location[0].form_location if doc.custom_local_transport_location else "",
-                            doc.custom_no_of_pkg_units or "",
-                            doc.custom_actual_weights or 0,
-                            doc.custom_product_category or "",
-                            doc.custom_shipment_type or "",
-                            doc.custom_shipment_date or "",
-                            supplier_row.supplier_name or supplier_row.supplier,
-                            doc.custom_remarks or "",
-                            doc.custom_consinee_name or "",
-                            items_html,
-                            form_url,
-                            "Binita Panchal"
-                        )
-                )
-                frappe.msgprint(
-                    "Email sent to {} ({})".format(
-                        supplier_row.supplier, supplier_email
-                    ), 
-                    alert=True
-                )
-            else:
-                frappe.msgprint(
-                    "No email found for supplier: {}".format(supplier_row.supplier),
-                    alert=True,
-                    indicator="orange"
-                )
+        <br/>
 
+        <p><b>{doc.company}</b><br/>
+        Meril Supply Chain (EXIM)</p>
+        """
 
+        # ----------------------------
+        # Send Email
+        # ----------------------------
+        frappe.sendmail(
+            recipients=[supplier_email],
+            subject=f"Request for Quotation - {doc.name} | {doc.company}",
+            message=message,
+        )
+
+        frappe.msgprint(
+            f"Email sent to {supplier_row.supplier} ({supplier_email})",
+            alert=True,
+        )
+        
 def _build_items_table_html(items):
     rows = ""
     for item in items:
@@ -243,16 +390,10 @@ def _build_items_table_html(items):
             <tr>
                 <td style="border:1px solid #ddd;padding:8px">{}</td>
                 <td style="border:1px solid #ddd;padding:8px">{}</td>
-                <td style="border:1px solid #ddd;padding:8px">{}</td>
-                <td style="border:1px solid #ddd;padding:8px">{}</td>
-                <td style="border:1px solid #ddd;padding:8px">{}</td>
             </tr>
         """.format(
             item.item_code,
             item.item_name or "",
-            item.qty,
-            item.custom_rate,
-            item.uom or ""
         )
 
     return """
@@ -261,14 +402,45 @@ def _build_items_table_html(items):
                 <tr style="background:#f2f2f2">
                     <th style="border:1px solid #ddd;padding:8px;text-align:left">Item Code</th>
                     <th style="border:1px solid #ddd;padding:8px;text-align:left">Item Name</th>
-                    <th style="border:1px solid #ddd;padding:8px;text-align:left">Quantity</th>
-                    <th style="border:1px solid #ddd;padding:8px;text-align:left">Rate</th>
-                    <th style="border:1px solid #ddd;padding:8px;text-align:left">UOM</th>
                 </tr>
             </thead>
             <tbody>{}</tbody>
         </table>
     """.format(rows)
+    
+# def _build_items_table_html(items):
+#     rows = ""
+#     for item in items:
+#         rows += """
+#             <tr>
+#                 <td style="border:1px solid #ddd;padding:8px">{}</td>
+#                 <td style="border:1px solid #ddd;padding:8px">{}</td>
+#                 <td style="border:1px solid #ddd;padding:8px">{}</td>
+#                 <td style="border:1px solid #ddd;padding:8px">{}</td>
+#                 <td style="border:1px solid #ddd;padding:8px">{}</td>
+#             </tr>
+#         """.format(
+#             item.item_code,
+#             item.item_name or "",
+#             item.qty,
+#             item.custom_rate,
+#             item.uom or ""
+#         )
+
+#     return """
+#         <table style="border-collapse:collapse;width:100%;margin:15px 0">
+#             <thead>
+#                 <tr style="background:#f2f2f2">
+#                     <th style="border:1px solid #ddd;padding:8px;text-align:left">Item Code</th>
+#                     <th style="border:1px solid #ddd;padding:8px;text-align:left">Item Name</th>
+#                     <th style="border:1px solid #ddd;padding:8px;text-align:left">Quantity</th>
+#                     <th style="border:1px solid #ddd;padding:8px;text-align:left">Rate</th>
+#                     <th style="border:1px solid #ddd;padding:8px;text-align:left">UOM</th>
+#                 </tr>
+#             </thead>
+#             <tbody>{}</tbody>
+#         </table>
+#     """.format(rows)
 
 
 @frappe.whitelist(allow_guest=True)
