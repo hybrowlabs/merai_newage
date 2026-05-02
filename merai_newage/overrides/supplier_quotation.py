@@ -173,16 +173,19 @@ def set_shipment_details_from_rfq(doc, method=None):
     # Map parent-level fields from RFQ to Supplier Quotation
     field_map = {
         "custom_shipment_mode": "custom_mode_of_shipment",
+        "custom_package_type": "custom_package_type",
+        "custom_port_of_destination": "custom_port_of_destination",
         "custom_shipment_type": "custom_shipment_type",
+        "custom_shipment_date": "custom_shipment_date",
+        "custom_eda": "custom_eda",
+        "custom_actual_weight": "custom_actual_weights",
         "custom_vol_weightkg": "custom_vol_weight",
         "custom_no_of_pkg_unit": "custom_no_of_pkg_units",
-        "custom_actual_weight": "custom_actual_weights",
         "custom_pickup_request": "custom_pickup_request",
-        "custom_package_type": "custom_package_type",
         "custom_port_of_loading": "custom_port_of_loading",
-        "custom_port_of_destination": "custom_port_of_destination",
+        "custom_port_code":"custom_port_code",
         "custom_product_category": "custom_product_category",
-        "custom_eda": "custom_eda"
+        "custom_country":"custom_country"
     }
 
     # Assign values only if target fields are empty

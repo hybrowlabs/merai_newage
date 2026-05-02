@@ -51,8 +51,8 @@
   "master_number",
   "job_number",
   "column_break_doqs",
-  "ad_code",
   "check_list_date",
+  "ad_code",
   "penalty",
   "section_items",
   "po_condition_change_items",
@@ -244,7 +244,7 @@
   {
    "fieldname": "loc_frt_vendor",
    "fieldtype": "Link",
-   "label": "Local Freight Vendor",
+   "label": "Local Freight (transporter ) Vendor",
    "options": "Supplier"
   },
   {
@@ -259,11 +259,13 @@
    "label": "Shipment Details"
   },
   {
+   "fetch_from": "pre_alert_req.house_number",
    "fieldname": "house_number",
    "fieldtype": "Data",
    "label": "House Number"
   },
   {
+   "fetch_from": "pre_alert_req.master_number",
    "fieldname": "master_number",
    "fieldtype": "Data",
    "label": "Master Number"
@@ -279,6 +281,7 @@
    "label": "AD Code"
   },
   {
+   "fetch_from": "pre_alert_req.check_list_date",
    "fieldname": "check_list_date",
    "fieldtype": "Date",
    "label": "Checklist Date"
@@ -385,7 +388,7 @@
    "fieldname": "vendor_type",
    "fieldtype": "Select",
    "label": "Vendor Type",
-   "options": "CHA\nCourier\nFreight"
+   "options": "CHA\nTransporters\nCourier\nFreight"
   },
   {
    "fieldname": "column_break_enla",
@@ -423,7 +426,7 @@
  ],
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-20 10:41:14.461111",
+ "modified": "2026-05-02 12:10:35.332229",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "PO Condition Change",
