@@ -301,7 +301,7 @@ def create_purchase_invoice(source_name):
     if hasattr(source, "plant"):
         pi.plant = source.plant
 
-    # 🔥 DIFFERENT LOGIC BASED ON TYPE
+    # DIFFERENT LOGIC BASED ON TYPE
     if source.invoice_type == "Non PO":
 
         if not source.non_po_items:
@@ -540,12 +540,23 @@ def get_supplier_document_details_from_po_new(doc_name=None, po_name=None, suppl
 
     return gate_entry.as_dict()
 
-# supplier quotation revision
+
 @frappe.whitelist()
 def create_revision_supplier_quotation(docname):
 
     source = frappe.get_doc("Supplier Quotation", docname)
 
+    #  base identify
+    base = source.custom_base_quotation or source.name
+
+    #  count revisions
+    revisions = frappe.get_all(
+        "Supplier Quotation",
+        filters={"custom_base_quotation": base},
+        pluck="name"
+    )
+
+    version = len(revisions) + 1
     new_doc = frappe.copy_doc(source)
 
     # reset
@@ -555,13 +566,9 @@ def create_revision_supplier_quotation(docname):
 
     # linking
     new_doc.custom_previous_quotation = source.name
+    new_doc.custom_base_quotation = base
     new_doc.custom_is_revision = 1
-    
-    symbol = frappe.get_cached_value("Currency", source.currency, "symbol")
-    # item logic
-    for item in new_doc.items:
-        item.custom_previous_rate_display = f"{symbol} {item.rate}"
-        item.rate = None
+    new_doc.custom_version = version
 
     new_doc.insert(ignore_permissions=True)
 
