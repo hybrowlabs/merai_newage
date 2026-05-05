@@ -30,15 +30,6 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
-  "modified": "2026-04-06 10:47:47.309820",
-  "name": "Pending GST Team",
-  "style": "",
-  "workflow_state_name": "Pending GST Team"
- },
- {
-  "docstatus": 0,
-  "doctype": "Workflow State",
-  "icon": "",
   "modified": "2026-04-06 10:47:19.094274",
   "name": "Pending Reporting Head",
   "style": "",
@@ -52,5 +43,14 @@
   "name": "Pending SCM Head",
   "style": "",
   "workflow_state_name": "Pending SCM Head"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-04-06 10:47:47.309820",
+  "name": "Pending GST Team",
+  "style": "",
+  "workflow_state_name": "Pending GST Team"
  }
 ]
