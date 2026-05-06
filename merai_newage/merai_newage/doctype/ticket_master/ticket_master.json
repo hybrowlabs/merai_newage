@@ -11,6 +11,7 @@
   "robot_serial_no",
   "hospital_name",
   "state",
+  "spare_receiving_address",
   "column_break_jkk6",
   "type",
   "surgery_no",
@@ -267,15 +268,21 @@
   {
    "fieldname": "status",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Status"
+  },
+  {
+   "fieldname": "spare_receiving_address",
+   "fieldtype": "Small Text",
+   "label": "Spare Receiving Address"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-01-30 15:45:06.234452",
- "modified_by": "Administrator",
+ "modified": "2026-05-05 20:28:12.383434",
+ "modified_by": "prajwal@mail.hybrowlabs.com",
  "module": "Merai Newage",
  "name": "Ticket Master",
  "naming_rule": "By \"Naming Series\" field",

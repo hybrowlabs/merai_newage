@@ -51,51 +51,101 @@ class TicketMaster(Document):
 
 
     def notify_master_admins(self):
-        users = frappe.get_all(
+        doc_url = frappe.utils.get_url_to_form(self.doctype, self.name)
+
+        # ─── Employee details ──────────────────────────────────────────────────
+        raised_by_data = frappe.db.get_value(
+            "Employee", self.raised_by,
+            ["employee_name", "reports_to", "department", "user_id"],
+            as_dict=True
+        ) or {}
+
+        raised_by = raised_by_data.get("employee_name") or self.raised_by
+        manager_of_raiser = raised_by_data.get("reports_to")
+        department = raised_by_data.get("department")
+        raised_by_user_id = raised_by_data.get("user_id")
+        print("rasied by ---",raised_by_user_id,"manager_of_raiser=======",manager_of_raiser)
+        # ─── Collect all recipients ────────────────────────────────────────────
+        recipients = []
+        notify_users = []  # for notification logs
+
+        # Master Admins
+        admin_users = frappe.get_all(
             "Has Role",
             filters={"role": "Master Admin"},
             pluck="parent"
         )
+        for user in admin_users:
+            email = frappe.db.get_value("User", user, "email")
+            if email:
+                recipients.append(email.strip())
+                notify_users.append(user)
 
-        doc_url = frappe.utils.get_url_to_form(
-            self.doctype,
-            self.name
-        )
-        raised_by = frappe.db.get_value("Employee",self.raised_by,"employee_name")
-        department = frappe.db.get_value("Employee",self.raised_by,"department")
+        # Raised By
+        if raised_by_user_id:
+            email = frappe.db.get_value("User", raised_by_user_id, "email")
+            if email:
+                recipients.append(email.strip())
+                notify_users.append(raised_by_user_id)
 
+        # Manager
+        manager_name = None
+        if manager_of_raiser:
+            manager_data = frappe.db.get_value(
+                "Employee", manager_of_raiser,
+                ["employee_name", "user_id"],
+                as_dict=True
+            ) or {}
+            manager_name = manager_data.get("employee_name") or manager_of_raiser
+            if manager_data.get("user_id"):
+                email = frappe.db.get_value("User", manager_data.get("user_id"), "email")
+                if email:
+                    recipients.append(email.strip())
+                    notify_users.append(manager_data.get("user_id"))
+
+        # Remove duplicates
+        recipients = list(set(recipients))
+        notify_users = list(set(notify_users))
+
+        if not recipients:
+            frappe.logger().warning(f"No recipients found for {self.name}")
+            return
+
+        # ─── Single email to all ───────────────────────────────────────────────
         subject = f"Ticket Pending for Review - {self.name}"
         message = f"""
-        <p>Dear Team,</p>
-        <p>A new service ticket has been raised.</p>
-        <b>Ticket Details:</b> <br>
-        <b>Ticket ID:</b> {self.name}<br>
-        <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
-        <b>Hospital Name:</b> {self.hospital_name} <br>
-        <b>Issue:</b> {self.ticket_subject}<br>
-        <b>Issue Reported:</b> {self.issue_reported}<br>
-        <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
-        <b>Department:</b> {department}<br>
-
-        <b>Date & Time:</b> {self.ticket_date_and_time}<br>
-        <p>Kindly review the ticket and proceed further.</p> <br>
-
-        <a href="{doc_url}" 
-        style="background:#007bff;color:#fff;
-        padding:10px 15px;
-        text-decoration:none;
-        border-radius:5px;">
-        Open Ticket
-        </a>
+            <p>Dear Team,</p>
+            <p>A new service ticket has been raised.</p>
+            <b>Ticket Details:</b> <br>
+            <b>Ticket ID:</b> {self.name}<br>
+            <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
+            <b>Hospital Name:</b> {self.hospital_name} <br>
+            <b>Issue:</b> {self.ticket_subject}<br>
+            <b>Issue Reported:</b> {self.issue_reported}<br>
+            <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
+            <b>Manager:</b> {manager_name or 'N/A'}<br>
+            <b>Department:</b> {department or 'N/A'}<br>
+            <b>Date & Time:</b> {self.ticket_date_and_time}<br>
+            <p>Kindly review the ticket and proceed further.</p>
+            <a href="{doc_url}"
+            style="background:#007bff;color:#fff;
+                    padding:10px 15px;
+                    text-decoration:none;
+                    border-radius:5px;">
+                Open Ticket
+            </a>
         """
 
-        for user in users:
-            frappe.sendmail(
-                recipients=user,
-                subject=subject,
-                message=message
-            )
+        frappe.sendmail(
+            recipients=recipients,
+            subject=subject,
+            message=message
+        )
 
+        # ─── Notification logs for all users ──────────────────────────────────
+        for user in notify_users:
+            if user == "Administrator":
+                continue
             frappe.get_doc({
                 "doctype": "Notification Log",
                 "subject": subject,
@@ -104,7 +154,7 @@ class TicketMaster(Document):
                 "document_type": self.doctype,
                 "document_name": self.name
             }).insert(ignore_permissions=True)
-    
+        
     def notify_software_team(self):
         # employee_list = self.software_team_engineer
         users = []
@@ -155,6 +205,8 @@ class TicketMaster(Document):
         """
 
         for user in users:
+            if user == "Administrator":
+                continue
             frappe.sendmail(
                 recipients=user,
                 subject=subject,
@@ -208,6 +260,8 @@ class TicketMaster(Document):
         """
 
         for user in users:
+            if user == "Administrator":
+                continue
             frappe.sendmail(
                 recipients=user,
                 subject=subject,
@@ -328,6 +382,8 @@ class TicketMaster(Document):
         """
 
         for user in users:
+            if user == "Administrator":
+                continue
             frappe.sendmail(
                 recipients=user,
                 subject=subject,
@@ -402,6 +458,8 @@ class TicketMaster(Document):
         """
 
         for user in users:
+            if user == "Administrator":
+                continue
             frappe.sendmail(
                 recipients=user,
                 subject=subject,
@@ -502,3 +560,58 @@ def create_ticket_again(old_doc):
         "naming_series": naming_series
     }
 
+
+import frappe
+
+
+def is_restriction_enabled():
+    """Check if restriction is enabled in Meril Manufacturing Settings."""
+    return frappe.db.get_single_value("Meril Manufacturing Settings", "engineers_cant_see_other_records")
+
+
+def get_permission_query_conditions(user=None):
+    """
+    If restriction enabled AND user has 'Engineers' role → only their own Ticket Master records.
+    All other roles or restriction disabled → see everything.
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if user == "Administrator":
+        return ""
+
+    if "System Manager" in roles:
+        return ""
+
+    # Engineer role + restriction enabled → only their own tickets
+    if is_restriction_enabled() and "Field Engineer" in roles:
+        return f"`tabTicket Master`.owner = '{user}'"
+
+    # All other roles or restriction disabled → no restriction
+    return ""
+
+
+def has_permission(doc, ptype="read", user=None):
+    """
+    If restriction enabled AND user has 'Engineers' role → only their own Ticket Master records.
+    All other roles or restriction disabled → full access.
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if user == "Administrator":
+        return True
+
+    if "System Manager" in roles:
+        return True
+
+    # Engineer role + restriction enabled → only their own tickets
+    if is_restriction_enabled() and "Field Engineer" in roles:
+        return doc.owner == user
+
+    # All other roles or restriction disabled → allow
+    return True
