@@ -70,6 +70,7 @@
   {
    "fieldname": "hospital_name",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Hospital Name",
    "options": "Account Master",
    "read_only_depends_on": "eval:doc.workflow_state!=\"Draft\""
@@ -84,6 +85,7 @@
   {
    "fieldname": "raised_by",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Raised By",
    "options": "Employee",
    "read_only": 1
@@ -122,7 +124,6 @@
   {
    "fieldname": "ticket_subject",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Ticket Subject",
    "reqd": 1
   },
@@ -281,8 +282,8 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-05 20:28:12.383434",
- "modified_by": "prajwal@mail.hybrowlabs.com",
+ "modified": "2026-05-07 10:26:26.081904",
+ "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",
  "naming_rule": "By \"Naming Series\" field",
