@@ -123,7 +123,6 @@ class TicketMaster(Document):
             <b>Issue:</b> {self.ticket_subject}<br>
             <b>Issue Reported:</b> {self.issue_reported}<br>
             <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
-            # <b>Manager:</b> {manager_name or 'N/A'}<br>
             <b>Department:</b> {department or 'N/A'}<br>
             <b>Date & Time:</b> {self.ticket_date_and_time}<br>
             <p>Kindly review the ticket and proceed further.</p>

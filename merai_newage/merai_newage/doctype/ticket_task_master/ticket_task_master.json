@@ -22,6 +22,7 @@
   "dispatch_date",
   "clinical_engineer",
   "service_engineer",
+  "remarks",
   "section_break_w2b2",
   "issue_reported",
   "system_admin_remarks",
@@ -85,7 +86,7 @@
    "fieldname": "docket_no",
    "fieldtype": "Data",
    "label": "Docket No.",
-   "mandatory_depends_on": "eval:doc.dispatch_type==\"By Courier\""
+   "mandatory_depends_on": "eval:doc.workflow_state==\"Pending From Store Team\""
   },
   {
    "depends_on": "eval:doc.dispatch_type==\"By Hand\"",
@@ -143,14 +144,14 @@
    "fieldname": "courier_name",
    "fieldtype": "Data",
    "label": "Courier Name",
-   "mandatory_depends_on": "eval:doc.dispatch_type==\"By Courier\""
+   "mandatory_depends_on": "eval:doc.workflow_state==\"Pending From Store Team\""
   },
   {
    "depends_on": "eval:doc.dispatch_type==\"By Courier\"",
    "fieldname": "dispatch_date",
    "fieldtype": "Date",
    "label": "Dispatch Date",
-   "mandatory_depends_on": "eval:doc.dispatch_type==\"By Courier\""
+   "mandatory_depends_on": "eval:doc.workflow_state==\"Pending From Store Team\""
   },
   {
    "fieldname": "column_break_vkkl",
@@ -197,14 +198,19 @@
    "fieldname": "spare_receiving_address",
    "fieldtype": "Small Text",
    "label": "Spare Receiving Address"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-05 20:29:27.758976",
- "modified_by": "prajwal@mail.hybrowlabs.com",
+ "modified": "2026-05-07 13:44:46.687706",
+ "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Task Master",
  "naming_rule": "Expression (old style)",
