@@ -11,6 +11,7 @@
   "robot_serial_no",
   "hospital_name",
   "state",
+  "spare_receiving_address",
   "column_break_jkk6",
   "type",
   "surgery_no",
@@ -69,6 +70,7 @@
   {
    "fieldname": "hospital_name",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Hospital Name",
    "options": "Account Master",
    "read_only_depends_on": "eval:doc.workflow_state!=\"Draft\""
@@ -83,6 +85,7 @@
   {
    "fieldname": "raised_by",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Raised By",
    "options": "Employee",
    "read_only": 1
@@ -121,7 +124,6 @@
   {
    "fieldname": "ticket_subject",
    "fieldtype": "Data",
-   "in_list_view": 1,
    "label": "Ticket Subject",
    "reqd": 1
   },
@@ -269,13 +271,18 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Status"
+  },
+  {
+   "fieldname": "spare_receiving_address",
+   "fieldtype": "Small Text",
+   "label": "Spare Receiving Address"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-04-07 10:22:38.647282",
+ "modified": "2026-05-07 10:26:26.081904",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",

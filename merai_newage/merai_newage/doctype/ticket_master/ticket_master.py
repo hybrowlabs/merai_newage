@@ -51,51 +51,101 @@ class TicketMaster(Document):
 
 
     def notify_master_admins(self):
-        users = frappe.get_all(
+        doc_url = frappe.utils.get_url_to_form(self.doctype, self.name)
+
+        # ─── Employee details ──────────────────────────────────────────────────
+        raised_by_data = frappe.db.get_value(
+            "Employee", self.raised_by,
+            ["employee_name", "reports_to", "department", "user_id"],
+            as_dict=True
+        ) or {}
+
+        raised_by = raised_by_data.get("employee_name") or self.raised_by
+        manager_of_raiser = raised_by_data.get("reports_to")
+        department = raised_by_data.get("department")
+        raised_by_user_id = raised_by_data.get("user_id")
+        print("rasied by ---",raised_by_user_id,"manager_of_raiser=======",manager_of_raiser)
+        # ─── Collect all recipients ────────────────────────────────────────────
+        recipients = []
+        notify_users = []  # for notification logs
+
+        # Master Admins
+        admin_users = frappe.get_all(
             "Has Role",
             filters={"role": "Master Admin"},
             pluck="parent"
         )
+        for user in admin_users:
+            email = frappe.db.get_value("User", user, "email")
+            if email:
+                recipients.append(email.strip())
+                notify_users.append(user)
 
-        doc_url = frappe.utils.get_url_to_form(
-            self.doctype,
-            self.name
-        )
-        raised_by = frappe.db.get_value("Employee",self.raised_by,"employee_name")
-        department = frappe.db.get_value("Employee",self.raised_by,"department")
+        # Raised By
+        if raised_by_user_id:
+            email = frappe.db.get_value("User", raised_by_user_id, "email")
+            if email:
+                recipients.append(email.strip())
+                notify_users.append(raised_by_user_id)
 
+        # Manager
+        manager_name = None
+        if manager_of_raiser:
+            manager_data = frappe.db.get_value(
+                "Employee", manager_of_raiser,
+                ["employee_name", "user_id"],
+                as_dict=True
+            ) or {}
+            manager_name = manager_data.get("employee_name") or manager_of_raiser
+            if manager_data.get("user_id"):
+                email = frappe.db.get_value("User", manager_data.get("user_id"), "email")
+                if email:
+                    recipients.append(email.strip())
+                    notify_users.append(manager_data.get("user_id"))
+
+        # Remove duplicates
+        recipients = list(set(recipients))
+        notify_users = list(set(notify_users))
+
+        if not recipients:
+            frappe.logger().warning(f"No recipients found for {self.name}")
+            return
+
+        # ─── Single email to all ───────────────────────────────────────────────
         subject = f"Ticket Pending for Review - {self.name}"
         message = f"""
-        <p>Dear Team,</p>
-        <p>A new service ticket has been raised.</p>
-        <b>Ticket Details:</b> <br>
-        <b>Ticket ID:</b> {self.name}<br>
-        <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
-        <b>Hospital Name:</b> {self.hospital_name} <br>
-        <b>Issue:</b> {self.ticket_subject}<br>
-        <b>Issue Reported:</b> {self.issue_reported}<br>
-        <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
-        <b>Department:</b> {department}<br>
-
-        <b>Date & Time:</b> {self.ticket_date_and_time}<br>
-        <p>Kindly review the ticket and proceed further.</p> <br>
-
-        <a href="{doc_url}" 
-        style="background:#007bff;color:#fff;
-        padding:10px 15px;
-        text-decoration:none;
-        border-radius:5px;">
-        Open Ticket
-        </a>
+            <p>Dear Team,</p>
+            <p>A new service ticket has been raised.</p>
+            <b>Ticket Details:</b> <br>
+            <b>Ticket ID:</b> {self.name}<br>
+            <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
+            <b>Hospital Name:</b> {self.hospital_name} <br>
+            <b>Issue:</b> {self.ticket_subject}<br>
+            <b>Issue Reported:</b> {self.issue_reported}<br>
+            <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
+            # <b>Manager:</b> {manager_name or 'N/A'}<br>
+            <b>Department:</b> {department or 'N/A'}<br>
+            <b>Date & Time:</b> {self.ticket_date_and_time}<br>
+            <p>Kindly review the ticket and proceed further.</p>
+            <a href="{doc_url}"
+            style="background:#007bff;color:#fff;
+                    padding:10px 15px;
+                    text-decoration:none;
+                    border-radius:5px;">
+                Open Ticket
+            </a>
         """
 
-        for user in users:
-            frappe.sendmail(
-                recipients=user,
-                subject=subject,
-                message=message
-            )
+        frappe.sendmail(
+            recipients=recipients,
+            subject=subject,
+            message=message
+        )
 
+        # ─── Notification logs for all users ──────────────────────────────────
+        for user in notify_users:
+            if user == "Administrator":
+                continue
             frappe.get_doc({
                 "doctype": "Notification Log",
                 "subject": subject,
@@ -104,7 +154,7 @@ class TicketMaster(Document):
                 "document_type": self.doctype,
                 "document_name": self.name
             }).insert(ignore_permissions=True)
-    
+        
     def notify_software_team(self):
         # employee_list = self.software_team_engineer
         users = []
@@ -155,6 +205,8 @@ class TicketMaster(Document):
         """
 
         for user in users:
+            if user == "Administrator":
+                continue
             frappe.sendmail(
                 recipients=user,
                 subject=subject,
@@ -208,6 +260,8 @@ class TicketMaster(Document):
         """
 
         for user in users:
+            if user == "Administrator":
+                continue
             frappe.sendmail(
                 recipients=user,
                 subject=subject,
@@ -328,6 +382,8 @@ class TicketMaster(Document):
         """
 
         for user in users:
+            if user == "Administrator":
+                continue
             frappe.sendmail(
                 recipients=user,
                 subject=subject,
@@ -402,6 +458,8 @@ class TicketMaster(Document):
         """
 
         for user in users:
+            if user == "Administrator":
+                continue
             frappe.sendmail(
                 recipients=user,
                 subject=subject,
@@ -429,57 +487,122 @@ class TicketMaster(Document):
         return {"success": False, "message": "Task ID not set or wrong workflow state"}
     
     def notify_on_field_engineer_after_resolve(self):
-
         if not self.raised_by:
             return
 
-        user = frappe.db.get_value(
-            "Employee",
-            self.raised_by,
-            "user_id"
-        )
+        doc_url = frappe.utils.get_url_to_form(self.doctype, self.name)
 
-        if not user:
+        # ─── Employee details ──────────────────────────────────────────────────
+        raised_by_data = frappe.db.get_value(
+            "Employee", self.raised_by,
+            ["employee_name", "reports_to", "department", "user_id"],
+            as_dict=True
+        ) or {}
+
+        raised_by = raised_by_data.get("employee_name") or self.raised_by
+        manager_of_raiser = raised_by_data.get("reports_to")
+        department = raised_by_data.get("department")
+        raised_by_user_id = raised_by_data.get("user_id")
+
+        # ─── Collect all recipients ────────────────────────────────────────────
+        recipients = []
+        notify_users = []
+
+        # 1. Master Admins
+        admin_users = frappe.get_all(
+            "Has Role",
+            filters={"role": "Master Admin"},
+            pluck="parent"
+        )
+        for user in admin_users:
+            email = frappe.db.get_value("User", user, "email")
+            if email:
+                recipients.append(email.strip())
+                notify_users.append(user)
+
+        # 2. Backend Team
+        backend_users = frappe.get_all(
+            "Has Role",
+            filters={"role": "Backend Team"},
+            pluck="parent"
+        )
+        for user in backend_users:
+            email = frappe.db.get_value("User", user, "email")
+            if email:
+                recipients.append(email.strip())
+                notify_users.append(user)
+
+        # 3. Raised By
+        if raised_by_user_id:
+            email = frappe.db.get_value("User", raised_by_user_id, "email")
+            if email:
+                recipients.append(email.strip())
+                notify_users.append(raised_by_user_id)
+
+        # 4. Manager
+        manager_name = None
+        if manager_of_raiser:
+            manager_data = frappe.db.get_value(
+                "Employee", manager_of_raiser,
+                ["employee_name", "user_id"],
+                as_dict=True
+            ) or {}
+            manager_name = manager_data.get("employee_name") or manager_of_raiser
+            if manager_data.get("user_id"):
+                email = frappe.db.get_value("User", manager_data.get("user_id"), "email")
+                if email:
+                    recipients.append(email.strip())
+                    notify_users.append(manager_data.get("user_id"))
+
+        # Remove duplicates
+        recipients = list(set(recipients))
+        notify_users = list(set(notify_users))
+
+        if not recipients:
+            frappe.logger().warning(f"No recipients found for {self.name}")
             return
-        ticket_task = "Ticket Master"
-        doc_url = frappe.utils.get_url_to_form(
-            ticket_task,
-            self.task_id
-        )
 
-        subject = f"Ticket - {self.name} has been  Resolved"
+        # ─── Email ────────────────────────────────────────────────────────────
+        subject = f"Ticket - {self.name} has been Resolved"
         message = f"""
-        <p>Dear Team,</p>
-        <p>The following service ticket has been resolved and closed.</p>
-        <b>Ticket Details:</b> <br>
-        <b>Ticket ID:</b> {self.name}<br>
-        <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
-        <b>Hospital Name:</b> {self.hospital_name} <br>
-        <b>Issue Type:</b> {self.issue_type}<br>
-        <b>Remarks:</b> {self.system_admin_remarks}<br>
-        <a href="{doc_url}" 
-        style="background:#007bff;color:#fff;
-        padding:10px 15px;
-        text-decoration:none;
-        border-radius:5px;">
-        Open Ticket
-        </a>
+            <p>Dear Team,</p>
+            <p>The following service ticket has been resolved and closed.</p>
+            <b>Ticket Details:</b> <br>
+            <b>Ticket ID:</b> {self.name}<br>
+            <b>Robot Serial & Batch Number:</b> {self.robot_serial_no}<br>
+            <b>Hospital Name:</b> {self.hospital_name} <br>
+            <b>Issue Type:</b> {self.issue_type}<br>
+            <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
+            <b>Department:</b> {department or 'N/A'}<br>
+            <b>Remarks:</b> {self.system_admin_remarks}<br>
+            <p>Kindly review the ticket for your reference.</p>
+            <a href="{doc_url}"
+            style="background:#007bff;color:#fff;
+                    padding:10px 15px;
+                    text-decoration:none;
+                    border-radius:5px;">
+                Open Ticket
+            </a>
         """
-        
+
         frappe.sendmail(
-            recipients=user,
+            recipients=recipients,
             subject=subject,
             message=message
         )
 
-        frappe.get_doc({
-            "doctype": "Notification Log",
-            "subject": subject,
-            "for_user": user,
-            "type": "Alert",
-            "document_type": self.doctype,
-            "document_name": self.name
-        }).insert(ignore_permissions=True)
+        # ─── Notification logs ────────────────────────────────────────────────
+        for user in notify_users:
+            if user == "Administrator":
+                continue
+            frappe.get_doc({
+                "doctype": "Notification Log",
+                "subject": subject,
+                "for_user": user,
+                "type": "Alert",
+                "document_type": self.doctype,
+                "document_name": self.name
+            }).insert(ignore_permissions=True)
 
 
 @frappe.whitelist()
