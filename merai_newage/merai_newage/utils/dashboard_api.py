@@ -1036,7 +1036,6 @@ def get_ticket_details(ticket_id):
 	except Exception as e:
 		frappe.log_error(f"Error in get_ticket_details: {str(e)}")
 		return None
-	
 import calendar
 @frappe.whitelist()
 def get_monthly_overview(year=None):
@@ -1053,7 +1052,7 @@ def get_monthly_overview(year=None):
         end = f"{year}-{str(m).zfill(2)}-{end_day} 23:59:59"
         
         open_data.append(frappe.db.count('Ticket Master', {'creation': ['between', [start, end]], 'workflow_state': 'Draft'}))
-        pending_data.append(frappe.db.count('Ticket Master', {'creation': ['between', [start, end]], 'workflow_state': ['not in', ['Draft', 'Resolved']]}))
+        pending_data.append(frappe.db.count('Ticket Master', {'creation': ['between', [start, end]], 'workflow_state': ['not in', ['Draft', 'Resolved','Rejected']]}))
         resolved_data.append(frappe.db.count('Ticket Master', {'creation': ['between', [start, end]], 'workflow_state': 'Resolved'}))
     
     return {'months': months, 'open': open_data, 'pending': pending_data, 'resolved': resolved_data}
