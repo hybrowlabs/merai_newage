@@ -465,15 +465,81 @@ def create_todo_for_engineer(task_doc, installation_name):
     }).insert(ignore_permissions=True)
 
 
+# @frappe.whitelist()
+# def update_ticket_master(reference_name, task_doc, previous_state=None):
+#     print("reference_name-----", reference_name, "task_doc====", task_doc)
+#     if isinstance(task_doc, str):
+#         task_doc = json.loads(task_doc)
+
+#     if not reference_name:
+#         return
+
+#     if task_doc.get("workflow_state") != "Approved":
+#         return
+
+#     issue_type = task_doc.get("issue_type")
+
+#     print("previous_state from JS-----", previous_state)
+
+#     # Load the actual Ticket Master doc so hooks fire
+#     ticket_doc = frappe.get_doc("Ticket Master", reference_name)
+
+#     # Set docket number
+#     ticket_doc.docket_number = task_doc.get("docket_no")
+#     ticket_doc.remarks = task_doc.get('remarks')
+#     # Set workflow state based on conditions
+#     if previous_state == "Draft":
+#         ticket_doc.workflow_state = "Resolved"
+#         print("Ticket Master closed → Resolved (was Draft)")
+
+#     elif issue_type == "Hardware" or issue_type=="Software + Service":
+#         ticket_doc.workflow_state = "Pending To Close"
+#         print("Ticket Master → Pending To Close")
+
+#     else:
+#         ticket_doc.workflow_state = "Resolved"
+#         print("Ticket Master closed → Resolved")
+
+#     # Clear and re-insert received_materials
+#     ticket_doc.received_materials = []
+
+#     for row in task_doc.get("robot_materials", []):
+#         ticket_doc.append("received_materials", {
+#             "item": row.get("item"),
+#             "item_name": row.get("item_name"),
+#             "qty": row.get("qty")
+#         })
+
+#     # Save with ignore_permissions so hooks fire properly
+#     ticket_doc.flags.ignore_permissions = True
+#     ticket_doc.save()
+#     frappe.db.commit()
+
+#     # Publish realtime event to refresh Ticket Master on all open tabs
+#     frappe.publish_realtime(
+#         event="doc_update",
+#         message={
+#             "doctype": "Ticket Master",
+#             "name": reference_name
+#         },
+#         doctype="Ticket Master",
+#         docname=reference_name
+#     )
+
+#     return reference_name
+
 @frappe.whitelist()
 def update_ticket_master(reference_name, task_doc, previous_state=None):
+
     print("reference_name-----", reference_name, "task_doc====", task_doc)
+
     if isinstance(task_doc, str):
         task_doc = json.loads(task_doc)
 
     if not reference_name:
         return
 
+    # Only proceed if task is approved
     if task_doc.get("workflow_state") != "Approved":
         return
 
@@ -481,41 +547,82 @@ def update_ticket_master(reference_name, task_doc, previous_state=None):
 
     print("previous_state from JS-----", previous_state)
 
-    # Load the actual Ticket Master doc so hooks fire
+    # =========================================================
+    # LOAD TICKET MASTER
+    # =========================================================
+
     ticket_doc = frappe.get_doc("Ticket Master", reference_name)
 
-    # Set docket number
-    ticket_doc.docket_number = task_doc.get("docket_no")
-    ticket_doc.remarks = task_doc.get('remarks')
-    # Set workflow state based on conditions
-    if previous_state == "Draft":
-        ticket_doc.workflow_state = "Resolved"
-        print("Ticket Master closed → Resolved (was Draft)")
+    # =========================================================
+    # UPDATE COMMON FIELDS
+    # =========================================================
 
-    elif issue_type == "Hardware" or issue_type=="Software + Service":
+    ticket_doc.docket_number = task_doc.get("docket_no")
+    ticket_doc.remarks = task_doc.get("remarks")
+
+    # =========================================================
+    # WORKFLOW STATE LOGIC
+    # =========================================================
+
+    should_submit = False
+
+    # Direct resolve case
+    if previous_state == "Draft":
+
+        ticket_doc.workflow_state = "Resolved"
+        should_submit = True
+
+        print("Ticket Master → Resolved")
+
+    # Hardware flow
+    elif issue_type in ["Hardware", "Software + Service"]:
+
         ticket_doc.workflow_state = "Pending To Close"
+
         print("Ticket Master → Pending To Close")
 
+    # Software flow
     else:
-        ticket_doc.workflow_state = "Resolved"
-        print("Ticket Master closed → Resolved")
 
-    # Clear and re-insert received_materials
-    ticket_doc.received_materials = []
+        ticket_doc.workflow_state = "Resolved"
+        should_submit = True
+
+        print("Ticket Master → Resolved")
+
+    # =========================================================
+    # UPDATE RECEIVED MATERIALS
+    # =========================================================
+
+    ticket_doc.set("received_materials", [])
 
     for row in task_doc.get("robot_materials", []):
+
         ticket_doc.append("received_materials", {
             "item": row.get("item"),
             "item_name": row.get("item_name"),
             "qty": row.get("qty")
         })
 
-    # Save with ignore_permissions so hooks fire properly
+    # =========================================================
+    # SAVE / SUBMIT
+    # =========================================================
+
     ticket_doc.flags.ignore_permissions = True
-    ticket_doc.save()
+
+    if should_submit and ticket_doc.docstatus == 0:
+
+        ticket_doc.submit()
+
+    else:
+
+        ticket_doc.save()
+
     frappe.db.commit()
 
-    # Publish realtime event to refresh Ticket Master on all open tabs
+    # =========================================================
+    # REALTIME REFRESH
+    # =========================================================
+
     frappe.publish_realtime(
         event="doc_update",
         message={
@@ -527,8 +634,6 @@ def update_ticket_master(reference_name, task_doc, previous_state=None):
     )
 
     return reference_name
-
-
 @frappe.whitelist()
 def close_related_ticket(ticket_name, issue_type):
     print("close_related_ticket============534===========")

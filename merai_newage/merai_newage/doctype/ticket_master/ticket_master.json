@@ -12,6 +12,7 @@
   "hospital_name",
   "state",
   "spare_receiving_address",
+  "city",
   "column_break_jkk6",
   "type",
   "surgery_no",
@@ -211,11 +212,11 @@
    "label": "Date of Issue Resolved"
   },
   {
-   "depends_on": "eval:doc.issue_type==\"Software\" || doc.issue_type==\"Software + Service\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && (doc.issue_type==\"Software\" || doc.issue_type==\"Software + Service\")",
    "fieldname": "software_team_engineer",
    "fieldtype": "Table MultiSelect",
    "label": "Software Team Engineer",
-   "mandatory_depends_on": "eval:doc.not_valid==0 && doc.workflow_state!=\"Draft\" && doc.issue_type==\"Software\" ",
+   "mandatory_depends_on": "eval:doc.not_valid==0 && doc.workflow_state!=\"Draft\" &&( doc.issue_type==\"Software\" || doc.issue_type==\"Software + Service\") ",
    "options": "Software Team Members"
   },
   {
@@ -303,15 +304,21 @@
    "fieldname": "defected_materials",
    "fieldtype": "Table",
    "label": "Defected Materials",
-   "mandatory_depends_on": "eval:doc.issue_type==\"Hardware\" || doc.issue_type==\"Software + Service\"",
+   "mandatory_depends_on": "eval:doc.issue_type==\"Hardware\" || doc.issue_type==\"Software + Service\" || doc.issue_type==\"Hardware + Clinical\"",
    "options": "Robot Materials"
+  },
+  {
+   "fetch_from": "hospital_name.city",
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-12 13:07:34.514271",
+ "modified": "2026-05-12 16:02:37.481373",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",

@@ -474,16 +474,16 @@ doc_events = {
 
 fixtures = [
     {"dt": "Batch Number Template"},
-    # {
-    #     "dt": "Workflow",
-    #     "filters": [
-    #         ["name", "in", [
-    #             # "Pre Alert Approval",
-    #             "Pre Alert check list Approval",
-    #             "BOE Entry Approval"
-    #         ]]
-    #     ]
-    # },
+    {
+        "dt": "Workflow",
+        "filters": [
+            ["name", "in", [
+                # "Pre Alert Approval",
+                "Ticket Management",
+                "Task Ticket Management"
+            ]]
+        ]
+    },
     # {
     #     "dt": "Workflow State",
     #     "filters": [
