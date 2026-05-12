@@ -3,6 +3,15 @@
   "docstatus": 0,
   "doctype": "Workflow State",
   "icon": "",
+  "modified": "2026-02-20 10:08:32.534921",
+  "name": "Pending From Checker",
+  "style": "",
+  "workflow_state_name": "Pending From Checker"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
   "modified": "2025-12-15 12:30:09.548600",
   "name": "cancel",
   "style": "",
@@ -232,5 +241,23 @@
   "name": "Submit To HIring Manager",
   "style": "",
   "workflow_state_name": "Submit To HIring Manager"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-05-08 10:29:45.203073",
+  "name": "Pending To Close",
+  "style": "",
+  "workflow_state_name": "Pending To Close"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Workflow State",
+  "icon": "",
+  "modified": "2026-05-08 16:16:36.337484",
+  "name": "Closed",
+  "style": "",
+  "workflow_state_name": "Closed"
  }
 ]

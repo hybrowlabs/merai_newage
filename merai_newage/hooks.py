@@ -339,15 +339,15 @@ doc_events = {
 
 fixtures = [
     {"dt": "Batch Number Template"},
-    # {
-    #     "dt": "Workflow",
-    # },
+    {
+        "dt": "Workflow",
+    },
     {
         "dt": "Web Page",
     },
-    #  {
-    #     "dt": "Workflow State",
-    # },
+     {
+        "dt": "Workflow State",
+    },
 # {"dt": "Property Setter",  "filters": [ ["name", "=", "Work Order-use_multi_level_bom-Check"]] }
     # {"dt": "Property Setter",  "filters": [ ["name", "=", "Material Request-material_request_type-options"]] }
 

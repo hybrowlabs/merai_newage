@@ -12,6 +12,7 @@
   "hospital_name",
   "state",
   "spare_receiving_address",
+  "city",
   "column_break_jkk6",
   "type",
   "surgery_no",
@@ -19,6 +20,7 @@
   "docket_number",
   "date_of_receipt",
   "date_of_issue_resolved",
+  "not_valid",
   "section_break_elia",
   "issue_type",
   "column_break_jbhl",
@@ -28,12 +30,15 @@
   "column_break_u2q7",
   "task_id",
   "priorty",
+  "remarks",
+  "software_task_id",
   "section_break_oehn",
   "raised_by",
   "column_break_ctjq",
   "ticket_date_and_time",
   "section_break_htzg",
   "issue_reported",
+  "defected_materials",
   "system_admin_remarks",
   "section_break_zbbu",
   "received_materials",
@@ -128,12 +133,11 @@
    "reqd": 1
   },
   {
-   "depends_on": "eval:doc.workflow_state!=\"Draft\"",
    "fieldname": "issue_type",
    "fieldtype": "Link",
    "label": "Issue Type",
-   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\"",
-   "options": "Issue Type"
+   "options": "Issue Type",
+   "reqd": 1
   },
   {
    "fieldname": "assign_engineer",
@@ -175,7 +179,7 @@
    "fieldtype": "Section Break"
   },
   {
-   "depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\"",
+   "depends_on": "eval:doc.workflow_state==\"Pending To Close\"",
    "fieldname": "received_materials",
    "fieldtype": "Table",
    "label": "Received Materials",
@@ -190,30 +194,29 @@
    "fieldtype": "Section Break"
   },
   {
-   "depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\"",
+   "depends_on": "eval:doc.workflow_state==\"Pending To Close\" || doc.docstatus==1",
    "fieldname": "docket_number",
    "fieldtype": "Data",
    "label": "Docket Number"
   },
   {
-   "depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\"",
+   "depends_on": "eval:doc.workflow_state==\"Pending To Close\" || doc.docstatus==1",
    "fieldname": "date_of_receipt",
    "fieldtype": "Date",
-   "label": "Date of Receipt",
-   "mandatory_depends_on": "eval:doc.workflow_state==\"Pending To Receive Material\" || doc.workflow_state==\"Received Material\""
+   "label": "Date of Receipt"
   },
   {
-   "depends_on": "eval:doc.workflow_state==\"Received Material\" || doc.workflow_state==\"Issue Resolved\"",
+   "depends_on": "eval:doc.workflow_state==\"Pending To Close\" || doc.docstatus==1",
    "fieldname": "date_of_issue_resolved",
    "fieldtype": "Date",
    "label": "Date of Issue Resolved"
   },
   {
-   "depends_on": "eval:doc.issue_type==\"Software\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && (doc.issue_type==\"Software\" || doc.issue_type==\"Software + Service\")",
    "fieldname": "software_team_engineer",
    "fieldtype": "Table MultiSelect",
    "label": "Software Team Engineer",
-   "mandatory_depends_on": "eval:doc.issue_type==\"Software\"",
+   "mandatory_depends_on": "eval:doc.not_valid==0 && doc.workflow_state!=\"Draft\" &&( doc.issue_type==\"Software\" || doc.issue_type==\"Software + Service\") ",
    "options": "Software Team Members"
   },
   {
@@ -242,7 +245,7 @@
    "fieldname": "priorty",
    "fieldtype": "Select",
    "label": "Priorty",
-   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "mandatory_depends_on": "eval:doc.not_valid==0 && doc.workflow_state!=\"Draft\" && doc.issue_type!=\"Software\" ",
    "options": "\nHigh\nNormal"
   },
   {
@@ -252,11 +255,11 @@
    "label": "Service Engineer Remarks"
   },
   {
-   "depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type!=\"Software\"",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\" && (doc.issue_type!=\"Software\" || doc.issue_type==\"Software + Service\")",
    "fieldname": "backend_team_engineer",
    "fieldtype": "Table MultiSelect",
    "label": "Backend Team Engineer",
-   "mandatory_depends_on": "eval:doc.workflow_state!=\"Draft\" && doc.issue_type!=\"Software\"",
+   "mandatory_depends_on": "eval:doc.not_valid==0 && doc.workflow_state!=\"Draft\" && doc.issue_type!=\"Software\" ",
    "options": "Software Team Members"
   },
   {
@@ -276,13 +279,46 @@
    "fieldname": "spare_receiving_address",
    "fieldtype": "Small Text",
    "label": "Spare Receiving Address"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.workflow_state!=\"Draft\"",
+   "fieldname": "not_valid",
+   "fieldtype": "Check",
+   "label": "Not Valid"
+  },
+  {
+   "fieldname": "software_task_id",
+   "fieldtype": "Link",
+   "label": "Software Task ID",
+   "options": "Ticket Task Master",
+   "read_only": 1
+  },
+  {
+   "fieldname": "defected_materials",
+   "fieldtype": "Table",
+   "label": "Defected Materials",
+   "mandatory_depends_on": "eval:doc.issue_type==\"Hardware\" || doc.issue_type==\"Software + Service\" || doc.issue_type==\"Hardware + Clinical\"",
+   "options": "Robot Materials"
+  },
+  {
+   "fetch_from": "hospital_name.city",
+   "fieldname": "city",
+   "fieldtype": "Data",
+   "label": "City"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-07 10:26:26.081904",
+ "modified": "2026-05-12 16:02:37.481373",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",

@@ -907,11 +907,14 @@ def get_robot_data(where_clause, values):
 		frappe.log_error(f"Error in get_robot_data: {str(e)}")
 		return {"labels": [], "data": []}
 
+import re
+
 
 def get_recent_tickets(where_clause, values, limit=100):
 	"""Get recent tickets for the table - filtered by date range"""
+
 	try:
-		# This will now properly filter by the date range since where_clause includes date filters
+
 		query = f"""
 			SELECT
 				name,
@@ -924,31 +927,85 @@ def get_recent_tickets(where_clause, values, limit=100):
 				priorty,
 				DATEDIFF(NOW(), creation) as days_open,
 				creation,
-				modified
+				modified,
+				raised_by,
+				issue_reported,
+				city
 			FROM `tabTicket Master`
 			{where_clause}
 			ORDER BY creation DESC
 			LIMIT {limit}
 		"""
-		
-		tickets = frappe.db.sql(query, values, as_dict=True)
-		
-		# Get engineers from child table for each ticket
+
+		tickets = frappe.db.sql(
+			query,
+			values,
+			as_dict=True
+		)
+
+		# GET ENGINEERS + CLEAN DESCRIPTION
 		for ticket in tickets:
+
 			try:
+
 				engineers = frappe.db.sql("""
 					SELECT software_engineer
 					FROM `tabSoftware Team Members`
-					WHERE parent = %(parent)s AND software_engineer IS NOT NULL AND software_engineer != ''
-				""", {"parent": ticket.name}, as_dict=True)
-				
-				ticket.engineers = ", ".join([e.software_engineer for e in engineers]) if engineers else "-"
-			except:
+					WHERE parent = %(parent)s
+					AND software_engineer IS NOT NULL
+					AND software_engineer != ''
+				""",
+				{
+					"parent": ticket.name
+				},
+				as_dict=True)
+
+				ticket.engineers = ", ".join([
+					e.software_engineer
+					for e in engineers
+					if e.software_engineer
+				]) if engineers else "-"
+
+			except Exception:
+
 				ticket.engineers = "-"
-		
+
+			# CLEAN ISSUE REPORTED
+			description = ticket.get(
+				"issue_reported"
+			) or ""
+
+			# REMOVE HTML TAGS
+			description = re.sub(
+				r"<[^>]*>",
+				" ",
+				description
+			)
+
+			# REMOVE HTML ENTITIES
+			description = re.sub(
+				r"&nbsp;|&amp;|&lt;|&gt;",
+				" ",
+				description
+			)
+
+			# REMOVE EXTRA SPACES
+			description = re.sub(
+				r"\s+",
+				" ",
+				description
+			).strip()
+
+			ticket.issue_reported = description or "-"
+
 		return tickets
+
 	except Exception as e:
-		frappe.log_error(f"Error in get_recent_tickets: {str(e)}")
+
+		frappe.log_error(
+			f"Error in get_recent_tickets: {str(e)}"
+		)
+
 		return []
 
 
@@ -1052,7 +1109,325 @@ def get_monthly_overview(year=None):
         end = f"{year}-{str(m).zfill(2)}-{end_day} 23:59:59"
         
         open_data.append(frappe.db.count('Ticket Master', {'creation': ['between', [start, end]], 'workflow_state': 'Draft'}))
-        pending_data.append(frappe.db.count('Ticket Master', {'creation': ['between', [start, end]], 'workflow_state': ['not in', ['Draft', 'Resolved']]}))
+        pending_data.append(frappe.db.count('Ticket Master', {'creation': ['between', [start, end]], 'workflow_state': ['not in', ['Draft', 'Resolved','Rejected']]}))
         resolved_data.append(frappe.db.count('Ticket Master', {'creation': ['between', [start, end]], 'workflow_state': 'Resolved'}))
     
     return {'months': months, 'open': open_data, 'pending': pending_data, 'resolved': resolved_data}
+
+
+
+
+# @frappe.whitelist()
+# def get_item_master_list():
+#     items = frappe.get_all("Item", fields=["item_code", "item_name"],
+#                            order_by="item_name asc", limit=500)
+#     return items
+# # for item master
+
+# @frappe.whitelist()
+# def get_defected_materials_report(items):
+#     import json
+
+#     if isinstance(items, str):
+#         items = json.loads(items)
+
+#     result_items = []
+#     global_counts = {
+#         "total": 0,
+#         "open": 0,
+#         "pending": 0,
+#         "resolved": 0,
+#         "cancelled": 0
+#     }
+
+#     for item_code in items:
+
+#         # Get child rows where item exists
+#         child_rows = frappe.get_all(
+#             "Robot Materials",
+#             filters={"item": item_code},
+#             fields=["parent", "item", "qty"]
+#         )
+
+#         if not child_rows:
+#             continue
+
+#         # Parent Ticket IDs
+#         parent_names = list(set([d.parent for d in child_rows]))
+
+#         # Qty mapping
+#         qty_map = {}
+#         for d in child_rows:
+#             qty_map[d.parent] = d.qty
+
+#         # FETCH FROM TICKET MASTER
+#         tickets = frappe.get_all(
+#             "Ticket Master",
+#             filters={"name": ["in", parent_names]},
+#             fields=[
+#                 "name",
+#                 "creation",
+#                 "robot_serial_no",
+#                 "hospital_name",
+#                 "ticket_subject",
+#                 "city",
+#                 "state",
+#                 "issue_type",
+#                 # "engineers",
+#                 "raised_by",
+#                 "issue_reported",
+#                 "workflow_state"
+#             ]
+#         )
+
+#         counts = {
+#             "total": len(tickets),
+#             "open": 0,
+#             "pending": 0,
+#             "resolved": 0,
+#             "cancelled": 0
+#         }
+
+#         for t in tickets:
+
+#             t["defect_item_code"] = item_code
+#             t["defect_qty"] = qty_map.get(t["name"])
+
+#             state = (t.get("workflow_state") or "").lower()
+
+#             if "resolved" in state:
+#                 counts["resolved"] += 1
+
+#             elif "pending" in state:
+#                 counts["pending"] += 1
+
+#             elif "cancel" in state:
+#                 counts["cancelled"] += 1
+
+#             else:
+#                 counts["open"] += 1
+
+#         # Update global metrics
+#         for k in global_counts:
+#             global_counts[k] += counts[k]
+
+#         item_doc = frappe.db.get_value(
+#             "Item",
+#             item_code,
+#             ["item_code", "item_name"],
+#             as_dict=True
+#         ) or {}
+
+#         result_items.append({
+#             "item_code": item_code,
+#             "item_name": item_doc.get("item_name", item_code),
+#             "metrics": counts,
+#             "tickets": tickets
+#         })
+
+#     return {
+#         "global_metrics": global_counts,
+#         "items": result_items
+#     }
+
+
+import frappe
+import json
+import re
+
+
+@frappe.whitelist()
+def get_item_master_list():
+
+    items = frappe.get_all(
+        "Item",
+        fields=["item_code", "item_name"],
+        order_by="item_name asc",
+        limit=500
+    )
+
+    return items
+
+
+@frappe.whitelist()
+def get_defected_materials_report(items):
+
+    if isinstance(items, str):
+        items = json.loads(items)
+
+    result_items = []
+
+    global_counts = {
+        "total": 0,
+        "open": 0,
+        "pending": 0,
+        "resolved": 0,
+        "cancelled": 0
+    }
+
+    for item_code in items:
+
+        # GET CHILD TABLE ROWS
+        child_rows = frappe.get_all(
+            "Robot Materials",
+            filters={
+                "item": item_code
+            },
+            fields=[
+                "parent",
+                "qty"
+            ]
+        )
+
+        if not child_rows:
+            continue
+
+        # UNIQUE TICKET IDS
+        parent_names = list(set([
+            d.parent for d in child_rows
+        ]))
+
+        # QTY MAP
+        qty_map = {}
+
+        for d in child_rows:
+            qty_map[d.parent] = d.qty
+
+        # GET TICKET MASTER DATA
+        tickets = frappe.get_all(
+            "Ticket Master",
+            filters={
+                "name": ["in", parent_names]
+            },
+            fields=[
+                "name",
+                "creation",
+                "robot_serial_no",
+                "hospital_name",
+                "ticket_subject",
+                "city",
+                "state",
+                "issue_type",
+                "raised_by",
+                "issue_reported",
+                "workflow_state"
+            ]
+        )
+
+        counts = {
+            "total": len(tickets),
+            "open": 0,
+            "pending": 0,
+            "resolved": 0,
+            "cancelled": 0
+        }
+
+        for t in tickets:
+
+            # GET ENGINEERS FROM CHILD TABLE
+            engineer_rows = frappe.get_all(
+                "Software Team Members",
+                filters={
+                    "parent": t.name
+                },
+                fields=[
+                    "software_engineer"
+                ]
+            )
+
+            engineers = ", ".join([
+                row.software_engineer
+                for row in engineer_rows
+                if row.software_engineer
+            ])
+
+            t["engineers"] = engineers or "-"
+
+            # CLEAN DESCRIPTION
+            description = t.get("issue_reported") or ""
+
+            # REMOVE HTML TAGS
+            description = re.sub(
+                r"<[^>]*>",
+                " ",
+                description
+            )
+
+            # REMOVE HTML ENTITIES
+            description = re.sub(
+                r"&nbsp;|&amp;|&lt;|&gt;",
+                " ",
+                description
+            )
+
+            # REMOVE EXTRA SPACES
+            description = re.sub(
+                r"\s+",
+                " ",
+                description
+            ).strip()
+
+            t["issue_reported"] = description or "-"
+
+            # EXTRA DATA
+            t["defect_item_code"] = item_code
+
+            t["defect_qty"] = qty_map.get(
+                t["name"],
+                0
+            )
+
+            # STATUS COUNTS
+            state = (
+                t.get("workflow_state") or ""
+            ).lower()
+
+            if "resolved" in state:
+
+                counts["resolved"] += 1
+
+            elif "pending" in state:
+
+                counts["pending"] += 1
+
+            elif "cancel" in state:
+
+                counts["cancelled"] += 1
+
+            else:
+
+                counts["open"] += 1
+
+        # UPDATE GLOBAL COUNTS
+        for k in global_counts:
+
+            global_counts[k] += counts[k]
+
+        # ITEM DETAILS
+        item_doc = frappe.db.get_value(
+            "Item",
+            item_code,
+            ["item_code", "item_name"],
+            as_dict=True
+        ) or {}
+
+        result_items.append({
+
+            "item_code": item_code,
+
+            "item_name": item_doc.get(
+                "item_name",
+                item_code
+            ),
+
+            "metrics": counts,
+
+            "tickets": tickets
+        })
+
+    return {
+
+        "global_metrics": global_counts,
+
+        "items": result_items
+    }

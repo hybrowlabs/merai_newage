@@ -47,9 +47,28 @@ class TicketMaster(Document):
                 
                 self.notify_backend_team()
                 self._notified_backend_engineer = True
+    def before_save(self):
+        prev_doc = self.get_doc_before_save()
+        prev_state = prev_doc.workflow_state if prev_doc else None
+
+        if prev_state == "Pending From Master Admin":
+            if self.workflow_state == "Resolved":
+                # Bypass all mandatory — only remarks will be checked in validate
+                self.flags.ignore_mandatory = True
             
+            # If Assign Engineer — do nothing, let normal mandatory checks run
 
+    def validate(self):
+        prev_doc = self.get_doc_before_save()
+        prev_state = prev_doc.workflow_state if prev_doc else None
 
+        if prev_state == "Pending From Master Admin":
+            if self.workflow_state == "Resolved":
+                # Only remarks is mandatory
+                if not self.system_admin_remarks:
+                    frappe.throw("System Admin Remarks is mandatory when closing the ticket.")
+        
+        # If Assign Engineer — Frappe handles mandatory normally (ignore_mandatory not set)
     def notify_master_admins(self):
         doc_url = frappe.utils.get_url_to_form(self.doctype, self.name)
 
@@ -166,7 +185,14 @@ class TicketMaster(Document):
             )
             if user:
                 users.append(user)
+        raised_by_user = frappe.db.get_value(
+            "Employee",
+            self.raised_by,
+            "user_id"
+        )
 
+        if raised_by_user and raised_by_user not in users:
+            users.append(raised_by_user)
         ticket_task = "Ticket Task Master"
         doc_url = frappe.utils.get_url_to_form(
             ticket_task,
@@ -343,6 +369,15 @@ class TicketMaster(Document):
             )
             if user:
                 users.append(user)
+        raised_by_user = frappe.db.get_value(
+            "Employee",
+            self.raised_by,
+            "user_id"
+        )
+
+        if raised_by_user and raised_by_user not in users:
+            users.append(raised_by_user)
+
 
         ticket_task = "Ticket Task Master"
         doc_url = frappe.utils.get_url_to_form(
@@ -478,7 +513,7 @@ class TicketMaster(Document):
     def send_backend_notification(self):
         """Send notification to backend engineer after task_id is set"""
         if self.workflow_state == "Pending From Backend Team" and self.task_id:
-            if self.issue_type=="Software":
+            if self.issue_type=="Software" or self.issue_type=="Software + Service":
                     self.notify_software_team()
             self.notify_backend_team()
             return {"success": True}
@@ -519,17 +554,14 @@ class TicketMaster(Document):
                 recipients.append(email.strip())
                 notify_users.append(user)
 
-        # 2. Backend Team
-        backend_users = frappe.get_all(
-            "Has Role",
-            filters={"role": "Backend Team"},
-            pluck="parent"
-        )
-        for user in backend_users:
-            email = frappe.db.get_value("User", user, "email")
-            if email:
-                recipients.append(email.strip())
-                notify_users.append(user)
+        # 2. Backend Team — from child table only (selected people)
+        for row in self.backend_team_engineer:
+            user = frappe.db.get_value("Employee", row.software_engineer, "user_id")
+            if user:
+                email = frappe.db.get_value("User", user, "email")
+                if email:
+                    recipients.append(email.strip())
+                    notify_users.append(user)
 
         # 3. Raised By
         if raised_by_user_id:
@@ -574,6 +606,7 @@ class TicketMaster(Document):
             <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
             <b>Department:</b> {department or 'N/A'}<br>
             <b>Remarks:</b> {self.system_admin_remarks}<br>
+            <b>Closed Reason:</b> {self.remarks}<br>
             <p>Kindly review the ticket for your reference.</p>
             <a href="{doc_url}"
             style="background:#007bff;color:#fff;
@@ -602,7 +635,6 @@ class TicketMaster(Document):
                 "document_type": self.doctype,
                 "document_name": self.name
             }).insert(ignore_permissions=True)
-
 
 @frappe.whitelist()
 def create_ticket_again(old_doc):

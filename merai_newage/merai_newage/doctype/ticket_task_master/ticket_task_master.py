@@ -318,14 +318,82 @@ class TicketTaskMaster(Document):
             "document_name": self.name
         }).insert(ignore_permissions=True)
 
-
-
-
-
+    def validate(self):
+        # Get the state from DB before this save
+        previous_state = frappe.db.get_value("Ticket Task Master", self.name, "workflow_state")
+        
+        # Only enforce remarks if coming from Draft AND moving to Resolved state
+        # (i.e., user clicked Resolve, not Send)
+        if previous_state == "Draft" and self.workflow_state == "Approved" and not self.remarks:
+            frappe.throw("Please fill in <b>Remarks</b> before proceeding.")
 @frappe.whitelist()
 def create_ticket_task(doc):
 
     doc = frappe.parse_json(doc)
+
+    if doc.get("issue_type") == "Software + Service":
+
+        ticket_ref = doc.get("name")
+
+        # =====================================================
+        # BACKEND / HARDWARE TASK  →  TASK-2026050070-HW
+        # =====================================================
+
+        backend_task = frappe.new_doc("Ticket Task Master")
+        backend_task.robot_serial_no = doc.get("robot_serial_no")
+        backend_task.issue_type = "Hardware"
+        backend_task.hospital_name = doc.get("hospital_name")
+        backend_task.issue_reported = doc.get("issue_reported")
+        backend_task.system_admin_remarks = doc.get("system_admin_remarks")
+        backend_task.ticket_master_reference = ticket_ref
+        backend_task.issue_raised_by = doc.get("raised_by")
+        backend_task.dispatch_type = "By Courier"
+
+        for row in doc.get("backend_team_engineer") or []:
+            backend_task.append("assign_engineer", {
+                "software_engineer": row.get("software_engineer")
+            })
+
+        # ✅ This flag tells Frappe: DO NOT auto-generate name, use what I set
+        backend_task.name = f"TASK-{ticket_ref}-HW"
+        backend_task.flags.name_set = True
+
+        backend_task.insert(ignore_permissions=True)
+        frappe.db.commit()
+
+        # =====================================================
+        # SOFTWARE TASK  →  TASK-2026050070-SW
+        # =====================================================
+
+        software_task = frappe.new_doc("Ticket Task Master")
+        software_task.robot_serial_no = doc.get("robot_serial_no")
+        software_task.issue_type = "Software"
+        software_task.hospital_name = doc.get("hospital_name")
+        software_task.issue_reported = doc.get("issue_reported")
+        software_task.system_admin_remarks = doc.get("system_admin_remarks")
+        software_task.ticket_master_reference = ticket_ref
+        software_task.issue_raised_by = doc.get("raised_by")
+
+        for row in doc.get("software_team_engineer") or []:
+            software_task.append("software_team", {
+                "software_engineer": row.get("software_engineer")
+            })
+
+        # ✅ Same flag for software task
+        software_task.name = f"TASK-{ticket_ref}-SW"
+        software_task.flags.name_set = True
+
+        software_task.insert(ignore_permissions=True)
+        frappe.db.commit()
+        print("backend_task=======",backend_task.name,"software_task_id=======",software_task.name)
+        return {
+            "backend_task_id": backend_task.name,   # TASK-2026050070-HW
+            "software_task_id": software_task.name  # TASK-2026050070-SW
+        }
+
+    # =========================================================
+    # EXISTING FLOW (unchanged)
+    # =========================================================
 
     new_task = frappe.new_doc("Ticket Task Master")
     new_task.robot_serial_no = doc.get("robot_serial_no")
@@ -334,35 +402,28 @@ def create_ticket_task(doc):
     new_task.issue_reported = doc.get("issue_reported")
     new_task.system_admin_remarks = doc.get("system_admin_remarks")
     new_task.ticket_master_reference = doc.get("name")
-    # new_task.assign_engineer = doc.get("assign_engineer")
     new_task.issue_raised_by = doc.get("raised_by")
 
     if doc.get("issue_type") == "Hardware + Clinical":
         new_task.dispatch_type = "By Hand"
-
     elif doc.get("issue_type") == "Hardware":
         new_task.dispatch_type = "By Courier"
 
     if doc.get("issue_type") == "Software":
-
-        for row in doc.get('software_team_engineer'):
+        for row in doc.get("software_team_engineer") or []:
             new_task.append("software_team", {
                 "software_engineer": row.get("software_engineer")
             })
-    elif doc.get("issue_type") != "Software":
-
-        for row in doc.get('backend_team_engineer'):
+    else:
+        for row in doc.get("backend_team_engineer") or []:
             new_task.append("assign_engineer", {
                 "software_engineer": row.get("software_engineer")
             })
-    
 
     new_task.insert(ignore_permissions=True)
+    frappe.db.commit()
+
     return new_task.name
-
-
-
-
 
 from frappe.utils import nowdate
 
@@ -402,15 +463,83 @@ def create_todo_for_engineer(task_doc, installation_name):
         "document_type": "Ticket Master",
         "document_name": installation_name,
     }).insert(ignore_permissions=True)
+
+
+# @frappe.whitelist()
+# def update_ticket_master(reference_name, task_doc, previous_state=None):
+#     print("reference_name-----", reference_name, "task_doc====", task_doc)
+#     if isinstance(task_doc, str):
+#         task_doc = json.loads(task_doc)
+
+#     if not reference_name:
+#         return
+
+#     if task_doc.get("workflow_state") != "Approved":
+#         return
+
+#     issue_type = task_doc.get("issue_type")
+
+#     print("previous_state from JS-----", previous_state)
+
+#     # Load the actual Ticket Master doc so hooks fire
+#     ticket_doc = frappe.get_doc("Ticket Master", reference_name)
+
+#     # Set docket number
+#     ticket_doc.docket_number = task_doc.get("docket_no")
+#     ticket_doc.remarks = task_doc.get('remarks')
+#     # Set workflow state based on conditions
+#     if previous_state == "Draft":
+#         ticket_doc.workflow_state = "Resolved"
+#         print("Ticket Master closed → Resolved (was Draft)")
+
+#     elif issue_type == "Hardware" or issue_type=="Software + Service":
+#         ticket_doc.workflow_state = "Pending To Close"
+#         print("Ticket Master → Pending To Close")
+
+#     else:
+#         ticket_doc.workflow_state = "Resolved"
+#         print("Ticket Master closed → Resolved")
+
+#     # Clear and re-insert received_materials
+#     ticket_doc.received_materials = []
+
+#     for row in task_doc.get("robot_materials", []):
+#         ticket_doc.append("received_materials", {
+#             "item": row.get("item"),
+#             "item_name": row.get("item_name"),
+#             "qty": row.get("qty")
+#         })
+
+#     # Save with ignore_permissions so hooks fire properly
+#     ticket_doc.flags.ignore_permissions = True
+#     ticket_doc.save()
+#     frappe.db.commit()
+
+#     # Publish realtime event to refresh Ticket Master on all open tabs
+#     frappe.publish_realtime(
+#         event="doc_update",
+#         message={
+#             "doctype": "Ticket Master",
+#             "name": reference_name
+#         },
+#         doctype="Ticket Master",
+#         docname=reference_name
+#     )
+
+#     return reference_name
+
 @frappe.whitelist()
 def update_ticket_master(reference_name, task_doc, previous_state=None):
+
     print("reference_name-----", reference_name, "task_doc====", task_doc)
+
     if isinstance(task_doc, str):
         task_doc = json.loads(task_doc)
 
     if not reference_name:
         return
 
+    # Only proceed if task is approved
     if task_doc.get("workflow_state") != "Approved":
         return
 
@@ -418,56 +547,82 @@ def update_ticket_master(reference_name, task_doc, previous_state=None):
 
     print("previous_state from JS-----", previous_state)
 
+    # =========================================================
+    # LOAD TICKET MASTER
+    # =========================================================
+
+    ticket_doc = frappe.get_doc("Ticket Master", reference_name)
+
+    # =========================================================
+    # UPDATE COMMON FIELDS
+    # =========================================================
+
+    ticket_doc.docket_number = task_doc.get("docket_no")
+    ticket_doc.remarks = task_doc.get("remarks")
+
+    # =========================================================
+    # WORKFLOW STATE LOGIC
+    # =========================================================
+
+    should_submit = False
+
+    # Direct resolve case
     if previous_state == "Draft":
-        frappe.db.set_value(
-            "Ticket Master",
-            reference_name,
-            {
-                "workflow_state": "Resolved",
-                "docket_number": task_doc.get("docket_no")
-            }
-        )
-        print("Ticket Master closed → Resolved (was Draft)")
 
-    elif issue_type == "Hardware":
-        frappe.db.set_value(
-            "Ticket Master",
-            reference_name,
-            {
-                "workflow_state": "Pending To Receive Material",
-                "docket_number": task_doc.get("docket_no")
-            }
-        )
-        print("Ticket Master → Pending To Receive Material")
+        ticket_doc.workflow_state = "Resolved"
+        should_submit = True
 
+        print("Ticket Master → Resolved")
+
+    # Hardware flow
+    elif issue_type in ["Hardware", "Software + Service"]:
+
+        ticket_doc.workflow_state = "Pending To Close"
+
+        print("Ticket Master → Pending To Close")
+
+    # Software flow
     else:
-        frappe.db.set_value(
-            "Ticket Master",
-            reference_name,
-            {
-                "workflow_state": "Resolved",
-                "docket_number": task_doc.get("docket_no")
-            }
-        )
-        print("Ticket Master closed → Resolved")
 
-    # Clear and re-insert received_materials
-    frappe.db.delete("Robot Materials", {"parent": reference_name})
+        ticket_doc.workflow_state = "Resolved"
+        should_submit = True
+
+        print("Ticket Master → Resolved")
+
+    # =========================================================
+    # UPDATE RECEIVED MATERIALS
+    # =========================================================
+
+    ticket_doc.set("received_materials", [])
 
     for row in task_doc.get("robot_materials", []):
-        frappe.get_doc({
-            "doctype": "Robot Materials",
-            "parent": reference_name,
-            "parenttype": "Ticket Master",
-            "parentfield": "received_materials",
+
+        ticket_doc.append("received_materials", {
             "item": row.get("item"),
             "item_name": row.get("item_name"),
             "qty": row.get("qty")
-        }).insert(ignore_permissions=True)
+        })
+
+    # =========================================================
+    # SAVE / SUBMIT
+    # =========================================================
+
+    ticket_doc.flags.ignore_permissions = True
+
+    if should_submit and ticket_doc.docstatus == 0:
+
+        ticket_doc.submit()
+
+    else:
+
+        ticket_doc.save()
 
     frappe.db.commit()
 
-    # Publish realtime event FROM SERVER to refresh Ticket Master on all open tabs
+    # =========================================================
+    # REALTIME REFRESH
+    # =========================================================
+
     frappe.publish_realtime(
         event="doc_update",
         message={
@@ -479,22 +634,20 @@ def update_ticket_master(reference_name, task_doc, previous_state=None):
     )
 
     return reference_name
-
-
 @frappe.whitelist()
 def close_related_ticket(ticket_name, issue_type):
+    print("close_related_ticket============534===========")
     if not ticket_name:
         return
 
-    # Only close if NOT Hardware (Hardware needs to go through material receipt first)
     if issue_type == "Hardware":
-        return  # Hardware ticket closed separately after material received
+        return
 
-    frappe.db.set_value(
-        "Ticket Master",
-        ticket_name,
-        "workflow_state",
-        "Resolved"
-    )
+    # Load doc so hooks fire
+    ticket_doc = frappe.get_doc("Ticket Master", ticket_name)
+    ticket_doc.workflow_state = "Resolved"
+    ticket_doc.flags.ignore_permissions = True
+    ticket_doc.save()
     frappe.db.commit()
+
     return ticket_name
