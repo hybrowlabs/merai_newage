@@ -86,6 +86,8 @@ class TicketTaskMaster(Document):
         """
 
         for user in users:
+            if user == "Administrator":
+                continue
             frappe.sendmail(
                 recipients=user,
                 subject=subject,
@@ -133,6 +135,8 @@ class TicketTaskMaster(Document):
         subject = f"New Ticket Assigned - {self.ticket_master_reference} | {self.issue_type}"
 
         for user in users:
+            if user == "Administrator":
+                continue
             message = f"""
             <p>Dear,</p>
             <p>You have been assigned a new ticket.</p>
@@ -559,6 +563,8 @@ def update_ticket_master(reference_name, task_doc, previous_state=None):
 
     ticket_doc.docket_number = task_doc.get("docket_no")
     ticket_doc.remarks = task_doc.get("remarks")
+    ticket_doc.date_of_receipt = task_doc.get("dispatch_date")
+    ticket_doc.courier_name = task_doc.get("courier_name")
 
     # =========================================================
     # WORKFLOW STATE LOGIC

@@ -12,6 +12,12 @@ class TicketMaster(Document):
             if not self.date_of_issue_resolved:
                 self.date_of_issue_resolved = nowdate()
 
+    def before_submit(self):
+        if self.task_id:
+            task_status = frappe.db.get_value("Ticket Task Master",self.task_id,"docstatus")
+            if task_status==0:
+                frappe.throw(f"Please Resolve Ticket Task {self.task_id}")
+
     def on_update(self):
         if not self.workflow_state:
             return
@@ -606,6 +612,9 @@ class TicketMaster(Document):
             <b>Raised By:</b> {raised_by} ({self.raised_by})<br>
             <b>Department:</b> {department or 'N/A'}<br>
             <b>Remarks:</b> {self.system_admin_remarks}<br>
+            <b>Docket No:</b> {self.docket_number}<br>
+            <b>Date Of Receipt:</b> {self.date_of_receipt}<br>
+            <b>Courier Name:</b> {self.courier_name}<br>
             <b>Closed Reason:</b> {self.remarks}<br>
             <p>Kindly review the ticket for your reference.</p>
             <a href="{doc_url}"
