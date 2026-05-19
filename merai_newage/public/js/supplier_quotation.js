@@ -2,7 +2,7 @@ frappe.ui.form.on("Supplier Quotation", {
 	// This trigger will run when the form is refreshed, and it will add a custom button to view the revision history of the RFQ if the document is submitted and is the latest revision.
 	refresh: function (frm) {
 
-        if (frm.doc.custom_is_revision && frm.doc.custom_previous_quotation) {
+        if ((frm.doc.custom_is_revision && frm.doc.custom_previous_quotation) || frm.doc.amended_from ){
 
             if (!frm.custom_compare_added) {
 
@@ -374,16 +374,19 @@ function toggle_base_rate_reqd(frm) {
 	frm.refresh_field("items");
 }
 
-
 function show_comparison(frm) {
 
     let current = frm.doc;
+
+    // revision OR amend source
+    let previous_doc =
+        frm.doc.custom_previous_quotation || frm.doc.amended_from;
 
     frappe.call({
         method: "frappe.client.get",
         args: {
             doctype: "Supplier Quotation",
-            name: frm.doc.custom_previous_quotation
+            name: previous_doc
         },
         callback: function (r) {
 
@@ -391,29 +394,30 @@ function show_comparison(frm) {
 
             let html = `
             <table style="width:100%; border-collapse: collapse;" border="1">
+
                 <tr style="background:#f5f5f5;">
-                    <th>Field</th>
-                    <th>Previous</th>
-                    <th>Current</th>
+                    <th style="padding:8px;">Field</th>
+                    <th style="padding:8px;">Previous</th>
+                    <th style="padding:8px;">Current</th>
                 </tr>
 
                 ${row("Airline Name", prev.custom_airline_name, current.custom_airline_name)}
-                ${row("Cw (Weight)", prev.custom_cw, current.custom_cw)}
-                ${row("Rate/Kg", prev.custom_rate_kg, current.custom_rate_kg)}
-                ${row("FSC", prev.custom_fsc, current.custom_fsc)}
                 ${row("SC", prev.custom_sc, current.custom_sc)}
-                ${row("X-Ray", prev.custom_xray, current.custom_xray)}
-                ${row("Pick up/Origin", prev.custom_pick_uporigin, current.custom_pick_uporigin)}
-                ${row("Ex. Works", prev.custom_ex_words, current.custom_ex_words)}
                 ${row("Total Freight", prev.custom_total_freight, current.custom_total_freight)}
-                ${row("From Currency", prev.custom_from_currency, current.custom_from_currency)}
-                ${row("To Currency", prev.custom_to_currency, current.custom_to_currency)}
-                ${row("xr(xe. com)", prev.custom_xrxe_com, current.custom_xrxe_com)}
                 ${row("Total Freight INR", prev.custom_total_freight_inr, current.custom_total_freight_inr)}
-                ${row("Total Landing Price (INR)", prev.custom_total_landing_pricecinr, current.custom_total_landing_pricecinr)}
-                ${row("DC (INR)", prev.custom_dc_inr, current.custom_dc_inr)}
-                ${row("Shipping Line Charges", prev.custom_shipping_line_charges, current.custom_shipping_line_charges)}
                 ${row("CFS Charges", prev.custom_cfs_charges, current.custom_cfs_charges)}
+                ${row("Cw (Weight)", prev.custom_cw, current.custom_cw)}
+                ${row("X-Ray", prev.custom_xray, current.custom_xray)}
+                ${row("From Currency", prev.custom_from_currency, current.custom_from_currency)}
+                ${row("Total Landing Price (INR)", prev.custom_total_landing_pricecinr, current.custom_total_landing_pricecinr)}
+                ${row("Rate/Kg", prev.custom_rate_kg, current.custom_rate_kg)}
+                ${row("Pick up/Origin", prev.custom_pick_uporigin, current.custom_pick_uporigin)}
+                ${row("To Currency", prev.custom_to_currency, current.custom_to_currency)}
+                ${row("DC (INR)", prev.custom_dc_inr, current.custom_dc_inr)}
+                ${row("FSC", prev.custom_fsc, current.custom_fsc)}
+                ${row("Ex. Works", prev.custom_ex_words, current.custom_ex_words)}
+                ${row("xr(xe. com)", prev.custom_xrxe_com, current.custom_xrxe_com)}
+                ${row("Shipping Line Charges", prev.custom_shipping_line_charges, current.custom_shipping_line_charges)}
                 ${row("Transit Day", prev.custom_transit_day, current.custom_transit_day)}
 
             </table>
@@ -421,7 +425,7 @@ function show_comparison(frm) {
 
             let d = new frappe.ui.Dialog({
                 title: "Quotation Comparison",
-                size: "large",
+                size: "extra-large",
                 fields: [
                     {
                         fieldtype: "HTML",
@@ -431,23 +435,27 @@ function show_comparison(frm) {
             });
 
             d.fields_dict.comparison_html.$wrapper.html(html);
+
             d.show();
         }
     });
 }
 
 
-// helper (clean code)
+// helper
 function row(label, prev, curr) {
 
     prev = (prev !== undefined && prev !== null && prev !== "") ? prev : 0;
     curr = (curr !== undefined && curr !== null && curr !== "") ? curr : 0;
 
+    // highlight changed values
+    let changed = prev != curr;
+
     return `
-        <tr>
-            <td><b>${label}</b></td>
-            <td>${prev}</td>
-            <td>${curr}</td>
+        <tr ${changed ? 'style="background:#fff3cd;"' : ''}>
+            <td style="padding:8px;"><b>${label}</b></td>
+            <td style="padding:8px;">${prev}</td>
+            <td style="padding:8px;">${curr}</td>
         </tr>
     `;
 }
