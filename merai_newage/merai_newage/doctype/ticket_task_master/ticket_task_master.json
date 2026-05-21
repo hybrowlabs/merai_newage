@@ -23,6 +23,7 @@
   "clinical_engineer",
   "service_engineer",
   "remarks",
+  "internal_remarks",
   "section_break_w2b2",
   "issue_reported",
   "system_admin_remarks",
@@ -203,13 +204,20 @@
    "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "Remarks"
+  },
+  {
+   "fetch_from": "ticket_master_reference.internal_remarks",
+   "fieldname": "internal_remarks",
+   "fieldtype": "Small Text",
+   "label": "Internal Remarks",
+   "permlevel": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-07 13:44:46.687706",
+ "modified": "2026-05-21 11:58:38.393836",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Task Master",

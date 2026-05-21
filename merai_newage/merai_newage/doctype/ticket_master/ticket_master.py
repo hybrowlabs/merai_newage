@@ -54,6 +54,12 @@ class TicketMaster(Document):
                 self.notify_backend_team()
                 self._notified_backend_engineer = True
     def before_save(self):
+        for i in self.defected_materials:
+            if not i.item:
+                frappe.throw("Please Add Defective Materials")
+
+        # if len(self.defected_materials)==0:
+
         prev_doc = self.get_doc_before_save()
         prev_state = prev_doc.workflow_state if prev_doc else None
 

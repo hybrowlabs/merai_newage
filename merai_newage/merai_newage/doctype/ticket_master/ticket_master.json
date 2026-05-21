@@ -22,6 +22,7 @@
   "date_of_issue_resolved",
   "not_valid",
   "courier_name",
+  "internal_remarks",
   "section_break_elia",
   "issue_type",
   "column_break_jbhl",
@@ -319,13 +320,19 @@
    "fieldname": "courier_name",
    "fieldtype": "Data",
    "label": "Courier Name"
+  },
+  {
+   "fieldname": "internal_remarks",
+   "fieldtype": "Small Text",
+   "label": "Internal Remarks",
+   "permlevel": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-05-18 14:43:32.544243",
+ "modified": "2026-05-21 11:45:13.577522",
  "modified_by": "Administrator",
  "module": "Merai Newage",
  "name": "Ticket Master",
