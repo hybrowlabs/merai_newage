@@ -18,7 +18,7 @@ function calculate_dimension_row(frm, cdt, cdn) {
     if (shipment_mode === "Air") {
         divisor = 6000;
     } 
-    else if (shipment_mode === "Ship") {
+    else if (shipment_mode === "Sea") {
         divisor = 1000000;
     } 
     else if (shipment_mode === "Courier") {
@@ -51,11 +51,12 @@ function calculate_dimension_row(frm, cdt, cdn) {
     // Final chargeable logic
     let final_value = 0;
 
-    if (shipment_mode === "Sea") {
-        final_value = total_volume;
-    } else {
-        final_value = Math.max(total_volume, total_gross);
-    }
+    final_value = Math.max(total_volume, total_gross);
+    // if (shipment_mode === "Sea") {
+    //     final_value = total_volume;
+    // } else {
+    //     final_value = Math.max(total_volume, total_gross);
+    // }
 
     frm.set_value("chargeable_weight", flt(final_value, 3));
 }
